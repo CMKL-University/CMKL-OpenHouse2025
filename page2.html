@@ -37,7 +37,7 @@
             overflow: hidden;
         }
         
-        /* Top decorative border - using Group 1.svg like main.html */
+        /* Top decorative border - using Group 1.svg like index.html */
         .top-border {
             position: absolute;
             top: 0;
@@ -53,7 +53,7 @@
             mask-position: center;
         }
         
-        /* Bottom decorative border - using Group 2.svg like main.html */
+        /* Bottom decorative border - using Group 2.svg like index.html */
         .bottom-border {
             position: absolute;
             bottom: 0;
@@ -926,7 +926,7 @@
             if (!userEmail || !userLastName) {
                 console.log('No user session found, redirecting to main page');
                 setTimeout(() => {
-                    window.location.href = 'main.html';
+                    window.location.href = 'index.html';
                 }, 1000);
                 return false;
             }
@@ -1169,7 +1169,7 @@
                     duration: 0.8,
                     easing: 'ease-in'
                 }).finished.then(() => {
-                    window.location.href = 'main.html';
+                    window.location.href = 'index.html';
                 });
             } else {
                 document.body.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-in';
@@ -1177,7 +1177,7 @@
                 document.body.style.transform = 'scale(0.8)';
                 
                 setTimeout(() => {
-                    window.location.href = 'main.html';
+                    window.location.href = 'index.html';
                 }, 800);
             }
         }
