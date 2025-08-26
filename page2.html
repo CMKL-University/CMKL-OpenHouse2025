@@ -8,6 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>CMKL Openhouse 2025 - Your Key</title>
     <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.iife.js"></script>
+    <!-- Configuration -->
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -813,7 +815,7 @@
         <!-- Header section -->
         <div class="header-section cyberpunk-element">
             <div class="header-title">YOUR KEY</div>
-            <div class="header-subtitle">HARTY CMKLUNIVERSITY</div>
+            <div class="header-subtitle" id="lastNameDisplay">LOADING...</div>
         </div>
         
         <!-- Navigation cards -->
@@ -932,6 +934,12 @@
             }
             
             console.log('User session found:', userEmail, userLastName);
+            
+            // Update the header subtitle with the last name
+            if (document.getElementById('lastNameDisplay')) {
+                document.getElementById('lastNameDisplay').textContent = userLastName.toUpperCase();
+            }
+            
             return true;
         }
         
@@ -1298,7 +1306,26 @@
         }
         
         // Enhanced hover effects with VR styling
+        // Function to display user's last name from localStorage
+        function displayUserLastName() {
+            // Get the user's last name from localStorage
+            const userLastName = localStorage.getItem('userLastName');
+            
+            if (userLastName) {
+                // Update the subtitle with the user's last name
+                document.getElementById('lastNameDisplay').textContent = userLastName.toUpperCase();
+                console.log(`Last name displayed from localStorage: ${userLastName}`);
+            } else {
+                // Fallback to GUEST if no last name is found
+                document.getElementById('lastNameDisplay').textContent = "GUEST";
+                console.log("No last name found in localStorage, displaying GUEST");
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Display the user's last name from localStorage
+            displayUserLastName();
+            
             document.querySelectorAll('.nav-card').forEach((card, index) => {
                 card.addEventListener('mouseenter', function() {
                     this.style.filter = 'none';
