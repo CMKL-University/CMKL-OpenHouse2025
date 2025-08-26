@@ -25,6 +25,7 @@ jobs:
   # Build job (for static sites, this just prepares the files)
   build:
     runs-on: ubuntu-latest
+    environment: github-pages
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,13 +33,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Create config.js from environment variables
+      - name: Create config.js from secrets
         run: |
           cat > config.js << EOF
           window.APP_CONFIG = {
-              AIRTABLE_API_KEY: '${{ vars.AIRTABLE_API_KEY }}',
-              AIRTABLE_BASE_ID: '${{ vars.AIRTABLE_BASE_ID }}',
-              AIRTABLE_TABLE_NAME: '${{ vars.AIRTABLE_TABLE_NAME }}'
+              AIRTABLE_API_KEY: '${{ secrets.AIRTABLE_API_KEY }}',
+              AIRTABLE_BASE_ID: '${{ secrets.AIRTABLE_BASE_ID }}',
+              AIRTABLE_TABLE_NAME: '${{ secrets.AIRTABLE_TABLE_NAME }}'
           };
           EOF
 
