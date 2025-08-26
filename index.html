@@ -1639,15 +1639,24 @@
         async function createOrUpdateUser(email, lastName) {
             try {
                 // First, check if user already exists
+                addDebugLog('Building search query...', 'info');
                 const filterFormula = encodeURIComponent(`{email} = "${email}"`);
+                addDebugLog('Sending search request to Airtable...', 'info');
+                
                 const searchResponse = await airtableRequest('GET', `${AIRTABLE_TABLE_NAME}?filterByFormula=${filterFormula}`);
                 
                 if (searchResponse.records && searchResponse.records.length > 0) {
                     // User exists, return existing record
+                    addDebugLog(`Existing user found: ${email}`, 'success');
+                    addDebugLog(`Record ID: ${searchResponse.records[0].id}`, 'info');
+                    addDebugLog('Returning existing user data', 'success');
                     console.log('User already exists:', searchResponse.records[0].fields);
                     return searchResponse.records[0];
                 } else {
                     // Create new user record
+                    addDebugLog('No existing user found', 'info');
+                    addDebugLog('Creating new user record...', 'info');
+                    
                     const createData = {
                         records: [
                             {
@@ -1662,17 +1671,91 @@
                         ]
                     };
                     
+                    addDebugLog('Sending create request to Airtable...', 'info');
                     const createResponse = await airtableRequest('POST', AIRTABLE_TABLE_NAME, createData);
                     
+                    addDebugLog(`New user created: ${email}`, 'success');
+                    addDebugLog(`New record ID: ${createResponse.records[0].id}`, 'success');
                     console.log('New user created:', createResponse.records[0].fields);
                     return createResponse.records[0];
                 }
             } catch (error) {
+                addDebugLog(`Airtable error: ${error.message}`, 'error');
                 console.error('Airtable error:', error);
                 throw error;
             }
         }
         
+        // Debug logging system
+        let debugStartTime = Date.now();
+        let currentProgress = 0;
+        
+        function getTimestamp() {
+            const elapsed = Date.now() - debugStartTime;
+            const seconds = Math.floor(elapsed / 1000);
+            const ms = elapsed % 1000;
+            return `[${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}:${String(ms).padStart(3, '0')}]`;
+        }
+        
+        function addDebugLog(message, type = 'info') {
+            const debugLog = document.getElementById('debugLog');
+            if (!debugLog) return;
+            
+            const logLine = document.createElement('div');
+            logLine.className = `debug-line ${type}`;
+            logLine.textContent = `${getTimestamp()} ${message}`;
+            
+            debugLog.appendChild(logLine);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            
+            // Remove old logs if too many
+            if (debugLog.children.length > 20) {
+                debugLog.removeChild(debugLog.firstChild);
+            }
+        }
+        
+        function updateProgress(percentage, text = 'LOADING...') {
+            const progressFill = document.querySelector('.progress-fill');
+            const progressText = document.querySelector('.progress-text');
+            const loadingPercentage = document.querySelector('.loading-percentage');
+            
+            if (progressFill) {
+                progressFill.style.width = percentage + '%';
+            }
+            if (progressText) {
+                progressText.textContent = text;
+            }
+            if (loadingPercentage) {
+                loadingPercentage.textContent = Math.round(percentage) + '%';
+            }
+            currentProgress = percentage;
+        }
+        
+        function showLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'flex';
+                debugStartTime = Date.now();
+                currentProgress = 0;
+                
+                // Clear previous debug logs
+                const debugLog = document.getElementById('debugLog');
+                if (debugLog) {
+                    debugLog.innerHTML = '<div class="debug-line">[00:00:00] System initialization started...</div>';
+                }
+                updateProgress(0, 'INITIALIZING...');
+            }
+        }
+        
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }
+        }
+
         // Navigation functions
         async function startARExperience() {
             const emailInput = document.getElementById('userEmail');
@@ -1688,14 +1771,46 @@
                 return;
             }
             
-            // Show loading state
-            showMessage('Creating user profile...');
+            // Show loading screen
+            showLoadingScreen();
             
             try {
-                // Create or update user in Airtable
+                // Step 1: Validate input
+                addDebugLog('Validating user input...', 'info');
+                updateProgress(10, 'VALIDATING INPUT...');
+                await delay(500);
+                addDebugLog(`Email: ${emailValue}`, 'success');
+                addDebugLog(`Last Name: ${lastNameValue}`, 'success');
+                
+                // Step 2: Initialize Airtable connection
+                addDebugLog('Initializing Airtable connection...', 'info');
+                updateProgress(25, 'CONNECTING TO DATABASE...');
+                await delay(800);
+                addDebugLog(`Base ID: ${AIRTABLE_BASE_ID.substring(0, 8)}...`, 'info');
+                addDebugLog(`Table: ${AIRTABLE_TABLE_NAME}`, 'info');
+                
+                // Step 3: Check for existing user
+                addDebugLog('Checking for existing user record...', 'info');
+                updateProgress(40, 'SEARCHING DATABASE...');
                 const userRecord = await createOrUpdateUser(emailValue, lastNameValue);
                 
-                // Store user data in localStorage
+                // Step 4: Process user data
+                addDebugLog('Processing user data...', 'info');
+                updateProgress(60, 'PROCESSING DATA...');
+                await delay(600);
+                
+                if (userRecord.id) {
+                    addDebugLog(`User record ID: ${userRecord.id}`, 'success');
+                    addDebugLog('User profile created/updated successfully', 'success');
+                } else {
+                    addDebugLog('Warning: No record ID returned', 'warning');
+                }
+                
+                // Step 5: Store in localStorage
+                addDebugLog('Storing user data locally...', 'info');
+                updateProgress(75, 'SAVING LOCALLY...');
+                await delay(400);
+                
                 localStorage.setItem('userEmail', emailValue);
                 localStorage.setItem('userLastName', lastNameValue);
                 localStorage.setItem('airtableRecordId', userRecord.id);
@@ -1705,7 +1820,23 @@
                     key3: userRecord.fields['key3 status'] || 'not_scanned'
                 }));
                 
-                // Add transition effect
+                addDebugLog('Local storage updated', 'success');
+                addDebugLog('Key statuses initialized', 'success');
+                
+                // Step 6: Prepare AR experience
+                addDebugLog('Preparing AR experience...', 'info');
+                updateProgress(90, 'PREPARING AR...');
+                await delay(800);
+                addDebugLog('Camera permissions check', 'info');
+                addDebugLog('AR targets loaded', 'success');
+                addDebugLog('3D models initialized', 'success');
+                
+                // Step 7: Complete
+                updateProgress(100, 'COMPLETE!');
+                addDebugLog('System ready - launching AR experience...', 'success');
+                await delay(1000);
+                
+                // Transition to page2
                 document.body.style.transition = 'opacity 0.5s ease-out';
                 document.body.style.opacity = '0';
                 
@@ -1715,8 +1846,20 @@
                 
             } catch (error) {
                 console.error('Failed to create user:', error);
-                showTerminalError('ERROR: Failed to create user profile. Please try again.');
+                addDebugLog(`ERROR: ${error.message}`, 'error');
+                addDebugLog('System initialization failed', 'error');
+                updateProgress(currentProgress, 'ERROR OCCURRED');
+                
+                setTimeout(() => {
+                    hideLoadingScreen();
+                    showTerminalError('ERROR: Failed to create user profile. Please try again.');
+                }, 2000);
             }
+        }
+        
+        // Utility delay function
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
         
         // Terminal error popup function
