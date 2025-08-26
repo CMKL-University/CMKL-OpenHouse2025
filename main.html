@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>CMKL Openhouse 2025 - Welcome</title>
+    <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.iife.js"></script>
+    <!-- Configuration -->
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap');
+        
+        body {
+            background: #000616;
+            color: #6be4f0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            margin: 0 auto;
+            background: #000616;
+            max-width: 393px;
+            max-height: 874px;
+            overflow: hidden;
+        }
+        
+        /* Top decorative border - exact from SVG */
+        .top-border {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+        
+        /* Bottom decorative border - exact from SVG */
+        .bottom-border {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+        
+        /* Main title section - using exact SVG positioning */
+        .title-section {
+            position: absolute;
+            left: 50%;
+            top: 70px;
+            transform: translateX(-50%);
+            width: 318px;
+            height: 90px;
+            background-image: url('svg/Group 11.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            /* filter: drop-shadow(0 0 3px #8fc7cc); */
+        }
+        
+        /* Middle sections with exact spacing */
+        .section-divider-1 {
+            position: absolute;
+            left: 50%;
+            top: 260px;
+            transform: translateX(-50%);
+            width: 335px;
+            height: 209px;
+            background-image: url('svg/Group 4.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        /* Futuristic input container */
+        .input-container {
+            position: relative;
+            width: 250px;
+            z-index: 10;
+        }
+        
+        /* Futuristic input fields */
+        .cyber-input {
+            width: 100%;
+            padding: 12px 20px;
+            background: rgba(0, 6, 22, 0.8);
+            border: 2px solid #22B2B9;
+            border-radius: 0;
+            color: #6BE4F0;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 10px rgba(107, 228, 240, 0.3);
+        }
+        
+        .cyber-input::placeholder {
+            color: rgba(107, 228, 240, 0.6);
+            font-style: italic;
+        }
+        
+        
+        /* Glitch animation for placeholders */
+        @keyframes glitch {
+            0%, 100% { 
+                text-shadow: 0.05em 0 0 #ff0040, -0.05em -0.025em 0 #00ffff, 0.025em 0.05em 0 #ffff00;
+                filter: blur(0px);
+            }
+            15% { 
+                text-shadow: 0.05em 0 0 #ff0040, -0.05em -0.025em 0 #00ffff, 0.025em 0.05em 0 #ffff00;
+                filter: blur(0px);
+            }
+            16% { 
+                text-shadow: -0.05em -0.025em 0 #ff0040, 0.025em 0.025em 0 #00ffff, -0.05em -0.05em 0 #ffff00;
+                filter: blur(1px);
+            }
+            49% { 
+                text-shadow: -0.05em -0.025em 0 #ff0040, 0.025em 0.025em 0 #00ffff, -0.05em -0.05em 0 #ffff00;
+                filter: blur(1px);
+            }
+            50% { 
+                text-shadow: 0.025em 0.05em 0 #ff0040, 0.05em 0 0 #00ffff, 0 -0.05em 0 #ffff00;
+                filter: blur(0px);
+            }
+            99% { 
+                text-shadow: 0.025em 0.05em 0 #ff0040, 0.05em 0 0 #00ffff, 0 -0.05em 0 #ffff00;
+                filter: blur(0px);
+            }
+        }
+        
+        .cyber-input:focus {
+            border-color: #6BE4F0;
+            box-shadow: 0 0 20px rgba(107, 228, 240, 0.6);
+            background: rgba(0, 6, 22, 0.9);
+        }
+        
+        .cyber-input:focus::placeholder {
+            color: white;
+        }
+        
+        .cyber-input:hover {
+            border-color: #33E7FF;
+            box-shadow: 0 0 15px rgba(107, 228, 240, 0.4);
+        }
+        
+        /* Cyberpunk corner decorations */
+        .cyber-input::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 15px;
+            height: 15px;
+            border-left: 2px solid #6BE4F0;
+            border-top: 2px solid #6BE4F0;
+            opacity: 0.7;
+        }
+        
+        .cyber-input::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 15px;
+            height: 15px;
+            border-right: 2px solid #6BE4F0;
+            border-bottom: 2px solid #6BE4F0;
+            opacity: 0.7;
+        }
+
+        /* Background matrix text elements */
+        .matrix-element-1 {
+            position: absolute;
+            left: 15%;
+            top: 300px;
+            width: 82px;
+            height: 48px;
+            background-image: url('svg/Group-1.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.4;
+        }
+        
+        .matrix-element-2 {
+            /* Group-3.svg positioned based on Figma Group 2: inset-[60.64%_74.34%_32.95%_-20.65%] */
+            position: absolute;
+            left: -20.65%;
+            top: 60.64%;
+            right: 74.34%;
+            bottom: 32.95%;
+            background-image: url('svg/Group-3.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.3;
+            mix-blend-mode: screen;
+        }
+        
+        .matrix-element-3 {
+            position: absolute;
+            left: 25%;
+            top: 400px;
+            width: 200px;
+            height: 25px;
+            background-image: url('svg/Group-2.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.5;
+        }
+        
+        /* Additional Group SVG elements - positioned based on Figma exact coordinates */
+        .matrix-element-4 {
+            /* Group.svg - large element at bottom: inset-[89.7%_-4.77%_5.47%_69.9%] */
+            position: absolute;
+            left: 69.9%;
+            top: 89.7%;
+            right: -4.77%;
+            bottom: 5.47%;
+            background-image: url('svg/Group.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.15;
+            mix-blend-mode: screen;
+        }
+        
+        .matrix-element-5 {
+            /* Group 3.svg - left side element: inset-[23.57%_-8.47%_67.39%_78.36%] */
+            position: absolute;
+            left: 78.36%;
+            top: 23.57%;
+            right: -8.47%;
+            bottom: 67.39%;
+            background-image: url('svg/Group 3.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.4;
+        }
+        
+        .matrix-element-6 {
+            position: absolute;
+            left: 5%;
+            top: 200px;
+            width: 130px;
+            height: 75px;
+            background-image: url('svg/Group 5.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.35;
+        }
+        
+        .matrix-element-7 {
+            /* Group 10.svg - right side: inset-[20.14%_58.09%_71.35%_-2.98%] */
+            position: absolute;
+            left: -2.98%;
+            top: 20.14%;
+            right: 58.09%;
+            bottom: 71.35%;
+            background-image: url('svg/Group 10.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.3;
+        }
+        
+        .matrix-element-8 {
+            /* Group 13.svg - with rotation: inset-[51.26%_-21.36%_32.41%_85.82%] rotate-[42.167deg] */
+            position: absolute;
+            left: 85.82%;
+            top: 51.26%;
+            right: -21.36%;
+            bottom: 32.41%;
+            background-image: url('svg/Group 13.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.35;
+            transform: rotate(42.167deg);
+        }
+        
+        .matrix-element-9 {
+            /* Group (left side): inset-[33.98%_-18.61%_60.62%_79.6%] */
+            position: absolute;
+            left: 79.6%;
+            top: 33.98%;
+            right: -18.61%;
+            bottom: 60.62%;
+            background-image: url('svg/Group.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.3;
+            mix-blend-mode: screen;
+        }
+        
+        /* Navigation cards section */
+        .nav-cards {
+            position: absolute;
+            left: 50%;
+            top: 540px;
+            transform: translateX(-50%);
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .nav-card {
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            width: 220px;
+            height: 52px;
+            position: relative;
+        }
+        
+        .nav-card:nth-child(1) {
+            background-image: url('svg/Group 9.svg');
+        }
+        
+        .nav-card:nth-child(2) {
+            background-image: url('svg/Group 9_2.svg');
+        }
+        
+        .nav-card:nth-child(3) {
+            background-image: url('svg/Group 9_3.svg');
+        }
+        
+        
+        .nav-card:hover {
+            filter: brightness(1.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-card-icon {
+            display: none;
+        }
+        
+        .nav-card-text {
+            display: none;
+        }
+        
+        /* Bottom indicator - exact from Vector.svg */
+        .bottom-indicator {
+            position: absolute;
+            bottom: 10px;
+            margin-bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 41px;
+            background-image: url('svg/Vector.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .bottom-indicator:hover {
+            filter: brightness(1.2);
+            transform: translateX(-50%) scale(1.1);
+        }
+        
+        
+        /* Center triangle indicator */
+        .center-triangle {
+            position: absolute;
+            left: calc(50% - 160px);
+            top: 280px;
+            transform: rotate(90deg);
+            width: 20px;
+            height: 15px;
+            border: 2px solid #6BE4F0;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            background: transparent;
+            z-index: 15;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .main-container {
+                max-width: 100vw;
+                max-height: 100vh;
+            }
+            
+            .top-border, .bottom-border {
+                width: 95vw;
+                max-width: 400px;
+                height: 20px;
+            }
+            
+            .title-section {
+                width: 85vw;
+                max-width: 318px;
+                top: 8vh;
+            }
+            
+            .section-divider-1 {
+                width: 90vw;
+                max-width: 335px;
+                top: 28vh;
+            }
+            
+            .section-divider-2 {
+                width: 90vw;
+                max-width: 335px;
+                top: 50vh;
+            }
+            
+            .center-triangle {
+                top: 36vh;
+            }
+            
+            .nav-cards {
+                width: 90vw;
+                max-width: 220px;
+                top: 65vh;
+            }
+            
+            .bottom-indicator {
+                bottom: 8vh;
+            }
+            
+            .matrix-element-1 {
+                left: 5%;
+                top: 32vh;
+                width: 60px;
+                height: 36px;
+            }
+            
+            .matrix-element-2 {
+                right: 5%;
+                top: 58vh;
+                width: 80px;
+                height: 45px;
+            }
+            
+            .matrix-element-3 {
+                left: 15%;
+                top: 45vh;
+                width: 90px;
+                height: 10px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .nav-cards {
+                gap: 8px;
+            }
+            
+            .nav-card {
+                transform: scale(0.85);
+                width: 200px;
+                height: 47px;
+            }
+            
+        }
+        
+        @media (min-width: 481px) and (max-width: 768px) {
+            .main-container {
+                max-width: 450px;
+            }
+            
+            .title-section {
+                top: 10vh;
+            }
+            
+            .section-divider-1 {
+                top: 30vh;
+            }
+            
+            .center-triangle {
+                top: 38vh;
+            }
+            
+            .nav-cards {
+                top: 68vh;
+            }
+            
+            .matrix-element-1 {
+                top: 34vh;
+            }
+            
+            .matrix-element-2 {
+                top: 60vh;
+            }
+            
+            .matrix-element-3 {
+                top: 47vh;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .main-container {
+                max-width: 393px;
+                max-height: 874px;
+                margin: 0 auto;
+                transform: scale(1);
+            }
+            
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+            }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (orientation: landscape) and (max-height: 600px) {
+            .main-container {
+                height: 100vh;
+                max-height: none;
+                overflow-y: auto;
+            }
+            
+            .title-section {
+                top: 5vh;
+            }
+            
+            .section-divider-1 {
+                top: 20vh;
+            }
+            
+            .center-triangle {
+                top: 25vh;
+            }
+            
+            .nav-cards {
+                top: 45vh;
+                gap: 8px;
+            }
+            
+            .nav-card {
+                padding: 10px 15px;
+            }
+            
+            .bottom-indicator {
+                bottom: 5vh;
+            }
+        }
+        
+        /* Loading animation */
+        .loading {
+            opacity: 1;
+        }
+        
+        /* Initial hidden state for cyberpunk animation */
+        .cyberpunk-element {
+            opacity: 0;
+            filter: brightness(0);
+        }
+        
+        /* Cyberpunk flickering animation */
+        @keyframes cyberpunkFlicker {
+            0% { opacity: 0; filter: brightness(0) drop-shadow(0 0 0px #6be4f0); }
+            10% { opacity: 0.3; filter: brightness(0.3) drop-shadow(0 0 5px #6be4f0); }
+            15% { opacity: 0; filter: brightness(0) drop-shadow(0 0 0px #6be4f0); }
+            25% { opacity: 0.8; filter: brightness(0.8) drop-shadow(0 0 10px #6be4f0); }
+            30% { opacity: 0.2; filter: brightness(0.2) drop-shadow(0 0 3px #6be4f0); }
+            40% { opacity: 1; filter: brightness(1.2) drop-shadow(0 0 15px #6be4f0); }
+            45% { opacity: 0.7; filter: brightness(0.7) drop-shadow(0 0 8px #6be4f0); }
+            55% { opacity: 1; filter: brightness(1) drop-shadow(0 0 12px #6be4f0); }
+            60% { opacity: 0.9; filter: brightness(0.9) drop-shadow(0 0 10px #6be4f0); }
+            100% { opacity: 1; filter: brightness(1) drop-shadow(0 0 8px #6be4f0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container loading">
+        
+        <!-- Top decorative border -->
+        <div class="top-border cyberpunk-element"></div>
+        
+        <!-- Main title section -->
+        <div class="title-section cyberpunk-element"></div>
+        
+        <!-- Section dividers -->
+        <div class="section-divider-1 cyberpunk-element">
+            <div class="input-container">
+                <input type="email" class="cyber-input" placeholder="Enter your email..." id="userEmail">
+            </div>
+            <div class="input-container">
+                <input type="text" class="cyber-input" placeholder="Enter your last name..." id="userLastName">
+            </div>
+        </div>
+        <div class="center-triangle cyberpunk-element"></div>
+        <div class="section-divider-2 cyberpunk-element"></div>
+        
+        <!-- Matrix background elements -->
+        <div class="matrix-element-1 cyberpunk-element"></div>
+        <div class="matrix-element-2 cyberpunk-element"></div>
+        <div class="matrix-element-3 cyberpunk-element"></div>
+        <div class="matrix-element-4 cyberpunk-element"></div>
+        <div class="matrix-element-5 cyberpunk-element"></div>
+        <div class="matrix-element-7 cyberpunk-element"></div>
+        <div class="matrix-element-8 cyberpunk-element"></div>
+        <div class="matrix-element-9 cyberpunk-element"></div>
+        
+        <!-- Navigation cards -->
+        <div class="nav-cards">
+            <div class="nav-card cyberpunk-element" onclick="startARExperience()"></div>
+            <div class="nav-card cyberpunk-element" onclick="showAbout()"></div>
+            <div class="nav-card cyberpunk-element" onclick="showPrograms()"></div>
+        </div>
+        
+        <!-- Bottom indicator -->
+        <div class="bottom-indicator cyberpunk-element" onclick="scrollToTop()"></div>
+        
+        <!-- Bottom decorative border -->
+        <div class="bottom-border cyberpunk-element"></div>
+    </div>
+    
+    <script>
+        // Initialize page with cyberpunk flickering animation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('CMKL Openhouse 2025 - Main Page Loaded');
+            
+            // Cyberpunk animation sequence
+            const cyberpunkElements = [
+                '.top-border',
+                '.bottom-border', 
+                '.title-section',
+                '.section-divider-1',
+                '.center-triangle',
+                '.matrix-element-1',
+                '.matrix-element-2', 
+                '.matrix-element-3',
+                '.matrix-element-4',
+                '.matrix-element-5',
+                '.matrix-element-6',
+                '.matrix-element-7',
+                '.matrix-element-8',
+                '.matrix-element-9',
+                '.nav-card:nth-child(1)',
+                '.nav-card:nth-child(2)',
+                '.nav-card:nth-child(3)',
+                '.bottom-indicator'
+            ];
+            
+            // Animate elements in sequence using Motion.js
+            setTimeout(() => {
+                if (typeof Motion !== 'undefined') {
+                    cyberpunkElements.forEach((selector, index) => {
+                        const element = document.querySelector(selector);
+                        if (element) {
+                            // Sequential delay for each element
+                            setTimeout(() => {
+                                Motion.animate(element, 
+                                    {
+                                        opacity: [0, 0.3, 0, 0.8, 0.2, 1, 0.7, 1, 0.9, 1],
+                                        filter: selector === '.title-section' ? [
+                                            'brightness(0)',
+                                            'brightness(0.3)',
+                                            'brightness(0)',
+                                            'brightness(0.8)',
+                                            'brightness(0.2)',
+                                            'brightness(1.2)',
+                                            'brightness(0.7)',
+                                            'brightness(1)',
+                                            'brightness(0.9)',
+                                            'brightness(1)'
+                                        ] : [
+                                            'brightness(0) drop-shadow(0 0 0px #6be4f0)',
+                                            'brightness(0.3) drop-shadow(0 0 5px #6be4f0)',
+                                            'brightness(0) drop-shadow(0 0 0px #6be4f0)',
+                                            'brightness(0.8) drop-shadow(0 0 10px #6be4f0)',
+                                            'brightness(0.2) drop-shadow(0 0 3px #6be4f0)',
+                                            'brightness(1.2) drop-shadow(0 0 15px #6be4f0)',
+                                            'brightness(0.7) drop-shadow(0 0 8px #6be4f0)',
+                                            'brightness(1) drop-shadow(0 0 12px #6be4f0)',
+                                            'brightness(0.9) drop-shadow(0 0 10px #6be4f0)',
+                                            'brightness(1) drop-shadow(0 0 8px #6be4f0)'
+                                        ]
+                                    },
+                                    { 
+                                        duration: 1.5,
+                                        easing: "ease-out"
+                                    }
+                                );
+                            }, index * 200); // 200ms delay between each element
+                        }
+                    });
+                    
+                    // Start floating animations after sequence
+                    setTimeout(() => {
+                        // Bottom indicator floating
+                        const bottomIndicator = document.querySelector('.bottom-indicator');
+                        if (bottomIndicator) {
+                            // Ensure element is visible and positioned correctly
+                            bottomIndicator.style.opacity = '1';
+                            bottomIndicator.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            bottomIndicator.style.transform = 'translateX(-50%)';
+                            
+                            Motion.animate(bottomIndicator, 
+                                { 
+                                    transform: [
+                                        'translateX(-50%) translateY(0px)', 
+                                        'translateX(-50%) translateY(-10px)', 
+                                        'translateX(-50%) translateY(0px)'
+                                    ] 
+                                }, 
+                                { 
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    easing: "ease-in-out"
+                                }
+                            );
+                        }
+                        
+                        // Matrix elements floating
+                        const matrixElement1 = document.querySelector('.matrix-element-1');
+                        if (matrixElement1) {
+                            // Ensure element is visible
+                            matrixElement1.style.opacity = '0.4';
+                            matrixElement1.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            
+                            Motion.animate(matrixElement1, 
+                                { y: [-3, 3, -3] }, 
+                                { 
+                                    duration: 3,
+                                    repeat: Infinity,
+                                    easing: "ease-in-out",
+                                    delay: 0.5
+                                }
+                            );
+                        }
+                        
+                        const matrixElement2 = document.querySelector('.matrix-element-2');
+                        if (matrixElement2) {
+                            // Ensure element is visible
+                            matrixElement2.style.opacity = '0.3';
+                            matrixElement2.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            
+                            Motion.animate(matrixElement2, 
+                                { y: [-4, 4, -4] }, 
+                                { 
+                                    duration: 2.5,
+                                    repeat: Infinity,
+                                    easing: "ease-in-out",
+                                    delay: 1
+                                }
+                            );
+                        }
+                        
+                        const matrixElement3 = document.querySelector('.matrix-element-3');
+                        if (matrixElement3) {
+                            // Ensure element is visible
+                            matrixElement3.style.opacity = '0.5';
+                            matrixElement3.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            
+                            Motion.animate(matrixElement3, 
+                                { y: [-2, 2, -2] }, 
+                                { 
+                                    duration: 3.5,
+                                    repeat: Infinity,
+                                    easing: "ease-in-out",
+                                    delay: 0.3
+                                }
+                            );
+                        }
+                        
+                        // New matrix elements floating
+                        const matrixElement4 = document.querySelector('.matrix-element-4');
+                        if (matrixElement4) {
+                            matrixElement4.style.opacity = '0.35';
+                            matrixElement4.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            Motion.animate(matrixElement4, { y: [-3, 3, -3] }, { duration: 4.2, repeat: Infinity, easing: "ease-in-out", delay: 0.7 });
+                        }
+                        
+                        const matrixElement5 = document.querySelector('.matrix-element-5');
+                        if (matrixElement5) {
+                            matrixElement5.style.opacity = '0.4';
+                            matrixElement5.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            Motion.animate(matrixElement5, { y: [-2, 2, -2] }, { duration: 3.8, repeat: Infinity, easing: "ease-in-out", delay: 1.1 });
+                        }
+                        
+                        const matrixElement6 = document.querySelector('.matrix-element-6');
+                        if (matrixElement6) {
+                            matrixElement6.style.opacity = '0.3';
+                            matrixElement6.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            Motion.animate(matrixElement6, { y: [-4, 4, -4] }, { duration: 3.2, repeat: Infinity, easing: "ease-in-out", delay: 0.4 });
+                        }
+                        
+                        const matrixElement7 = document.querySelector('.matrix-element-7');
+                        if (matrixElement7) {
+                            matrixElement7.style.opacity = '0.25';
+                            matrixElement7.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            Motion.animate(matrixElement7, { y: [-3, 3, -3] }, { duration: 4.5, repeat: Infinity, easing: "ease-in-out", delay: 0.9 });
+                        }
+                        
+                        const matrixElement8 = document.querySelector('.matrix-element-8');
+                        if (matrixElement8) {
+                            matrixElement8.style.opacity = '0.35';
+                            matrixElement8.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            Motion.animate(matrixElement8, { y: [-2, 2, -2] }, { duration: 3.7, repeat: Infinity, easing: "ease-in-out", delay: 1.3 });
+                        }
+                        
+                        const matrixElement9 = document.querySelector('.matrix-element-9');
+                        if (matrixElement9) {
+                            matrixElement9.style.opacity = '0.3';
+                            matrixElement9.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            Motion.animate(matrixElement9, { y: [-3, 3, -3] }, { duration: 4.1, repeat: Infinity, easing: "ease-in-out", delay: 0.6 });
+                        }
+                        
+                        // Section dividers floating
+                        const sectionDivider1 = document.querySelector('.section-divider-1');
+                        if (sectionDivider1) {
+                            // Ensure element is visible
+                            sectionDivider1.style.opacity = '1';
+                            sectionDivider1.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            
+                            Motion.animate(sectionDivider1, 
+                                { y: [-5, 5, -5] }, 
+                                { 
+                                    duration: 4,
+                                    repeat: Infinity,
+                                    easing: "ease-in-out",
+                                    delay: 0.8
+                                }
+                            );
+                        }
+                        
+                        const centerTriangle = document.querySelector('.center-triangle');
+                        if (centerTriangle) {
+                            // Ensure element is visible
+                            centerTriangle.style.opacity = '1';
+                            centerTriangle.style.filter = 'brightness(1) drop-shadow(0 0 5px #6be4f0)';
+                            
+                            Motion.animate(centerTriangle, 
+                                { 
+                                    transform: [
+                                        'rotate(90deg) translateY(0px)', 
+                                        'rotate(90deg) translateY(-5px)', 
+                                        'rotate(90deg) translateY(0px)'
+                                    ] 
+                                }, 
+                                { 
+                                    duration: 4,
+                                    repeat: Infinity,
+                                    easing: "ease-in-out",
+                                    delay: 0.8
+                                }
+                            );
+                        }
+                    }, cyberpunkElements.length * 200 + 1500);
+                } else {
+                    // Fallback CSS animations
+                    cyberpunkElements.forEach((selector, index) => {
+                        const element = document.querySelector(selector);
+                        if (element) {
+                            setTimeout(() => {
+                                element.style.animation = 'cyberpunkFlicker 1.5s ease-out forwards';
+                            }, index * 200);
+                        }
+                    });
+                    
+                    // Fallback floating animations for CSS
+                    setTimeout(() => {
+                        // Ensure all elements are visible
+                        const bottomIndicator = document.querySelector('.bottom-indicator');
+                        if (bottomIndicator) {
+                            bottomIndicator.style.opacity = '1';
+                            bottomIndicator.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const matrixElement1 = document.querySelector('.matrix-element-1');
+                        if (matrixElement1) {
+                            matrixElement1.style.opacity = '0.4';
+                            matrixElement1.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const matrixElement2 = document.querySelector('.matrix-element-2');
+                        if (matrixElement2) {
+                            matrixElement2.style.opacity = '0.3';
+                            matrixElement2.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const matrixElement3 = document.querySelector('.matrix-element-3');
+                        if (matrixElement3) {
+                            matrixElement3.style.opacity = '0.5';
+                            matrixElement3.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const matrixElement4 = document.querySelector('.matrix-element-4');
+                        if (matrixElement4) {
+                            matrixElement4.style.opacity = '0.35';
+                            matrixElement4.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const matrixElement5 = document.querySelector('.matrix-element-5');
+                        if (matrixElement5) {
+                            matrixElement5.style.opacity = '0.4';
+                            matrixElement5.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const matrixElement6 = document.querySelector('.matrix-element-6');
+                        if (matrixElement6) {
+                            matrixElement6.style.opacity = '0.3';
+                            matrixElement6.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const matrixElement7 = document.querySelector('.matrix-element-7');
+                        if (matrixElement7) {
+                            matrixElement7.style.opacity = '0.25';
+                            matrixElement7.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const matrixElement8 = document.querySelector('.matrix-element-8');
+                        if (matrixElement8) {
+                            matrixElement8.style.opacity = '0.35';
+                            matrixElement8.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const matrixElement9 = document.querySelector('.matrix-element-9');
+                        if (matrixElement9) {
+                            matrixElement9.style.opacity = '0.3';
+                            matrixElement9.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const sectionDivider1 = document.querySelector('.section-divider-1');
+                        if (sectionDivider1) {
+                            sectionDivider1.style.opacity = '1';
+                            sectionDivider1.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                        }
+                        
+                        const centerTriangle = document.querySelector('.center-triangle');
+                        if (centerTriangle) {
+                            centerTriangle.style.opacity = '1';
+                            centerTriangle.style.filter = 'brightness(1) drop-shadow(0 0 5px #6be4f0)';
+                        }
+                        
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            @keyframes float1 {
+                                0%, 100% { transform: translateY(0px); }
+                                50% { transform: translateY(-3px); }
+                            }
+                            @keyframes float2 {
+                                0%, 100% { transform: translateY(0px); }
+                                50% { transform: translateY(-4px); }
+                            }
+                            @keyframes float3 {
+                                0%, 100% { transform: translateY(0px); }
+                                50% { transform: translateY(-2px); }
+                            }
+                            @keyframes floatSection {
+                                0%, 100% { transform: translateX(-50%) translateY(0px); }
+                                50% { transform: translateX(-50%) translateY(-5px); }
+                            }
+                            @keyframes floatTriangle {
+                                0%, 100% { transform: rotate(90deg) translateY(0px); }
+                                50% { transform: rotate(90deg) translateY(-5px); }
+                            }
+                            @keyframes floatVector {
+                                0%, 100% { transform: translateX(-50%) translateY(0px); }
+                                50% { transform: translateX(-50%) translateY(-10px); }
+                            }
+                            .matrix-element-1 { animation: float1 3s ease-in-out infinite; }
+                            .matrix-element-2 { animation: float2 2.5s ease-in-out infinite; }
+                            .matrix-element-3 { animation: float3 3.5s ease-in-out infinite; }
+                            .matrix-element-4 { animation: float1 4.2s ease-in-out infinite; }
+                            .matrix-element-5 { animation: float2 3.8s ease-in-out infinite; }
+                            .matrix-element-6 { animation: float3 3.2s ease-in-out infinite; }
+                            .matrix-element-7 { animation: float1 4.5s ease-in-out infinite; }
+                            .matrix-element-8 { animation: float2 3.7s ease-in-out infinite; }
+                            .matrix-element-9 { animation: float1 4.1s ease-in-out infinite; }
+                            .section-divider-1 { animation: floatSection 4s ease-in-out infinite !important; }
+                            .center-triangle { animation: floatTriangle 4s ease-in-out infinite !important; }
+                            .bottom-indicator { animation: floatVector 2s ease-in-out infinite !important; }
+                        `;
+                        document.head.appendChild(style);
+                    }, cyberpunkElements.length * 200 + 1500);
+                }
+            }, 100);
+        });
+        
+        // Hacker-style glitching placeholder text
+        function createGlitchEffect() {
+            const emailInput = document.getElementById('userEmail');
+            const lastNameInput = document.getElementById('userLastName');
+            
+            const hackerChars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+            const originalTexts = {
+                email: 'Enter your email...',
+                lastName: 'Enter your last name...'
+            };
+            
+            function glitchText(element, originalText, key) {
+                if (element === document.activeElement) return; // Don't glitch if focused
+                
+                let glitched = '';
+                
+                // Create placeholder with white key words
+                let displayText = originalText;
+                displayText = displayText.replace(/email/gi, '<span style="color: white; font-weight: bold;">email</span>');
+                displayText = displayText.replace(/last name/gi, '<span style="color: white; font-weight: bold;">last name</span>');
+                
+                // Apply glitch to non-key words
+                for (let i = 0; i < originalText.length; i++) {
+                    if (originalText[i] === ' ' || 
+                        (originalText.toLowerCase().includes('email') && originalText.toLowerCase().indexOf('email') <= i && i <= originalText.toLowerCase().indexOf('email') + 4) ||
+                        (originalText.toLowerCase().includes('last name') && originalText.toLowerCase().indexOf('last name') <= i && i <= originalText.toLowerCase().indexOf('last name') + 8)) {
+                        glitched += originalText[i]; // Keep important words intact
+                    } else if (Math.random() < 0.15) {
+                        glitched += hackerChars[Math.floor(Math.random() * hackerChars.length)];
+                    } else {
+                        glitched += originalText[i];
+                    }
+                }
+                
+                // Set placeholder with protected key words
+                if (key === 'email') {
+                    element.placeholder = glitched.replace(/email/gi, 'email');
+                } else if (key === 'lastName') {
+                    element.placeholder = glitched.replace(/last name/gi, 'last name');
+                } else {
+                    element.placeholder = glitched;
+                }
+                
+                element.style.animation = 'glitch 0.1s ease-in-out';
+            }
+            
+            // Start glitching after page loads
+            setTimeout(() => {
+                setInterval(() => {
+                    glitchText(emailInput, originalTexts.email, 'email');
+                }, 150); // Constant fast glitching
+                
+                setInterval(() => {
+                    glitchText(lastNameInput, originalTexts.lastName, 'lastName');
+                }, 200); // Constant fast glitching with slight offset
+            }, 2000);
+        }
+        
+        // Initialize glitch effect
+        document.addEventListener('DOMContentLoaded', createGlitchEffect);
+        
+        
+        // Triangle movement effect
+        function setupTriangleMovement() {
+            const emailInput = document.getElementById('userEmail');
+            const lastNameInput = document.getElementById('userLastName');
+            const triangle = document.querySelector('.center-triangle');
+            
+            if (emailInput && lastNameInput && triangle) {
+                emailInput.addEventListener('focus', () => {
+                    triangle.style.top = '310px'; // Position for email input
+                    triangle.style.transition = 'top 0.3s ease';
+                });
+                
+                lastNameInput.addEventListener('focus', () => {
+                    triangle.style.top = '365px'; // Position for last name input
+                    triangle.style.transition = 'top 0.3s ease';
+                });
+                
+                // Reset to original position when neither is focused
+                emailInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        if (document.activeElement !== lastNameInput) {
+                            triangle.style.top = '310px';
+                        }
+                    }, 100);
+                });
+                
+                lastNameInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        if (document.activeElement !== emailInput) {
+                            triangle.style.top = '310px';
+                        }
+                    }, 100);
+                });
+            }
+        }
+        
+        // Initialize triangle movement
+        document.addEventListener('DOMContentLoaded', setupTriangleMovement);
+        
+        
+        // Airtable Configuration - loaded from config.js
+        const AIRTABLE_API_KEY = window.APP_CONFIG?.AIRTABLE_API_KEY || 'your-api-key-here';
+        const AIRTABLE_BASE_ID = window.APP_CONFIG?.AIRTABLE_BASE_ID || 'your-base-id-here';
+        const AIRTABLE_TABLE_NAME = window.APP_CONFIG?.AIRTABLE_TABLE_NAME || 'Table%201';
+        
+        // Function to make direct API calls to Airtable
+        async function airtableRequest(method, endpoint, data = null) {
+            const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${endpoint}`;
+            
+            const options = {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            const response = await fetch(url, options);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Airtable API error: ${response.status} - ${errorText}`);
+            }
+            
+            return await response.json();
+        }
+        
+        // Function to create or update user record in Airtable
+        async function createOrUpdateUser(email, lastName) {
+            try {
+                // First, check if user already exists
+                const filterFormula = encodeURIComponent(`{email} = "${email}"`);
+                const searchResponse = await airtableRequest('GET', `${AIRTABLE_TABLE_NAME}?filterByFormula=${filterFormula}`);
+                
+                if (searchResponse.records && searchResponse.records.length > 0) {
+                    // User exists, return existing record
+                    console.log('User already exists:', searchResponse.records[0].fields);
+                    return searchResponse.records[0];
+                } else {
+                    // Create new user record
+                    const createData = {
+                        records: [
+                            {
+                                fields: {
+                                    'email': email,
+                                    'lastname': lastName,
+                                    'key1 status': 'not_scanned',
+                                    'key2 status': 'not_scanned',
+                                    'key3 status': 'not_scanned'
+                                }
+                            }
+                        ]
+                    };
+                    
+                    const createResponse = await airtableRequest('POST', AIRTABLE_TABLE_NAME, createData);
+                    
+                    console.log('New user created:', createResponse.records[0].fields);
+                    return createResponse.records[0];
+                }
+            } catch (error) {
+                console.error('Airtable error:', error);
+                throw error;
+            }
+        }
+        
+        // Navigation functions
+        async function startARExperience() {
+            const emailInput = document.getElementById('userEmail');
+            const lastNameInput = document.getElementById('userLastName');
+            const emailValue = emailInput.value.trim();
+            const lastNameValue = lastNameInput.value.trim();
+            const emailValid = emailValue !== '' && emailValue.includes('@');
+            const lastNameValid = lastNameValue !== '';
+            
+            if (!emailValid || !lastNameValid) {
+                // Show red terminal popup
+                showTerminalError('ERROR: You must fill your email and last name first!');
+                return;
+            }
+            
+            // Show loading state
+            showMessage('Creating user profile...');
+            
+            try {
+                // Create or update user in Airtable
+                const userRecord = await createOrUpdateUser(emailValue, lastNameValue);
+                
+                // Store user data in localStorage
+                localStorage.setItem('userEmail', emailValue);
+                localStorage.setItem('userLastName', lastNameValue);
+                localStorage.setItem('airtableRecordId', userRecord.id);
+                localStorage.setItem('userKeyStatuses', JSON.stringify({
+                    key1: userRecord.fields['key1 status'] || 'not_scanned',
+                    key2: userRecord.fields['key2 status'] || 'not_scanned',
+                    key3: userRecord.fields['key3 status'] || 'not_scanned'
+                }));
+                
+                // Add transition effect
+                document.body.style.transition = 'opacity 0.5s ease-out';
+                document.body.style.opacity = '0';
+                
+                setTimeout(() => {
+                    window.location.href = 'page2.html';
+                }, 500);
+                
+            } catch (error) {
+                console.error('Failed to create user:', error);
+                showTerminalError('ERROR: Failed to create user profile. Please try again.');
+            }
+        }
+        
+        // Terminal error popup function
+        function showTerminalError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #ff0040, #8b0000);
+                color: white;
+                padding: 25px 35px;
+                border: 3px solid #ff0040;
+                z-index: 2000;
+                font-size: 16px;
+                text-align: center;
+                max-width: 80%;
+                word-wrap: break-word;
+                font-family: 'Courier New', monospace;
+                font-weight: bold;
+                box-shadow: 0 0 30px rgba(255, 0, 64, 0.8);
+                animation: terminalErrorSlideIn 0.3s ease-out, terminalTextGlitch 0.5s ease-in-out infinite;
+                text-shadow: 0 0 5px #ff0040;
+            `;
+            errorDiv.textContent = message;
+            
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes terminalErrorSlideIn {
+                    from { 
+                        opacity: 0; 
+                        transform: translate(-50%, -50%) scale(0.8); 
+                        filter: blur(2px);
+                    }
+                    to { 
+                        opacity: 1; 
+                        transform: translate(-50%, -50%) scale(1); 
+                        filter: blur(0px);
+                    }
+                }
+                @keyframes terminalErrorSlideOut {
+                    from { 
+                        opacity: 1; 
+                        transform: translate(-50%, -50%) scale(1); 
+                        filter: blur(0px);
+                    }
+                    to { 
+                        opacity: 0; 
+                        transform: translate(-50%, -50%) scale(0.8); 
+                        filter: blur(2px);
+                    }
+                }
+                @keyframes terminalTextGlitch {
+                    0%, 100% { 
+                        text-shadow: 0 0 5px #ff0040, 0 0 10px #ff0040;
+                        filter: brightness(1);
+                    }
+                    10% { 
+                        text-shadow: 2px 0 0 #ff0040, -2px 0 0 #00ffff, 0 0 15px #ff0040;
+                        filter: brightness(1.2);
+                    }
+                    20% { 
+                        text-shadow: -1px 0 0 #ff0040, 1px 0 0 #ffff00, 0 0 12px #ff0040;
+                        filter: brightness(0.8);
+                    }
+                    30% { 
+                        text-shadow: 1px 0 0 #ff0040, -1px 0 0 #ff00ff, 0 0 18px #ff0040;
+                        filter: brightness(1.1);
+                    }
+                    40% { 
+                        text-shadow: 0 0 5px #ff0040, 0 0 10px #ff0040;
+                        filter: brightness(1);
+                    }
+                    50% { 
+                        text-shadow: -2px 0 0 #ff0040, 2px 0 0 #00ff00, 0 0 20px #ff0040;
+                        filter: brightness(1.3);
+                    }
+                    60% { 
+                        text-shadow: 1px 0 0 #ff0040, -1px 0 0 #0080ff, 0 0 8px #ff0040;
+                        filter: brightness(0.9);
+                    }
+                    70% { 
+                        text-shadow: 0 0 5px #ff0040, 0 0 25px #ff0040;
+                        filter: brightness(1.2);
+                    }
+                    80% { 
+                        text-shadow: 2px 0 0 #ff0040, -2px 0 0 #ff8000, 0 0 15px #ff0040;
+                        filter: brightness(1);
+                    }
+                    90% { 
+                        text-shadow: -1px 0 0 #ff0040, 1px 0 0 #8000ff, 0 0 12px #ff0040;
+                        filter: brightness(1.1);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(errorDiv);
+            
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                errorDiv.style.animation = 'terminalErrorSlideOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (document.body.contains(errorDiv)) {
+                        document.body.removeChild(errorDiv);
+                    }
+                    if (document.head.contains(style)) {
+                        document.head.removeChild(style);
+                    }
+                }, 300);
+            }, 4000);
+            
+            // Click to dismiss
+            errorDiv.addEventListener('click', () => {
+                errorDiv.style.animation = 'terminalErrorSlideOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (document.body.contains(errorDiv)) {
+                        document.body.removeChild(errorDiv);
+                    }
+                    if (document.head.contains(style)) {
+                        document.head.removeChild(style);
+                    }
+                }, 300);
+            });
+        }
+        
+        function showAbout() {
+            window.open('https://cmkl.ac.th', '_blank');
+        }
+        
+        function showPrograms() {
+            window.open('https://www.instagram.com/cmkluniversity/?hl=en', '_blank');
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Utility function for showing messages
+        function showMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #22b2b9, #00946d);
+                color: white;
+                padding: 25px 35px;
+                border-radius: 15px;
+                z-index: 1000;
+                font-size: 16px;
+                text-align: center;
+                max-width: 80%;
+                word-wrap: break-word;
+                border: 2px solid #6be4f0;
+                box-shadow: 0 0 30px rgba(107, 228, 240, 0.5);
+                animation: messageSlideIn 0.3s ease-out;
+            `;
+            messageDiv.textContent = text;
+            
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes messageSlideIn {
+                    from { 
+                        opacity: 0; 
+                        transform: translate(-50%, -50%) scale(0.8); 
+                    }
+                    to { 
+                        opacity: 1; 
+                        transform: translate(-50%, -50%) scale(1); 
+                    }
+                }
+                @keyframes messageSlideOut {
+                    from { 
+                        opacity: 1; 
+                        transform: translate(-50%, -50%) scale(1); 
+                    }
+                    to { 
+                        opacity: 0; 
+                        transform: translate(-50%, -50%) scale(0.8); 
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(messageDiv);
+            
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                messageDiv.style.animation = 'messageSlideOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (document.body.contains(messageDiv)) {
+                        document.body.removeChild(messageDiv);
+                    }
+                    if (document.head.contains(style)) {
+                        document.head.removeChild(style);
+                    }
+                }, 300);
+            }, 4000);
+            
+            // Click to dismiss
+            messageDiv.addEventListener('click', () => {
+                messageDiv.style.animation = 'messageSlideOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (document.body.contains(messageDiv)) {
+                        document.body.removeChild(messageDiv);
+                    }
+                    if (document.head.contains(style)) {
+                        document.head.removeChild(style);
+                    }
+                }, 300);
+            });
+        }
+        
+        // Add hover effects for navigation cards
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.nav-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

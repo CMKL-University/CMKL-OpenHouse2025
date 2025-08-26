@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <title>CMKL Openhouse 2025 - AR Scanner</title>
+    
+    <!-- MindAR Dependencies -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap');
+        
+        /* CSS Variables for mobile viewport */
+        :root {
+            --vh: 1vh;
+        }
+        
+        body {
+            background: #000616;
+            color: #6be4f0;
+            font-family: 'Darker Grotesque', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100); /* Fallback for older browsers */
+            height: 100dvh; /* Dynamic viewport height for mobile */
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* AR Scanner Container */
+        .ar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
+            height: 100dvh; /* Dynamic viewport height for mobile */
+            background: #000616;
+            z-index: 1;
+        }
+        
+        /* AR Scene Styling - Show camera feed for AR */
+        .ar-scene,
+        a-scene {
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            opacity: 1 !important; /* Show camera feed */
+            visibility: visible !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+        
+        /* Show video camera feed but style it properly */
+        .ar-scene video,
+        a-scene video {
+            opacity: 1 !important;
+            visibility: visible !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            z-index: 1 !important;
+        }
+        
+        /* Hide AR rendering canvas but keep video */
+        .ar-scene canvas,
+        a-scene canvas,
+        a-scene canvas.a-canvas {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            position: absolute !important;
+            z-index: -1 !important;
+        }
+        
+        /* Scanner UI Overlay - Transparent to show camera */
+        .scanner-ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile */
+            z-index: 1000;
+            pointer-events: none;
+            background: transparent; /* Transparent to show camera feed */
+        }
+        
+        /* Top Status Bar - Mobile Optimized */
+        .status-bar {
+            position: absolute;
+            top: env(safe-area-inset-top, 20px);
+            top: max(env(safe-area-inset-top), 20px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(0, 6, 22, 0.95), rgba(34, 178, 185, 0.3));
+            border: 2px solid #22B2B9;
+            border-radius: 20px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 25px rgba(107, 228, 240, 0.5);
+            max-width: calc(100vw - 40px);
+            min-height: 44px; /* Minimum touch target for mobile */
+        }
+        
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00ff41;
+            box-shadow: 0 0 10px #00ff41;
+            animation: pulseGreen 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGreen {
+            0%, 100% { 
+                opacity: 1; 
+                box-shadow: 0 0 10px #00ff41; 
+            }
+            50% { 
+                opacity: 0.6; 
+                box-shadow: 0 0 20px #00ff41, 0 0 30px #00ff41; 
+            }
+        }
+        
+        .status-text {
+            color: #6BE4F0;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        
+        /* Scanner Reticle - Mobile Optimized */
+        .scanner-reticle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(250px, 60vw);
+            height: min(250px, 60vw);
+            border: 3px solid #6BE4F0;
+            border-radius: 20px;
+            opacity: 0.9;
+            box-shadow: 0 0 15px rgba(107, 228, 240, 0.3);
+        }
+        
+        .scanner-reticle::before,
+        .scanner-reticle::after,
+        .scanner-reticle .corner-tl,
+        .scanner-reticle .corner-tr,
+        .scanner-reticle .corner-bl,
+        .scanner-reticle .corner-br {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #00ff41;
+            box-shadow: 0 0 10px #00ff41;
+        }
+        
+        .scanner-reticle::before {
+            top: -3px;
+            left: -3px;
+            border-right: none;
+            border-bottom: none;
+            border-top-left-radius: 20px;
+            animation: scanCorner 2s ease-in-out infinite;
+        }
+        
+        .scanner-reticle::after {
+            top: -3px;
+            right: -3px;
+            border-left: none;
+            border-bottom: none;
+            border-top-right-radius: 20px;
+            animation: scanCorner 2s ease-in-out infinite 0.5s;
+        }
+        
+        .corner-bl {
+            bottom: -3px;
+            left: -3px;
+            border-right: none;
+            border-top: none;
+            border-bottom-left-radius: 20px;
+            animation: scanCorner 2s ease-in-out infinite 1s;
+        }
+        
+        .corner-br {
+            bottom: -3px;
+            right: -3px;
+            border-left: none;
+            border-top: none;
+            border-bottom-right-radius: 20px;
+            animation: scanCorner 2s ease-in-out infinite 1.5s;
+        }
+        
+        @keyframes scanCorner {
+            0%, 100% { 
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.1);
+                box-shadow: 0 0 20px #00ff41;
+            }
+        }
+        
+        /* Scanning Animation Lines */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                #00ff41 20%, 
+                #6BE4F0 50%, 
+                #00ff41 80%, 
+                transparent 100%);
+            box-shadow: 0 0 10px #00ff41;
+            animation: scanLine 3s linear infinite;
+        }
+        
+        @keyframes scanLine {
+            0% { 
+                top: 0; 
+                opacity: 0; 
+            }
+            10% { 
+                opacity: 1; 
+            }
+            90% { 
+                opacity: 1; 
+            }
+            100% { 
+                top: 100%; 
+                opacity: 0; 
+            }
+        }
+        
+        /* Instructions - Mobile Optimized */
+        .instructions {
+            position: absolute;
+            bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            max-width: calc(100vw - 40px);
+            padding: 0 20px;
+        }
+        
+        .instruction-text {
+            color: #CAFAFF;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px #6BE4F0;
+            animation: textGlow 3s ease-in-out infinite;
+        }
+        
+        .instruction-subtext {
+            color: #6BE4F0;
+            font-size: 12px;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
+        
+        @keyframes textGlow {
+            0%, 100% {
+                text-shadow: 0 0 10px #6BE4F0;
+            }
+            50% {
+                text-shadow: 0 0 20px #6BE4F0, 0 0 30px #00ff41;
+            }
+        }
+        
+        /* Bottom Navigation - Mobile Optimized */
+        .bottom-nav {
+            position: absolute;
+            bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            pointer-events: auto;
+            padding: 0 20px;
+            width: calc(100vw - 40px);
+            justify-content: center;
+        }
+        
+        .nav-button {
+            background: linear-gradient(135deg, rgba(34, 178, 185, 0.9), rgba(0, 148, 109, 0.9));
+            border: 2px solid #6BE4F0;
+            border-radius: 12px;
+            padding: 14px 24px;
+            color: white;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 20px rgba(107, 228, 240, 0.4);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            min-width: 100px;
+            min-height: 44px; /* iOS touch target minimum */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            flex: 1;
+            max-width: 150px;
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(107, 228, 240, 0.6);
+            background: linear-gradient(135deg, rgba(34, 178, 185, 1), rgba(0, 148, 109, 1));
+        }
+        
+        /* Success Animation */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(0, 255, 65, 0.9), 
+                rgba(107, 228, 240, 0.8)
+            );
+            display: none;
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            border: 5px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            animation: successPulse 1s ease-out;
+        }
+        
+        .success-icon::after {
+            content: '✓';
+            font-size: 50px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        @keyframes successPulse {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .success-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+        
+        .success-subtext {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        /* Loading State */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 6, 22, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1500;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(107, 228, 240, 0.3);
+            border-top: 4px solid #6BE4F0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #6BE4F0;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        /* Error State */
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255, 0, 64, 0.9), rgba(139, 0, 0, 0.9));
+            color: white;
+            padding: 25px 35px;
+            border-radius: 15px;
+            border: 3px solid #ff0040;
+            z-index: 2500;
+            font-size: 16px;
+            text-align: center;
+            max-width: 90%;
+            font-weight: 600;
+            box-shadow: 0 0 30px rgba(255, 0, 64, 0.8);
+            display: none;
+        }
+        
+        /* Matrix Digital Rain Background - Overlay on camera */
+        .digital-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.15; /* Reduced opacity to not block camera view */
+        }
+        
+        .rain-drop {
+            position: absolute;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            animation: rainFall 4s linear infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes rainFall {
+            0% {
+                top: -20px;
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                top: 100vh;
+                opacity: 0;
+            }
+        }
+        
+        /* Mobile Responsive Design */
+        @media (max-width: 480px) {
+            .status-bar {
+                padding: 6px 16px;
+                gap: 8px;
+                border-radius: 16px;
+                max-width: calc(100vw - 32px);
+            }
+            
+            .status-text {
+                font-size: 12px;
+                font-weight: 700;
+            }
+            
+            .scanner-reticle {
+                width: min(200px, 70vw);
+                height: min(200px, 70vw);
+                border-width: 2px;
+            }
+            
+            .scanner-reticle::before,
+            .scanner-reticle::after,
+            .corner-bl,
+            .corner-br {
+                width: 25px;
+                height: 25px;
+                border-width: 2px;
+            }
+            
+            .instruction-text {
+                font-size: 16px;
+                font-weight: 700;
+                margin-bottom: 6px;
+            }
+            
+            .instruction-subtext {
+                font-size: 10px;
+                font-weight: 500;
+            }
+            
+            .nav-button {
+                padding: 12px 18px;
+                font-size: 13px;
+                min-height: 48px;
+                border-radius: 10px;
+                font-weight: 700;
+            }
+            
+            .bottom-nav {
+                gap: 12px;
+                width: calc(100vw - 32px);
+                padding: 0 16px;
+            }
+        }
+        
+        /* Very small screens */
+        @media (max-width: 360px) {
+            .scanner-reticle {
+                width: min(180px, 75vw);
+                height: min(180px, 75vw);
+            }
+            
+            .instruction-text {
+                font-size: 14px;
+            }
+            
+            .instruction-subtext {
+                font-size: 9px;
+            }
+            
+            .nav-button {
+                font-size: 12px;
+                padding: 10px 15px;
+            }
+        }
+        
+        /* Landscape orientation on mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .status-bar {
+                top: 10px;
+                padding: 4px 12px;
+            }
+            
+            .status-text {
+                font-size: 11px;
+            }
+            
+            .scanner-reticle {
+                width: min(160px, 40vh);
+                height: min(160px, 40vh);
+            }
+            
+            .instructions {
+                bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+            }
+            
+            .instruction-text {
+                font-size: 14px;
+            }
+            
+            .instruction-subtext {
+                font-size: 9px;
+            }
+            
+            .bottom-nav {
+                bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+            }
+            
+            .nav-button {
+                padding: 8px 16px;
+                font-size: 12px;
+                min-height: 40px;
+            }
+        }
+        
+        /* AR Scene Custom Styles - Additional overrides */
+        .ar-scene {
+            background: transparent !important;
+            display: block !important;
+        }
+        
+        /* Force hide A-Frame elements */
+        .ar-scene .a-enter-vr,
+        .ar-scene .a-orientation-modal,
+        a-scene .a-enter-vr,
+        a-scene .a-orientation-modal {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        
+        /* Hide A-Frame Inspector Button */
+        .a-enter-vr {
+            display: none !important;
+        }
+        
+        .a-orientation-modal {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Initializing AR Scanner...</div>
+    </div>
+    
+    <!-- Digital Rain Background -->
+    <div class="digital-rain" id="digitalRain"></div>
+    
+    <!-- AR Container -->
+    <div class="ar-container">
+        <!-- MindAR Scene -->
+        <a-scene 
+            class="ar-scene"
+            mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/band.mind; autoStart: true; uiLoading: no; uiError: no; uiScanning: no;" 
+            color-space="sRGB" 
+            renderer="colorManagement: true, physicallyCorrectLights, antialias: false" 
+            vr-mode-ui="enabled: false" 
+            device-orientation-permission-ui="enabled: false"
+            loading-screen="enabled: false"
+            embedded
+            style="width: 100%; height: 100%; opacity: 0; position: absolute; z-index: -1;">
+            
+            <!-- Assets -->
+            <a-assets>
+                <a-asset-item id="bearModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/bear/scene.gltf"></a-asset-item>
+                <a-asset-item id="raccoonModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf"></a-asset-item>
+            </a-assets>
+
+            <!-- Camera -->
+            <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+            <!-- AR Targets -->
+            <a-entity mindar-image-target="targetIndex: 0">
+                <a-gltf-model 
+                    rotation="0 0 0" 
+                    position="0 -0.25 0" 
+                    scale="0.05 0.05 0.05" 
+                    src="#raccoonModel" 
+                    animation-mixer
+                    id="model1">
+                </a-gltf-model>
+            </a-entity>
+            
+            <a-entity mindar-image-target="targetIndex: 1">
+                <a-gltf-model 
+                    rotation="0 0 0" 
+                    position="0 -0.25 0" 
+                    scale="0.05 0.05 0.05" 
+                    src="#bearModel" 
+                    animation-mixer
+                    id="model2">
+                </a-gltf-model>
+            </a-entity>
+        </a-scene>
+        
+        <!-- Scanner UI Overlay -->
+        <div class="scanner-ui">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-icon"></div>
+                <div class="status-text" id="statusText">SCANNING FOR KEY...</div>
+            </div>
+            
+            <!-- Scanner Reticle -->
+            <div class="scanner-reticle">
+                <div class="corner-bl"></div>
+                <div class="corner-br"></div>
+                <div class="scan-line"></div>
+            </div>
+            
+            <!-- Instructions -->
+            <div class="instructions">
+                <div class="instruction-text">Point camera at the key image</div>
+                <div class="instruction-subtext">ALIGN THE KEY WITHIN THE SCANNER FRAME</div>
+            </div>
+            
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <button class="nav-button" onclick="goBack()">← BACK</button>
+                <button class="nav-button" onclick="toggleFlashlight()">🔦 LIGHT</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Overlay -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-icon"></div>
+        <div class="success-text">KEY DETECTED!</div>
+        <div class="success-subtext">Your AR experience is loading...</div>
+    </div>
+    
+    <!-- Error Message -->
+    <div class="error-message" id="errorMessage">
+        Camera access denied. Please allow camera permissions and reload.
+    </div>
+    
+    <script>
+        // Digital Rain Effect
+        function createDigitalRain() {
+            const rainContainer = document.getElementById('digitalRain');
+            const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            
+            function createRainDrop() {
+                const drop = document.createElement('div');
+                drop.className = 'rain-drop';
+                drop.textContent = characters[Math.floor(Math.random() * characters.length)];
+                drop.style.left = Math.random() * 100 + '%';
+                drop.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                drop.style.animationDelay = Math.random() * 2 + 's';
+                drop.style.fontSize = (Math.random() * 4 + 8) + 'px';
+                drop.style.opacity = Math.random() * 0.6 + 0.2;
+                
+                rainContainer.appendChild(drop);
+                
+                setTimeout(() => {
+                    if (rainContainer.contains(drop)) {
+                        rainContainer.removeChild(drop);
+                    }
+                }, 6000);
+            }
+            
+            // Create rain drops
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => createRainDrop(), i * 200);
+            }
+            
+            setInterval(createRainDrop, 500);
+        }
+        
+        // AR Scanner Logic
+        let isScanning = true;
+        let targetDetected = false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('CMKL AR Scanner - Initializing...');
+            
+            // Check user session
+            if (!checkUserSession()) {
+                return; // Will redirect to main page
+            }
+            
+            // Start digital rain
+            createDigitalRain();
+            
+            // Get selected key from localStorage or URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedKey = urlParams.get('key') || localStorage.getItem('selectedKey') || '1';
+            
+            console.log('Scanning for key:', selectedKey);
+            
+            // Store selected key
+            localStorage.setItem('selectedKey', selectedKey);
+            
+            // Hide loading overlay after AR scene loads
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+                
+                // Setup AR elements for proper display
+                setupARDisplay();
+            }, 3000);
+            
+            // Setup AR event listeners
+            setupAREvents();
+            
+            // Update UI based on selected key
+            updateUIForKey(selectedKey);
+            
+            // Initialize mobile optimizations
+            initializeMobileOptimizations();
+        });
+        
+        // Check if user has valid session
+        function checkUserSession() {
+            const userEmail = localStorage.getItem('userEmail');
+            const userLastName = localStorage.getItem('userLastName');
+            const recordId = localStorage.getItem('airtableRecordId');
+            
+            if (!userEmail || !userLastName || !recordId) {
+                console.log('No valid user session found, redirecting to main page');
+                showError('Please register first from the main page.');
+                setTimeout(() => {
+                    window.location.href = 'main.html';
+                }, 3000);
+                return false;
+            }
+            
+            console.log('User session valid:', userEmail);
+            return true;
+        }
+        
+        // Function to aggressively hide AR elements
+        function hideARElements() {
+            const sceneEl = document.querySelector('a-scene');
+            if (sceneEl) {
+                // Hide scene
+                sceneEl.style.cssText += `
+                    opacity: 0 !important;
+                    visibility: hidden !important;
+                    position: absolute !important;
+                    z-index: -1000 !important;
+                    pointer-events: none !important;
+                    left: -9999px !important;
+                    top: -9999px !important;
+                    width: 1px !important;
+                    height: 1px !important;
+                `;
+                
+                // Hide all video and canvas elements
+                const videos = document.querySelectorAll('video');
+                const canvases = document.querySelectorAll('canvas');
+                
+                videos.forEach(video => {
+                    video.style.cssText += `
+                        opacity: 0 !important;
+                        visibility: hidden !important;
+                        position: absolute !important;
+                        z-index: -2000 !important;
+                        left: -9999px !important;
+                        top: -9999px !important;
+                        width: 1px !important;
+                        height: 1px !important;
+                    `;
+                    video.muted = true;
+                    video.playsInline = true;
+                });
+                
+                canvases.forEach(canvas => {
+                    canvas.style.cssText += `
+                        opacity: 0 !important;
+                        visibility: hidden !important;
+                        position: absolute !important;
+                        z-index: -2000 !important;
+                        left: -9999px !important;
+                        top: -9999px !important;
+                        width: 1px !important;
+                        height: 1px !important;
+                    `;
+                });
+                
+                // Hide A-Frame UI elements
+                const aframeElements = document.querySelectorAll('.a-enter-vr, .a-orientation-modal, .a-loader-title');
+                aframeElements.forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
+            
+            console.log('AR elements hidden successfully');
+        }
+        
+        // Function to setup AR elements for proper display
+        function setupARDisplay() {
+            const sceneEl = document.querySelector('a-scene');
+            if (sceneEl) {
+                // Ensure scene is visible
+                sceneEl.style.opacity = '1';
+                sceneEl.style.visibility = 'visible';
+                sceneEl.style.position = 'absolute';
+                sceneEl.style.zIndex = '1';
+                sceneEl.style.pointerEvents = 'none';
+                
+                // Ensure video is visible
+                setTimeout(() => {
+                    const videos = document.querySelectorAll('video');
+                    videos.forEach(video => {
+                        video.style.opacity = '1';
+                        video.style.visibility = 'visible';
+                        video.style.position = 'absolute';
+                        video.style.top = '0';
+                        video.style.left = '0';
+                        video.style.width = '100%';
+                        video.style.height = '100%';
+                        video.style.objectFit = 'cover';
+                        video.style.zIndex = '1';
+                        video.muted = true;
+                        video.playsInline = true;
+                    });
+                    
+                    // Hide only A-Frame UI elements
+                    const aframeElements = document.querySelectorAll('.a-enter-vr, .a-orientation-modal, .a-loader-title');
+                    aframeElements.forEach(el => {
+                        el.style.display = 'none';
+                    });
+                }, 1000);
+            }
+            
+            console.log('AR elements setup for display');
+        }
+        
+        function setupAREvents() {
+            const sceneEl = document.querySelector('a-scene');
+            
+            // Wait for scene to load
+            sceneEl.addEventListener('loaded', function() {
+                console.log('AR Scene loaded - Camera visible');
+                
+                // Setup target detection with multiple event formats
+                setupTargetDetection(sceneEl);
+                
+                // MindAR specific events
+                sceneEl.addEventListener('arReady', function() {
+                    console.log('MindAR ready - scanning active');
+                    updateScannerStatus('SCANNING ACTIVE');
+                });
+                
+                sceneEl.addEventListener('arError', function(event) {
+                    console.error('MindAR error:', event.detail);
+                    showError('AR initialization failed. Please check camera permissions.');
+                });
+            });
+            
+            // Enhanced camera permission handling for mobile
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                const constraints = {
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 30 }
+                    }
+                };
+                
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then(function(stream) {
+                        console.log('Camera access granted');
+                        // Immediately stop the test stream
+                        stream.getTracks().forEach(track => track.stop());
+                        
+                        // Update status
+                        updateScannerStatus('CAMERA READY');
+                    })
+                    .catch(function(error) {
+                        console.error('Camera access denied:', error);
+                        let errorMessage = 'Camera access required for AR scanning.';
+                        
+                        if (error.name === 'NotAllowedError') {
+                            errorMessage = 'Please allow camera access and reload the page.';
+                        } else if (error.name === 'NotFoundError') {
+                            errorMessage = 'No camera found on this device.';
+                        } else if (error.name === 'NotSupportedError') {
+                            errorMessage = 'Camera not supported in this browser.';
+                        }
+                        
+                        showError(errorMessage);
+                    });
+            } else {
+                showError('Camera not supported in this browser.');
+            }
+        }
+        
+        function updateScannerStatus(status) {
+            const statusText = document.getElementById('statusText');
+            if (statusText) {
+                statusText.textContent = status;
+            }
+        }
+        
+        function setupTargetDetection(sceneEl) {
+            // Method 1: Standard MindAR events
+            sceneEl.addEventListener('targetFound', function(event) {
+                try {
+                    console.log('Target found (method 1):', event.detail);
+                    let targetIndex = 0;
+                    
+                    if (event.detail) {
+                        targetIndex = event.detail.targetIndex ?? 
+                                     event.detail.target?.targetIndex ?? 
+                                     event.detail.index ?? 0;
+                    }
+                    
+                    onTargetFound(targetIndex);
+                } catch (error) {
+                    console.error('Error in targetFound handler:', error);
+                }
+            });
+            
+            sceneEl.addEventListener('targetLost', function(event) {
+                try {
+                    console.log('Target lost (method 1):', event.detail);
+                    onTargetLost();
+                } catch (error) {
+                    console.error('Error in targetLost handler:', error);
+                }
+            });
+            
+            // Method 2: Listen on individual target entities
+            setTimeout(() => {
+                const targets = sceneEl.querySelectorAll('[mindar-image-target]');
+                console.log('Found target entities:', targets.length);
+                
+                targets.forEach((target, index) => {
+                    target.addEventListener('targetFound', function(event) {
+                        try {
+                            console.log(`Target ${index} found (method 2):`, event.detail);
+                            onTargetFound(index);
+                        } catch (error) {
+                            console.error(`Error in target ${index} found handler:`, error);
+                        }
+                    });
+                    
+                    target.addEventListener('targetLost', function(event) {
+                        try {
+                            console.log(`Target ${index} lost (method 2):`, event.detail);
+                            onTargetLost();
+                        } catch (error) {
+                            console.error(`Error in target ${index} lost handler:`, error);
+                        }
+                    });
+                });
+            }, 2000);
+            
+            // Method 3: Direct MindAR system events
+            setTimeout(() => {
+                if (sceneEl.systems && sceneEl.systems['mindar-image-system']) {
+                    const mindARSystem = sceneEl.systems['mindar-image-system'];
+                    console.log('MindAR system found, setting up direct listeners');
+                    
+                    // Override or hook into MindAR's target detection
+                    const originalOnTargetFound = mindARSystem.onTargetFound;
+                    const originalOnTargetLost = mindARSystem.onTargetLost;
+                    
+                    if (originalOnTargetFound) {
+                        mindARSystem.onTargetFound = function(targetIndex) {
+                            try {
+                                console.log(`Target found via MindAR system: ${targetIndex}`);
+                                onTargetFound(targetIndex);
+                                originalOnTargetFound.call(this, targetIndex);
+                            } catch (error) {
+                                console.error('Error in MindAR target found:', error);
+                            }
+                        };
+                    }
+                    
+                    if (originalOnTargetLost) {
+                        mindARSystem.onTargetLost = function(targetIndex) {
+                            try {
+                                console.log(`Target lost via MindAR system: ${targetIndex}`);
+                                onTargetLost();
+                                originalOnTargetLost.call(this, targetIndex);
+                            } catch (error) {
+                                console.error('Error in MindAR target lost:', error);
+                            }
+                        };
+                    }
+                }
+            }, 3000);
+        }
+        
+        function updateUIForKey(keyNumber) {
+            const statusText = document.getElementById('statusText');
+            statusText.textContent = `SCANNING FOR KEY ${keyNumber}...`;
+        }
+        
+        function onTargetFound(targetIndex) {
+            if (targetDetected) return;
+            
+            targetDetected = true;
+            isScanning = false;
+            
+            console.log('Key detected! Target index:', targetIndex);
+            
+            // Update status
+            const statusText = document.getElementById('statusText');
+            const statusIcon = document.querySelector('.status-icon');
+            
+            statusText.textContent = 'KEY DETECTED!';
+            statusIcon.style.background = '#00ff41';
+            statusIcon.style.animation = 'pulseGreen 0.5s ease-in-out 3';
+            
+            // Show success overlay
+            setTimeout(() => {
+                const successOverlay = document.getElementById('successOverlay');
+                successOverlay.style.display = 'flex';
+                
+                // Navigate to success page after delay
+                setTimeout(() => {
+                    // Store success data
+                    localStorage.setItem('keyFound', 'true');
+                    localStorage.setItem('targetIndex', targetIndex);
+                    localStorage.setItem('timestamp', Date.now());
+                    
+                    // Navigate to success page or back to main flow
+                    window.location.href = 'success.html';
+                }, 3000);
+            }, 1000);
+        }
+        
+        function onTargetLost() {
+            if (!targetDetected) {
+                const statusText = document.getElementById('statusText');
+                const statusIcon = document.querySelector('.status-icon');
+                
+                statusText.textContent = 'SCANNING FOR KEY...';
+                statusIcon.style.background = '#6BE4F0';
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Navigation functions
+        function goBack() {
+            // Store current state before navigating back
+            localStorage.setItem('scannerExited', 'true');
+            
+            // Navigate back to key selection
+            window.location.href = 'page2.html';
+        }
+        
+        function toggleFlashlight() {
+            // Note: Flashlight control requires advanced camera API
+            // This is a placeholder for future implementation
+            const button = event.target;
+            const isOn = button.textContent.includes('🔦');
+            
+            if (isOn) {
+                button.innerHTML = '💡 LIGHT';
+                // Would enable flashlight here
+            } else {
+                button.innerHTML = '🔦 LIGHT';
+                // Would disable flashlight here
+            }
+            
+            // Simulate flashlight feedback
+            button.style.background = isOn ? 
+                'linear-gradient(135deg, rgba(255, 255, 0, 0.8), rgba(255, 200, 0, 0.8))' :
+                'linear-gradient(135deg, rgba(34, 178, 185, 0.8), rgba(0, 148, 109, 0.8))';
+        }
+        
+        // Enhanced mobile handling
+        function initializeMobileOptimizations() {
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Prevent pinch zoom
+            document.addEventListener('touchmove', function(event) {
+                if (event.scale !== 1) {
+                    event.preventDefault();
+                }
+            }, { passive: false });
+            
+            // Lock orientation to portrait on mobile
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait').catch(function(error) {
+                    console.log('Orientation lock failed:', error);
+                });
+            }
+            
+            // Force full screen on iOS
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                window.addEventListener('touchstart', function() {
+                    if (window.navigator.standalone !== true) {
+                        document.body.style.height = window.innerHeight + 'px';
+                    }
+                });
+            }
+            
+            // Android specific optimizations
+            if (/Android/.test(navigator.userAgent)) {
+                // Hide address bar
+                setTimeout(() => {
+                    window.scrollTo(0, 1);
+                }, 100);
+                
+                // Viewport height fix
+                const setVH = () => {
+                    let vh = window.innerHeight * 0.01;
+                    document.documentElement.style.setProperty('--vh', `${vh}px`);
+                };
+                
+                setVH();
+                window.addEventListener('resize', setVH);
+            }
+        }
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                isScanning = false;
+                console.log('Page hidden - pausing scan');
+            } else if (!targetDetected) {
+                isScanning = true;
+                console.log('Page visible - resuming scan');
+                updateScannerStatus('SCANNING ACTIVE');
+            }
+        });
+        
+        // Prevent context menu and text selection on mobile
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+        });
+        
+        // Handle orientation changes with better mobile support
+        function handleOrientationChange() {
+            setTimeout(() => {
+                // Update viewport calculations
+                if (/Android/.test(navigator.userAgent)) {
+                    let vh = window.innerHeight * 0.01;
+                    document.documentElement.style.setProperty('--vh', `${vh}px`);
+                }
+                
+                // Force re-render of AR scene
+                const sceneEl = document.querySelector('a-scene');
+                if (sceneEl) {
+                    // Force MindAR to recalculate dimensions
+                    if (sceneEl.systems && sceneEl.systems['mindar-image-system']) {
+                        setTimeout(() => {
+                            sceneEl.systems['mindar-image-system'].pause();
+                            sceneEl.systems['mindar-image-system'].unpause();
+                        }, 300);
+                    }
+                }
+                
+                console.log('Orientation changed - AR scene updated');
+            }, 500);
+        }
+        
+        window.addEventListener('orientationchange', handleOrientationChange);
+        window.addEventListener('resize', handleOrientationChange);
+    </script>
+</body>
+</html>
