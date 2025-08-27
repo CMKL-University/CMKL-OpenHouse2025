@@ -3,7 +3,7 @@
 .env.local
 .env.development
 .env.production
-
+.claude
 # Configuration files with sensitive data
 config.js
 
