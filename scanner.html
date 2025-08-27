@@ -166,73 +166,13 @@
             transform: translate(-50%, -50%);
             width: min(250px, 60vw);
             height: min(250px, 60vw);
-            border: 3px solid #6BE4F0;
+            border: 3px solid #00ff41;
             border-radius: 20px;
             opacity: 0.9;
-            box-shadow: 0 0 15px rgba(107, 228, 240, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.6);
         }
         
-        .scanner-reticle::before,
-        .scanner-reticle::after,
-        .scanner-reticle .corner-tl,
-        .scanner-reticle .corner-tr,
-        .scanner-reticle .corner-bl,
-        .scanner-reticle .corner-br {
-            content: '';
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border: 3px solid #00ff41;
-            box-shadow: 0 0 10px #00ff41;
-        }
-        
-        .scanner-reticle::before {
-            top: -3px;
-            left: -3px;
-            border-right: none;
-            border-bottom: none;
-            border-top-left-radius: 20px;
-            animation: scanCorner 2s ease-in-out infinite;
-        }
-        
-        .scanner-reticle::after {
-            top: -3px;
-            right: -3px;
-            border-left: none;
-            border-bottom: none;
-            border-top-right-radius: 20px;
-            animation: scanCorner 2s ease-in-out infinite 0.5s;
-        }
-        
-        .corner-bl {
-            bottom: -3px;
-            left: -3px;
-            border-right: none;
-            border-top: none;
-            border-bottom-left-radius: 20px;
-            animation: scanCorner 2s ease-in-out infinite 1s;
-        }
-        
-        .corner-br {
-            bottom: -3px;
-            right: -3px;
-            border-left: none;
-            border-top: none;
-            border-bottom-right-radius: 20px;
-            animation: scanCorner 2s ease-in-out infinite 1.5s;
-        }
-        
-        @keyframes scanCorner {
-            0%, 100% { 
-                opacity: 0.6;
-                transform: scale(1);
-            }
-            50% { 
-                opacity: 1;
-                transform: scale(1.1);
-                box-shadow: 0 0 20px #00ff41;
-            }
-        }
+        /* Green corner elements removed */
         
         /* Scanning Animation Lines */
         .scan-line {
@@ -318,8 +258,8 @@
         
         .nav-button {
             background: linear-gradient(135deg, rgba(34, 178, 185, 0.9), rgba(0, 148, 109, 0.9));
-            border: 2px solid #6BE4F0;
-            border-radius: 12px;
+            border: none;
+            border-radius: 20px;
             padding: 14px 24px;
             color: white;
             font-family: 'Darker Grotesque', sans-serif;
@@ -713,7 +653,7 @@
             <!-- Status Bar -->
             <div class="status-bar">
                 <div class="status-icon"></div>
-                <div class="status-text" id="statusText">SCANNING FOR KEY...</div>
+                <div class="status-text" id="statusText">SCANNING...</div>
             </div>
             
             <!-- Scanner Reticle -->
@@ -732,7 +672,6 @@
             <!-- Bottom Navigation -->
             <div class="bottom-nav">
                 <button class="nav-button" onclick="goBack()">← BACK</button>
-                <button class="nav-button" onclick="toggleFlashlight()">🔦 LIGHT</button>
             </div>
         </div>
     </div>
@@ -1106,7 +1045,7 @@
         
         function updateUIForKey(keyNumber) {
             const statusText = document.getElementById('statusText');
-            statusText.textContent = `SCANNING FOR KEY ${keyNumber}...`;
+            statusText.textContent = `KEY ${keyNumber}...`;
         }
         
         function onTargetFound(targetIndex) {
