@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>CMKL Openhouse 2025 - Menu</title>
+    <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.iife.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Druk+Wide:wght@400;700&display=swap');
+        
+        body {
+            background: #000616 url('svg/background.svg') no-repeat center center fixed;
+            background-size: cover;
+            color: #6be4f0;
+            font-family: 'Darker Grotesque', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            margin: 0 auto;
+            background: transparent;
+            max-width: 393px;
+            max-height: 874px;
+            overflow: hidden;
+            z-index: 2;
+        }
+        
+        /* Top decorative border */
+        .top-border {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+        
+        /* Bottom decorative border */
+        .bottom-border {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+        
+        /* CMKL Title section */
+        .title-section {
+            position: absolute;
+            left: 50%;
+            top: 70px;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .title-logo {
+            width: 318px;
+            height: 90px;
+            background-image: url('svg/Group 11.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-bottom: 10px;
+        }
+        
+        /* Main content area from Figma design */
+        .main-content {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 15;
+        }
+        
+        /* Menu button styling based on Figma vectors */
+        .menu-button {
+            position: relative;
+            width: 255px;
+            height: 54px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .menu-button:hover {
+            transform: translateY(-2px) scale(1.02);
+            filter: brightness(1.2);
+        }
+        
+        /* Register button - green theme with glow */
+        .register-button {
+            background-image: url('svg/Group 20.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .register-button:hover {
+            transform: translateY(-2px) scale(1.05);
+        }
+        
+        .register-button .icon {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            background-image: url('svg/Group 20.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .register-button .text {
+            color: #00e2a7;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 600;
+            font-size: 25px;
+            letter-spacing: 1.25px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #00e2a7;
+        }
+        
+        /* Event Details button - blue theme */
+        .event-details-button {
+            background-image: url('svg/Group 21.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .event-details-button .icon {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 20px;
+            background-image: url('svg/Group 21.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .event-details-button .text {
+            color: #59e5ff;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 600;
+            font-size: 25px;
+            letter-spacing: 1.25px;
+            text-transform: uppercase;
+        }
+        
+        /* About CMKL button - blue theme */
+        .about-button {
+            background-image: url('svg/Group 22.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .about-button .icon {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 20px;
+            background-image: url('svg/Group 22.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .about-button .text {
+            color: #59e5ff;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 600;
+            font-size: 25px;
+            letter-spacing: 1.25px;
+            text-transform: uppercase;
+        }
+        
+        /* Matrix background elements - same as index.html */
+        .matrix-element-1 {
+            position: absolute;
+            left: 15%;
+            top: 300px;
+            width: 82px;
+            height: 48px;
+            background-image: url('svg/Group-1.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.4;
+        }
+        
+        .matrix-element-2 {
+            position: absolute;
+            left: -20.65%;
+            top: 60.64%;
+            right: 74.34%;
+            bottom: 32.95%;
+            background-image: url('svg/Group-3.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.3;
+            mix-blend-mode: screen;
+        }
+        
+        .matrix-element-3 {
+            position: absolute;
+            left: 25%;
+            top: 400px;
+            width: 200px;
+            height: 25px;
+            background-image: url('svg/Group-2.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.5;
+        }
+        
+        .matrix-element-4 {
+            position: absolute;
+            left: 69.9%;
+            top: 89.7%;
+            right: -4.77%;
+            bottom: 5.47%;
+            background-image: url('svg/Group.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.15;
+            mix-blend-mode: screen;
+        }
+        
+        .matrix-element-5 {
+            position: absolute;
+            left: 78.36%;
+            top: 23.57%;
+            right: -8.47%;
+            bottom: 67.39%;
+            background-image: url('svg/Group 3.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.4;
+        }
+        
+        .matrix-element-6 {
+            position: absolute;
+            left: 50%;
+            top: 240px;
+            transform: translateX(-50%);
+            width: 335px;
+            height: 209px;
+            background-image: url('svg/Group 4.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.35;
+        }
+        
+        .matrix-element-7 {
+            position: absolute;
+            left: -2.98%;
+            top: 20.14%;
+            right: 58.09%;
+            bottom: 71.35%;
+            background-image: url('svg/Group 10.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.3;
+        }
+        
+        .matrix-element-8 {
+            position: absolute;
+            left: 85.82%;
+            top: 51.26%;
+            right: -21.36%;
+            bottom: 32.41%;
+            background-image: url('svg/Group 13.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.35;
+            transform: rotate(42.167deg);
+        }
+        
+        .matrix-element-9 {
+            position: absolute;
+            left: 79.6%;
+            top: 33.98%;
+            right: -18.61%;
+            bottom: 60.62%;
+            background-image: url('svg/Group.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.3;
+            mix-blend-mode: screen;
+        }
+        
+        /* Group 24 - positioned below menus */
+        .matrix-element-10 {
+            position: absolute;
+            left: 50%;
+            top: 65%;
+            transform: translateX(-50%);
+            width: 335px;
+            height: 18px;
+            background-image: url('svg/Group 24.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.6;
+        }
+        
+        /* Group 4_1 - frame above menus */
+        .matrix-element-11 {
+            position: absolute;
+            left: 50%;
+            top: 25%;
+            transform: translateX(-50%);
+            width: 335px;
+            height: 150px;
+            background-image: url('svg/Group 4_1.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.4;
+        }
+        
+        /* Bottom indicator */
+        .bottom-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 41px;
+            background-image: url('svg/Vector.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .bottom-indicator:hover {
+            filter: brightness(1.2);
+            transform: translateX(-50%) scale(1.1);
+        }
+        
+        /* Initial hidden state for cyberpunk animation */
+        .cyberpunk-element {
+            opacity: 0;
+            filter: brightness(0);
+        }
+        
+        /* Cyberpunk flickering animation */
+        @keyframes cyberpunkFlicker {
+            0% { opacity: 0; filter: brightness(0) drop-shadow(0 0 0px #6be4f0); }
+            10% { opacity: 0.3; filter: brightness(0.3) drop-shadow(0 0 5px #6be4f0); }
+            15% { opacity: 0; filter: brightness(0) drop-shadow(0 0 0px #6be4f0); }
+            25% { opacity: 0.8; filter: brightness(0.8) drop-shadow(0 0 10px #6be4f0); }
+            30% { opacity: 0.2; filter: brightness(0.2) drop-shadow(0 0 3px #6be4f0); }
+            40% { opacity: 1; filter: brightness(1.2) drop-shadow(0 0 15px #6be4f0); }
+            45% { opacity: 0.7; filter: brightness(0.7) drop-shadow(0 0 8px #6be4f0); }
+            55% { opacity: 1; filter: brightness(1) drop-shadow(0 0 12px #6be4f0); }
+            60% { opacity: 0.9; filter: brightness(0.9) drop-shadow(0 0 10px #6be4f0); }
+            100% { opacity: 1; filter: brightness(1) drop-shadow(0 0 8px #6be4f0); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .main-container {
+                max-width: 100vw;
+                max-height: 100vh;
+            }
+            
+            .top-border, .bottom-border {
+                width: 95vw;
+                max-width: 400px;
+                height: 20px;
+            }
+            
+            .title-section {
+                top: 8vh;
+            }
+            
+            .title-logo {
+                width: 85vw;
+                max-width: 318px;
+            }
+            
+            .main-content {
+                width: 90vw;
+                max-width: 280px;
+            }
+            
+            .menu-button {
+                width: 90vw;
+                max-width: 255px;
+                transform: scale(0.9);
+            }
+            
+            .bottom-indicator {
+                bottom: 8vh;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .main-content {
+                gap: 12px;
+            }
+            
+            .menu-button {
+                transform: scale(0.85);
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .main-container {
+                max-width: 393px;
+                max-height: 874px;
+                margin: 0 auto;
+                transform: scale(1);
+            }
+            
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+            }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (orientation: landscape) and (max-height: 600px) {
+            .main-container {
+                height: 100vh;
+                max-height: none;
+                overflow-y: auto;
+            }
+            
+            .title-section {
+                top: 5vh;
+            }
+            
+            .main-content {
+                top: 45vh;
+                gap: 10px;
+            }
+            
+            .menu-button {
+                transform: scale(0.9);
+            }
+            
+            .bottom-indicator {
+                bottom: 5vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        
+        <!-- Top decorative border -->
+        <div class="top-border cyberpunk-element"></div>
+        
+        <!-- CMKL Title section -->
+        <div class="title-section cyberpunk-element">
+            <div class="title-logo"></div>
+        </div>
+        
+        <!-- Matrix background elements -->
+        <div class="matrix-element-1 cyberpunk-element"></div>
+        <div class="matrix-element-2 cyberpunk-element"></div>
+        <!-- <div class="matrix-element-3 cyberpunk-element"></div> -->
+        <div class="matrix-element-4 cyberpunk-element"></div>
+        <div class="matrix-element-5 cyberpunk-element"></div>
+        <!-- <div class="matrix-element-6 cyberpunk-element"></div> -->
+        <div class="matrix-element-7 cyberpunk-element"></div>
+        <div class="matrix-element-8 cyberpunk-element"></div>
+        <div class="matrix-element-9 cyberpunk-element"></div>
+        <div class="matrix-element-10 cyberpunk-element"></div>
+        <div class="matrix-element-11 cyberpunk-element"></div>
+        
+        <!-- Main menu content -->
+        <div class="main-content cyberpunk-element">
+            <button class="menu-button register-button cyberpunk-element" onclick="goToRegister()">
+                <div class="icon"></div>
+            </button>
+            
+            <button class="menu-button event-details-button cyberpunk-element" onclick="goToEventDetails()">
+                <div class="icon"></div>
+            </button>
+            
+            <button class="menu-button about-button cyberpunk-element" onclick="goToAboutCMKL()">
+                <div class="icon"></div>
+            </button>
+        </div>
+        
+        <!-- Bottom indicator -->
+        <div class="bottom-indicator cyberpunk-element" onclick="scrollToTop()"></div>
+        
+        <!-- Bottom decorative border -->
+        <div class="bottom-border cyberpunk-element"></div>
+    </div>
+    
+    <script>
+        // Initialize page with cyberpunk flickering animation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('CMKL Openhouse 2025 - Menu Page Loaded');
+            
+            // Cyberpunk animation sequence
+            const cyberpunkElements = [
+                '.top-border',
+                '.bottom-border', 
+                '.title-section',
+                '.matrix-element-1',
+                '.matrix-element-2', 
+                '.matrix-element-4',
+                '.matrix-element-5',
+                '.matrix-element-7',
+                '.matrix-element-8',
+                '.matrix-element-9',
+                '.main-content',
+                '.bottom-indicator'
+            ];
+            
+            // Separate elements that need special handling
+            const specialElements = ['.matrix-element-10', '.matrix-element-11'];
+            const menuButtons = ['.register-button', '.event-details-button', '.about-button'];
+            
+            // Animate elements in sequence using Motion.js
+            setTimeout(() => {
+                if (typeof Motion !== 'undefined') {
+                    cyberpunkElements.forEach((selector, index) => {
+                        const element = document.querySelector(selector);
+                        if (element) {
+                            // Sequential delay for each element
+                            setTimeout(() => {
+                                Motion.animate(element, 
+                                    {
+                                        opacity: [0, 0.3, 0, 0.8, 0.2, 1, 0.7, 1, 0.9, 1],
+                                        filter: selector === '.title-section' ? [
+                                            'brightness(0)',
+                                            'brightness(0.3)',
+                                            'brightness(0)',
+                                            'brightness(0.8)',
+                                            'brightness(0.2)',
+                                            'brightness(1.2)',
+                                            'brightness(0.7)',
+                                            'brightness(1)',
+                                            'brightness(0.9)',
+                                            'brightness(1)'
+                                        ] : [
+                                            'brightness(0) drop-shadow(0 0 0px #6be4f0)',
+                                            'brightness(0.3) drop-shadow(0 0 5px #6be4f0)',
+                                            'brightness(0) drop-shadow(0 0 0px #6be4f0)',
+                                            'brightness(0.8) drop-shadow(0 0 10px #6be4f0)',
+                                            'brightness(0.2) drop-shadow(0 0 3px #6be4f0)',
+                                            'brightness(1.2) drop-shadow(0 0 15px #6be4f0)',
+                                            'brightness(0.7) drop-shadow(0 0 8px #6be4f0)',
+                                            'brightness(1) drop-shadow(0 0 12px #6be4f0)',
+                                            'brightness(0.9) drop-shadow(0 0 10px #6be4f0)',
+                                            'brightness(1) drop-shadow(0 0 8px #6be4f0)'
+                                        ]
+                                    },
+                                    { 
+                                        duration: 1.5,
+                                        easing: "ease-out"
+                                    }
+                                );
+                            }, index * 200); // 200ms delay between each element
+                        }
+                    });
+                    
+                    // Start floating animations after sequence
+                    setTimeout(() => {
+                        // Bottom indicator floating
+                        const bottomIndicator = document.querySelector('.bottom-indicator');
+                        if (bottomIndicator) {
+                            bottomIndicator.style.opacity = '1';
+                            bottomIndicator.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                            bottomIndicator.style.transform = 'translateX(-50%)';
+                            
+                            Motion.animate(bottomIndicator, 
+                                { 
+                                    transform: [
+                                        'translateX(-50%) translateY(0px)', 
+                                        'translateX(-50%) translateY(-10px)', 
+                                        'translateX(-50%) translateY(0px)'
+                                    ] 
+                                }, 
+                                { 
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    easing: "ease-in-out"
+                                }
+                            );
+                        }
+                        
+                        // Matrix elements floating
+                        [1,2,4,5,7,8,9].forEach(num => {
+                            const element = document.querySelector(`.matrix-element-${num}`);
+                            if (element) {
+                                element.style.opacity = num <= 3 ? ['0.4', '0.3', '0.5'][num-1] : '0.35';
+                                element.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                                
+                                Motion.animate(element, 
+                                    { y: [-3, 3, -3] }, 
+                                    { 
+                                        duration: 3 + (num * 0.2),
+                                        repeat: Infinity,
+                                        easing: "ease-in-out",
+                                        delay: num * 0.1
+                                    }
+                                );
+                            }
+                        });
+                        
+                        // Start special elements after everything else
+                        setTimeout(() => {
+                            // Animate special elements first
+                            specialElements.forEach((selector, index) => {
+                                const element = document.querySelector(selector);
+                                if (element) {
+                                    console.log(`Animating special element: ${selector}`);
+                                    setTimeout(() => {
+                                        Motion.animate(element, 
+                                            {
+                                                opacity: [0, 0.3, 0, 0.8, 0.2, 1, 0.7, 1, 0.9, 1],
+                                                filter: [
+                                                    'brightness(0) drop-shadow(0 0 0px #6be4f0)',
+                                                    'brightness(0.3) drop-shadow(0 0 5px #6be4f0)',
+                                                    'brightness(0) drop-shadow(0 0 0px #6be4f0)',
+                                                    'brightness(0.8) drop-shadow(0 0 10px #6be4f0)',
+                                                    'brightness(0.2) drop-shadow(0 0 3px #6be4f0)',
+                                                    'brightness(1.2) drop-shadow(0 0 15px #6be4f0)',
+                                                    'brightness(0.7) drop-shadow(0 0 8px #6be4f0)',
+                                                    'brightness(1) drop-shadow(0 0 12px #6be4f0)',
+                                                    'brightness(0.9) drop-shadow(0 0 10px #6be4f0)',
+                                                    'brightness(1) drop-shadow(0 0 8px #6be4f0)'
+                                                ]
+                                            },
+                                            { 
+                                                duration: 0.8,
+                                                easing: "ease-out"
+                                            }
+                                        );
+                                    }, index * 100);
+                                }
+                            });
+                            
+                            // Animate menu buttons separately  
+                            menuButtons.forEach((selector, index) => {
+                                const element = document.querySelector(selector);
+                                if (element) {
+                                    console.log(`Animating menu button: ${selector}`);
+                                    setTimeout(() => {
+                                        const isRegister = element.classList.contains('register-button');
+                                        Motion.animate(element, 
+                                            {
+                                                opacity: [0, 0.3, 0, 0.8, 0.2, 1, 0.7, 1, 0.9, 1],
+                                                filter: isRegister ? [
+                                                    'brightness(0) drop-shadow(0 0 0px #00e2a7)',
+                                                    'brightness(0.3) drop-shadow(0 0 5px #00e2a7)',
+                                                    'brightness(0) drop-shadow(0 0 0px #00e2a7)',
+                                                    'brightness(0.8) drop-shadow(0 0 10px #00e2a7)',
+                                                    'brightness(0.2) drop-shadow(0 0 3px #00e2a7)',
+                                                    'brightness(1.2) drop-shadow(0 0 15px #00e2a7)',
+                                                    'brightness(0.7) drop-shadow(0 0 8px #00e2a7)',
+                                                    'brightness(1) drop-shadow(0 0 12px #00e2a7)',
+                                                    'brightness(0.9) drop-shadow(0 0 10px #00e2a7)',
+                                                    'brightness(1) drop-shadow(0 0 15px #00e2a7)'
+                                                ] : [
+                                                    'brightness(0)',
+                                                    'brightness(0.3)',
+                                                    'brightness(0)',
+                                                    'brightness(0.8)',
+                                                    'brightness(0.2)',
+                                                    'brightness(1.2)',
+                                                    'brightness(0.7)',
+                                                    'brightness(1)',
+                                                    'brightness(0.9)',
+                                                    'brightness(1)'
+                                                ]
+                                            },
+                                            { 
+                                                duration: 0.8,
+                                                easing: "ease-out"
+                                            }
+                                        );
+                                    }, (index + 2) * 100); // Start after special elements
+                                }
+                            });
+                            
+                            // Then start floating animations
+                            setTimeout(() => {
+                                const matrixElement10 = document.querySelector('.matrix-element-10');
+                                if (matrixElement10) {
+                                    console.log('Starting matrix-element-10 floating');
+                                    matrixElement10.style.opacity = '0.6';
+                                    matrixElement10.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                                    
+                                    Motion.animate(matrixElement10, 
+                                        { y: [-4, 4, -4] }, 
+                                        { 
+                                            duration: 4.5,
+                                            repeat: Infinity,
+                                            easing: "ease-in-out"
+                                        }
+                                    );
+                                }
+                                
+                                const matrixElement11 = document.querySelector('.matrix-element-11');
+                                if (matrixElement11) {
+                                    console.log('Starting matrix-element-11 floating');
+                                    matrixElement11.style.opacity = '0.4';
+                                    matrixElement11.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                                    
+                                    Motion.animate(matrixElement11, 
+                                        { y: [-5, 5, -5] }, 
+                                        { 
+                                            duration: 5,
+                                            repeat: Infinity,
+                                            easing: "ease-in-out"
+                                        }
+                                    );
+                                }
+                                
+                                // Start menu button floating animations
+                                document.querySelectorAll('.menu-button').forEach((button, index) => {
+                                    console.log(`Starting floating animation for menu button ${index}`);
+                                    button.style.opacity = '1';
+                                    
+                                    // Set appropriate filter for each button type
+                                    if (button.classList.contains('register-button')) {
+                                        // Don't set initial filter - let animation handle it
+                                        
+                                        // Add color flicker effect like page2.html
+                                        setTimeout(() => {
+                                            console.log('Starting register button color flicker effect');
+                                            
+                                            // Color flicker animation with delays (orange and red only)
+                                            Motion.animate(button, 
+                                                {
+                                                    filter: [
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(0.8) drop-shadow(0 0 20px #ffa500)',
+                                                        'brightness(0.9) drop-shadow(0 0 12px #ff0040)',
+                                                        'brightness(1.1) drop-shadow(0 0 25px #ffa500)',
+                                                        'brightness(1.2) drop-shadow(0 0 18px #ff0040)',
+                                                        'brightness(0.7) drop-shadow(0 0 30px #ffa500)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)',
+                                                        'brightness(0.9) drop-shadow(0 0 22px #ff0040)',
+                                                        'brightness(1.3) drop-shadow(0 0 35px #ffa500)',
+                                                        'brightness(1) drop-shadow(0 0 15px #00e2a7)'
+                                                    ]
+                                                },
+                                                {
+                                                    duration: 6,
+                                                    repeat: Infinity,
+                                                    easing: "steps(21, jump-end)"
+                                                }
+                                            );
+                                        }, 500);
+                                    } else {
+                                        button.style.filter = 'brightness(1)';
+                                    }
+                                    
+                                    // Add floating animation to all menu buttons
+                                    Motion.animate(button, 
+                                        { y: [-2, 2, -2] }, 
+                                        { 
+                                            duration: 3.5 + (index * 0.3),
+                                            repeat: Infinity,
+                                            easing: "ease-in-out",
+                                            delay: index * 0.2
+                                        }
+                                    );
+                                });
+                            }, 1000);
+                            
+                        }, 200);
+                        
+                        // Menu buttons floating - special handling for register button
+                        document.querySelectorAll('.menu-button').forEach((button, index) => {
+                            button.style.opacity = '1';
+                            
+                            // Only register button gets glow, others get standard filter
+                            if (button.classList.contains('register-button')) {
+                                button.style.filter = 'drop-shadow(0 0 15px #00e2a7)';
+                                
+                                // Add continuous flickering to register button
+                                setTimeout(() => {
+                                    Motion.animate(button, 
+                                        {
+                                            filter: [
+                                                'drop-shadow(0 0 15px #00e2a7)',
+                                                'drop-shadow(0 0 25px #00e2a7) brightness(1.2)',
+                                                'drop-shadow(0 0 10px #00e2a7) brightness(0.9)',
+                                                'drop-shadow(0 0 30px #00e2a7) brightness(1.3)',
+                                                'drop-shadow(0 0 15px #00e2a7)'
+                                            ]
+                                        },
+                                        {
+                                            duration: 2,
+                                            repeat: Infinity,
+                                            easing: "ease-in-out"
+                                        }
+                                    );
+                                }, 1000);
+                            } else {
+                                button.style.filter = 'brightness(1)';
+                            }
+                            
+                            // Add floating animation to all menu buttons
+                            console.log(`Starting floating animation for menu button ${index}`);
+                            Motion.animate(button, 
+                                { y: [-2, 2, -2] }, 
+                                { 
+                                    duration: 3.5 + (index * 0.3),
+                                    repeat: Infinity,
+                                    easing: "ease-in-out",
+                                    delay: index * 0.2
+                                }
+                            );
+                        });
+                        
+                    }, cyberpunkElements.length * 100 + 800);
+                } else {
+                    // Fallback CSS animations
+                    cyberpunkElements.forEach((selector, index) => {
+                        const element = document.querySelector(selector);
+                        if (element) {
+                            setTimeout(() => {
+                                element.style.animation = 'cyberpunkFlicker 1.5s ease-out forwards';
+                            }, index * 200);
+                        }
+                    });
+                    
+                    // Fallback floating animations for CSS
+                    setTimeout(() => {
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            @keyframes float1 {
+                                0%, 100% { transform: translateY(0px); }
+                                50% { transform: translateY(-3px); }
+                            }
+                            @keyframes float2 {
+                                0%, 100% { transform: translateY(0px); }
+                                50% { transform: translateY(-4px); }
+                            }
+                            @keyframes float3 {
+                                0%, 100% { transform: translateY(0px); }
+                                50% { transform: translateY(-2px); }
+                            }
+                            @keyframes floatVector {
+                                0%, 100% { transform: translateX(-50%) translateY(0px); }
+                                50% { transform: translateX(-50%) translateY(-10px); }
+                            }
+                            @keyframes float4 {
+                                0%, 100% { transform: translateX(-50%) translateY(0px); }
+                                50% { transform: translateX(-50%) translateY(-4px); }
+                            }
+                            @keyframes float5 {
+                                0%, 100% { transform: translateX(-50%) translateY(0px); }
+                                50% { transform: translateX(-50%) translateY(-5px); }
+                            }
+                            .matrix-element-1, .matrix-element-4, .matrix-element-7 { animation: float1 3s ease-in-out infinite; opacity: 0.4; filter: brightness(1) drop-shadow(0 0 8px #6be4f0); }
+                            .matrix-element-2, .matrix-element-5, .matrix-element-8 { animation: float2 3.5s ease-in-out infinite; opacity: 0.3; filter: brightness(1) drop-shadow(0 0 8px #6be4f0); }
+                            .matrix-element-3, .matrix-element-6, .matrix-element-9 { animation: float3 4s ease-in-out infinite; opacity: 0.5; filter: brightness(1) drop-shadow(0 0 8px #6be4f0); }
+                            .matrix-element-10 { animation: float4 4.5s ease-in-out infinite; opacity: 0.6; filter: brightness(1) drop-shadow(0 0 8px #6be4f0); }
+                            .matrix-element-11 { animation: float5 5s ease-in-out infinite; opacity: 0.4; filter: brightness(1) drop-shadow(0 0 8px #6be4f0); }
+                            .menu-button { animation: float3 4s ease-in-out infinite; opacity: 1; filter: brightness(1); }
+                            @keyframes registerFlicker {
+                                0%, 5%, 10%, 15%, 20%, 25%, 30% { filter: brightness(1) drop-shadow(0 0 15px #00e2a7); }
+                                35% { filter: brightness(0.8) drop-shadow(0 0 20px #ffa500); }
+                                40% { filter: brightness(0.9) drop-shadow(0 0 12px #ff0040); }
+                                45% { filter: brightness(1.1) drop-shadow(0 0 25px #ffa500); }
+                                50% { filter: brightness(1.2) drop-shadow(0 0 18px #ff0040); }
+                                55% { filter: brightness(0.7) drop-shadow(0 0 30px #ffa500); }
+                                60%, 65%, 70%, 75%, 80%, 85% { filter: brightness(1) drop-shadow(0 0 15px #00e2a7); }
+                                90% { filter: brightness(0.9) drop-shadow(0 0 22px #ff0040); }
+                                95% { filter: brightness(1.3) drop-shadow(0 0 35px #ffa500); }
+                                100% { filter: brightness(1) drop-shadow(0 0 15px #00e2a7); }
+                            }
+                            .register-button { animation: float3 4s ease-in-out infinite, registerFlicker 6s steps(21, jump-end) infinite; opacity: 1; }
+                            .bottom-indicator { animation: floatVector 2s ease-in-out infinite !important; opacity: 1; filter: brightness(1) drop-shadow(0 0 8px #6be4f0); }
+                        `;
+                        document.head.appendChild(style);
+                    }, cyberpunkElements.length * 100 + 800);
+                }
+            }, 100);
+        });
+        
+        // Navigation functions
+        function goToRegister() {
+            console.log('Navigating to Register page');
+            // Add page transition
+            document.body.style.transition = 'opacity 0.5s ease-out';
+            document.body.style.opacity = '0';
+            
+            setTimeout(() => {
+                window.location.href = 'index.html'; // Navigate back to main registration page
+            }, 500);
+        }
+        
+        function goToEventDetails() {
+            console.log('Navigating to Event Details page');
+            // Add page transition
+            document.body.style.transition = 'opacity 0.5s ease-out';
+            document.body.style.opacity = '0';
+            
+            setTimeout(() => {
+                // Create or navigate to event details page
+                window.location.href = 'event-details.html';
+            }, 500);
+        }
+        
+        function goToAboutCMKL() {
+            console.log('Navigating to About CMKL page');
+            // Add page transition
+            document.body.style.transition = 'opacity 0.5s ease-out';
+            document.body.style.opacity = '0';
+            
+            setTimeout(() => {
+                // Navigate to CMKL website or create about page
+                window.open('https://cmkl.ac.th', '_blank');
+                // Reset opacity in case user comes back
+                document.body.style.opacity = '1';
+            }, 500);
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Add hover effects for menu buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.menu-button').forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.02)';
+                    this.style.filter = 'brightness(1.2) drop-shadow(0 0 15px #6be4f0)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.filter = 'brightness(1) drop-shadow(0 0 8px #6be4f0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

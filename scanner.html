@@ -29,7 +29,8 @@
         }
         
         body {
-            background: #000616;
+            background: #000616 url('svg/background.svg') no-repeat center center fixed;
+            background-size: cover;
             color: #6be4f0;
             font-family: 'Darker Grotesque', sans-serif;
             margin: 0;
@@ -45,6 +46,18 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            pointer-events: none;
         }
         
         /* AR Scanner Container */
@@ -363,7 +376,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 6, 22, 0.95);
+            background: rgba(0, 6, 22, 0.3);
             display: flex;
             justify-content: center;
             align-items: center;
