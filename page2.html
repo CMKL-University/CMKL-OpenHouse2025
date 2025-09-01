@@ -192,7 +192,7 @@
         }
         
         /* Special styling for locked last card */
-        .nav-card:nth-child(5).locked {
+        .nav-card:nth-child(4).locked {
             opacity: 0.6;
             animation: glitchEffect 1s infinite;
         }
@@ -420,6 +420,50 @@
             75% { 
                 transform: translateY(-2px) translateX(-0.5px);
                 filter: brightness(1.1) hue-rotate(10deg);
+            }
+        }
+        
+        /* Program Logos Row */
+        .logos-row {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            z-index: 1000;
+            opacity: 0.8;
+        }
+        
+        .logo-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .program-logo {
+            width: 80px;
+            height: 80px;
+            filter: brightness(0.9) drop-shadow(0 0 10px rgba(107, 228, 240, 0.5));
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .program-logo:hover {
+            filter: brightness(1.2) drop-shadow(0 0 20px rgba(107, 228, 240, 0.8));
+            transform: translateY(-5px) scale(1.1);
+        }
+        
+        /* Responsive logos */
+        @media (max-width: 480px) {
+            .logos-row {
+                gap: 20px;
+                bottom: 40px;
+            }
+            
+            .program-logo {
+                width: 100px;
+                /* height: 100%; */
             }
         }
         
@@ -1222,14 +1266,21 @@
                     <div class="card-text">???</div>
                 </div>
             </div>
-            <div class="nav-card cyberpunk-element" onclick="selectCard(5)">
-                <div class="card-icon"></div>
-                <div>
-                    <div class="card-text">???</div>
-                </div>
-            </div>
         </div>
         
+        
+        <!-- Program Logos Row -->
+        <div class="logos-row">
+            <div class="logo-item">
+                <img src="svg/AiCE.svg" alt="AICE" class="program-logo">
+            </div>
+            <div class="logo-item">
+                <img src="svg/ECE.svg" alt="ECE" class="program-logo">
+            </div>
+            <div class="logo-item">
+                <img src="svg/Aii.svg" alt="AII" class="program-logo">
+            </div>
+        </div>
         
         <!-- Matrix background elements -->
         <div class="matrix-element-1 cyberpunk-element"></div>
@@ -1367,24 +1418,24 @@
             try {
                 const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
                 
-                // Count scanned keys (only first 4 cards)
+                // Count scanned keys (only first 3 cards for unlock condition)
                 let scannedCount = 0;
-                for (let i = 1; i <= 4; i++) {
+                for (let i = 1; i <= 3; i++) {
                     if ((keyStatuses[`key${i}`] || 'not_scanned') === 'scanned') {
                         scannedCount++;
                     }
                 }
                 
                 // Update each key card based on status
-                for (let i = 1; i <= 5; i++) {
+                for (let i = 1; i <= 4; i++) {
                     const card = document.querySelector(`.nav-card:nth-child(${i})`);
                     const cardText = card.querySelector('.card-text');
                     const keyStatus = keyStatuses[`key${i}`] || 'not_scanned';
                     
-                    if (i === 5) {
-                        // Special handling for last card
+                    if (i === 4) {
+                        // Special handling for 4th card (locked until 2 keys scanned)
                         if (scannedCount >= 2) {
-                            // Unlock the last card
+                            // Unlock the 4th card
                             card.classList.remove('locked');
                             if (keyStatus === 'scanned') {
                                 cardText.textContent = 'SCANNED';
@@ -1392,19 +1443,22 @@
                                 card.style.opacity = '0.7';
                                 card.style.filter = 'brightness(0.8)';
                             } else {
-                                cardText.textContent = 'UNLOCKED';
+                                cardText.textContent = 'Special key';
                                 cardText.style.color = '#00ff41';
+                                cardText.style.fontWeight = 'bold';
+                                cardText.style.textShadow = '0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 30px #00ff41';
                                 card.style.opacity = '1';
-                                card.style.filter = 'none';
+                                card.style.filter = 'drop-shadow(0 0 15px #00ff41)';
+                                card.classList.add('locked'); // Keep glitch effect
                             }
                         } else {
-                            // Keep last card locked
+                            // Keep 4th card locked
                             card.classList.add('locked');
                             cardText.textContent = 'LOCKED';
                             cardText.style.color = '#ff4444';
                         }
                     } else {
-                        // Normal cards (1-4)
+                        // Normal cards (1-3)
                         if (keyStatus === 'scanned') {
                             cardText.textContent = 'SCANNED';
                             cardText.style.color = '#00ff41';
@@ -1436,7 +1490,6 @@
                 '.nav-card:nth-child(2)',
                 '.nav-card:nth-child(3)',
                 '.nav-card:nth-child(4)',
-                '.nav-card:nth-child(5)',
                 '.bottom-nav-card:nth-child(1)',
                 '.bottom-nav-card:nth-child(2)',
                 '.bottom-nav-card:nth-child(3)',
@@ -1522,9 +1575,9 @@
             const cards = document.querySelectorAll('.nav-card');
             const selectedCard = cards[cardNumber - 1];
             
-            // Check if this is the locked last card
-            if (cardNumber === 5 && selectedCard.classList.contains('locked')) {
-                showVRMessage('Card 5 is locked!\nScan 2 keys first.');
+            // Check if this is the locked 4th card
+            if (cardNumber === 4 && selectedCard.classList.contains('locked')) {
+                showVRMessage('Card 4 is locked! Scan 2 keys first.');
                 return;
             }
             
