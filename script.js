@@ -1,74 +1,80 @@
-// Simple key collection system - no external submissions
+// Secure frontend script - no sensitive data exposed
+const API_BASE = window.location.origin + '/api';
 
-// User data management
-let userData = {
-    collectedKeys: [],
-    startTime: new Date().toISOString(),
-    interactions: [],
-    targetsFound: [],
-    requiredKeys: ['Engineering Access Key', 'Science Lab Key'],
-    sessionId: generateSessionId()
+// Minimal client-side data - no sensitive information
+let clientState = {
+    sessionId: null,
+    collectedKeysCount: 0,
+    totalKeys: 2,
+    targetsFoundCount: 0,
+    isCompleted: false,
+    isInitialized: false
 };
 
-// Generate unique session ID
-function generateSessionId() {
-    return 'cmkl_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+// Initialize secure session
+async function initializeSecureSession() {
+    try {
+        const response = await fetch(`${API_BASE}/session/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!response.ok) throw new Error('Failed to create session');
+        
+        const data = await response.json();
+        clientState.sessionId = data.sessionId;
+        clientState.totalKeys = data.requiredKeys.length;
+        clientState.isInitialized = true;
+        
+        // Make session ID globally available for HTML forms
+        window.currentSessionId = data.sessionId;
+        
+        console.log('✅ Secure session initialized');
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to initialize session:', error);
+        showMessage('Failed to connect to server. Please refresh.', '#ff6b6b');
+        return false;
+    }
 }
 
 // Auto-initialize app
-function initializeApp() {
-    // Clear all saved data on app initialization (fresh start each time)
-    clearAllSavedData();
+async function initializeApp() {
+    // Clear any local storage
+    localStorage.clear();
     
-    // Initialize AR interactions
-    initializeARInteractions();
-    
-    console.log('CMKL AR Experience initialized (fresh session):', userData);
-}
-
-// Clear all saved data (called on every page load/refresh)
-function clearAllSavedData() {
-    // Clear localStorage completely
-    localStorage.removeItem('cmkl_openhouse_data');
-    
-    // Reset userData to initial state
-    userData = {
-        collectedKeys: [],
-        startTime: new Date().toISOString(),
-        interactions: [],
-        targetsFound: [],
-        requiredKeys: ['Engineering Access Key', 'Science Lab Key'],
-        sessionId: generateSessionId()
-    };
-    
-    // Reset UI elements
+    // Reset UI
     resetUI();
     
-    console.log('All data cleared - fresh session started');
+    // Initialize secure session
+    const success = await initializeSecureSession();
+    
+    if (success) {
+        // Initialize AR interactions
+        initializeARInteractions();
+        console.log('🔒 Secure CMKL AR Experience initialized');
+    }
 }
 
 // Reset UI to initial state
 function resetUI() {
-    // Reset keys display
     const keysList = document.getElementById('keys-list');
     if (keysList) {
         keysList.innerHTML = '<p style="color: #ccc; font-size: 10px;">Find targets to collect keys!</p>';
     }
     
-    // Reset target counter
     const targetsFoundSpan = document.getElementById('targets-found');
     if (targetsFoundSpan) {
         targetsFoundSpan.textContent = '0';
     }
     
-    // Show all collect buttons (in case any were hidden)
+    // Reset collect buttons
     const collectButtons = document.querySelectorAll('.collect-button');
     collectButtons.forEach(button => {
-        button.style.display = 'none'; // Start hidden, show when target detected
+        button.style.display = 'none';
         button.classList.remove('show');
         button.style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
         
-        // Reset button text
         const targetType = button.getAttribute('data-target');
         if (targetType === 'engineering') {
             button.innerHTML = '🏗️ Collect Engineering Key';
@@ -77,7 +83,6 @@ function resetUI() {
         }
     });
     
-    // Hide target detection indicator
     const indicator = document.getElementById('target-indicator');
     if (indicator) {
         indicator.style.display = 'none';
@@ -86,7 +91,6 @@ function resetUI() {
 
 // Initialize AR interactions
 function initializeARInteractions() {
-    // Wait for A-Frame to be ready
     const scene = document.querySelector('a-scene');
     
     if (scene.hasLoaded) {
@@ -96,73 +100,76 @@ function initializeARInteractions() {
     }
 }
 
-// Setup click handlers for AR objects and buttons
+// Setup click handlers
 function setupClickHandlers() {
-    // Setup collect button handlers
     const collectButtons = document.querySelectorAll('.collect-button');
     collectButtons.forEach(button => {
         button.addEventListener('click', function() {
-            collectKeyFromButton(this);
+            collectKeySecurely(this);
         });
     });
     
-    // Building model interactions
+    // Building interactions
     const engineeringBuilding = document.getElementById('engineering-building');
     if (engineeringBuilding) {
-        engineeringBuilding.addEventListener('click', function() {
-            showBuildingMessage('engineering');
-        });
+        engineeringBuilding.addEventListener('click', () => handleBuildingClick('engineering'));
     }
     
     const scienceLab = document.getElementById('science-lab');
     if (scienceLab) {
-        scienceLab.addEventListener('click', function() {
-            showBuildingMessage('science');
-        });
+        scienceLab.addEventListener('click', () => handleBuildingClick('science'));
     }
     
     // Info box interactions
     const engineeringInfo = document.getElementById('engineering-info');
     if (engineeringInfo) {
-        engineeringInfo.addEventListener('click', function() {
-            showInfoMessage('engineering');
-        });
+        engineeringInfo.addEventListener('click', () => handleInfoClick('engineering'));
     }
     
     const scienceInfo = document.getElementById('science-info');
     if (scienceInfo) {
-        scienceInfo.addEventListener('click', function() {
-            showInfoMessage('science');
-        });
+        scienceInfo.addEventListener('click', () => handleInfoClick('science'));
     }
 }
 
-// Collect a key from button press
-function collectKeyFromButton(buttonElement) {
+// Secure key collection
+async function collectKeySecurely(buttonElement) {
+    if (!clientState.sessionId) {
+        showMessage('Session not initialized. Please refresh.', '#ff6b6b');
+        return;
+    }
+    
     const keyName = buttonElement.getAttribute('data-key');
     const targetType = buttonElement.getAttribute('data-target');
     
-    if (!userData.collectedKeys.includes(keyName)) {
-        userData.collectedKeys.push(keyName);
-        
-        // Track which target was found
-        if (!userData.targetsFound.includes(targetType)) {
-            userData.targetsFound.push(targetType);
-        }
-        
-        // Record interaction
-        userData.interactions.push({
-            type: 'key_collected',
-            keyName: keyName,
-            targetType: targetType,
-            method: 'button_press',
-            timestamp: new Date().toISOString()
+    try {
+        const response = await fetch(`${API_BASE}/session/${clientState.sessionId}/collect-key`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                keyName,
+                targetType,
+                method: 'button_press'
+            })
         });
         
-        // Hide the collect button
-        buttonElement.classList.remove('show');
+        if (!response.ok) {
+            const error = await response.json();
+            if (error.error === 'Key already collected') {
+                showMessage('Key already collected!', '#FF9800');
+                return;
+            }
+            throw new Error(error.error || 'Failed to collect key');
+        }
         
-        // Visual feedback - animate button
+        const result = await response.json();
+        
+        // Update client state with minimal data
+        clientState.collectedKeysCount = result.totalCollected;
+        clientState.isCompleted = result.isCompleted;
+        
+        // Hide button with animation
+        buttonElement.classList.remove('show');
         buttonElement.style.background = '#4CAF50';
         buttonElement.innerHTML = '✅ Collected!';
         
@@ -174,39 +181,38 @@ function collectKeyFromButton(buttonElement) {
         updateKeysDisplay();
         updateTargetStatus();
         
-        // Check if all required keys collected
-        checkGameCompletion();
-        
-        // Save locally only
-        autoSaveData();
-        
         // Show success message
-        showMessage(`🎉 Collected: ${keyName}!`, '#4CAF50');
+        showMessage(result.message, '#4CAF50');
         
-        console.log('Key collected via button:', keyName, 'from target:', targetType);
+        console.log('🔒 Key collected securely');
+        
+    } catch (error) {
+        console.error('❌ Failed to collect key:', error);
+        showMessage('Failed to collect key. Please try again.', '#ff6b6b');
     }
 }
 
-// Update keys display
+// Update keys display (minimal info only)
 function updateKeysDisplay() {
     const keysList = document.getElementById('keys-list');
     keysList.innerHTML = '';
     
-    userData.collectedKeys.forEach(keyName => {
+    // Show only progress, not actual keys
+    for (let i = 0; i < clientState.collectedKeysCount; i++) {
         const keyDiv = document.createElement('div');
         keyDiv.className = 'key-item';
-        keyDiv.textContent = keyName;
+        keyDiv.textContent = `🔑 Key ${i + 1}`;
         keysList.appendChild(keyDiv);
-    });
+    }
     
-    if (userData.collectedKeys.length === 0) {
+    if (clientState.collectedKeysCount === 0) {
         keysList.innerHTML = '<p style="color: #ccc; font-size: 10px;">Find targets to collect keys!</p>';
     }
     
     // Show progress
     const progressDiv = document.createElement('div');
     progressDiv.style.cssText = 'color: #FFD700; font-size: 10px; margin-top: 5px;';
-    progressDiv.textContent = `Progress: ${userData.collectedKeys.length}/${userData.requiredKeys.length}`;
+    progressDiv.textContent = `Progress: ${clientState.collectedKeysCount}/${clientState.totalKeys}`;
     keysList.appendChild(progressDiv);
 }
 
@@ -214,33 +220,13 @@ function updateKeysDisplay() {
 function updateTargetStatus() {
     const targetsFoundSpan = document.getElementById('targets-found');
     if (targetsFoundSpan) {
-        targetsFoundSpan.textContent = userData.targetsFound.length;
+        targetsFoundSpan.textContent = clientState.targetsFoundCount;
     }
 }
 
-// Check game completion
-function checkGameCompletion() {
-    const hasAllKeys = userData.requiredKeys.every(key => userData.collectedKeys.includes(key));
-    
-    if (hasAllKeys) {
-        setTimeout(() => {
-            showMessage('🎉 Congratulations! You found all CMKL facilities and collected both keys! Welcome to CMKL University Openhouse 2025!', '#4CAF50');
-            
-            // Record completion
-            userData.interactions.push({
-                type: 'game_completed',
-                completionTime: new Date().toISOString(),
-                timeTaken: new Date() - new Date(userData.startTime)
-            });
-            
-            // Save locally only
-            autoSaveData();
-        }, 1500);
-    }
-}
 
-// Show building message
-function showBuildingMessage(buildingType) {
+// Handle building clicks securely
+async function handleBuildingClick(buildingType) {
     const messages = {
         engineering: [
             "🏗️ Welcome to CMKL Engineering!",
@@ -260,17 +246,12 @@ function showBuildingMessage(buildingType) {
     const randomMessage = buildingMessages[Math.floor(Math.random() * buildingMessages.length)];
     showMessage(randomMessage, buildingType === 'engineering' ? '#FF9800' : '#2196F3');
     
-    // Record interaction
-    userData.interactions.push({
-        type: 'building_clicked',
-        buildingType: buildingType,
-        message: randomMessage,
-        timestamp: new Date().toISOString()
-    });
+    // Record interaction securely on server
+    recordInteractionSecurely('building_clicked', { buildingType });
 }
 
-// Show info message
-function showInfoMessage(infoType) {
+// Handle info clicks securely
+async function handleInfoClick(infoType) {
     const messages = {
         engineering: [
             "📐 Engineering Building - Where innovation begins!",
@@ -288,13 +269,24 @@ function showInfoMessage(infoType) {
     const randomMessage = infoMessages[Math.floor(Math.random() * infoMessages.length)];
     showMessage(randomMessage, '#9C27B0');
     
-    // Record interaction
-    userData.interactions.push({
-        type: 'info_clicked',
-        infoType: infoType,
-        message: randomMessage,
-        timestamp: new Date().toISOString()
-    });
+    // Record interaction securely on server
+    recordInteractionSecurely('info_clicked', { infoType });
+}
+
+// Record interaction securely
+async function recordInteractionSecurely(type, data) {
+    if (!clientState.sessionId) return;
+    
+    try {
+        await fetch(`${API_BASE}/session/${clientState.sessionId}/interaction`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, data })
+        });
+    } catch (error) {
+        console.error('Failed to record interaction:', error);
+        // Don't show error to user for analytics failures
+    }
 }
 
 // Show temporary message
@@ -330,21 +322,6 @@ function showMessage(text, color = '#333') {
     }, 3000);
 }
 
-// Simple local data saving - no external submissions
-function autoSaveData() {
-    const dataToSave = {
-        ...userData,
-        lastSaved: new Date().toISOString(),
-        totalKeys: userData.collectedKeys.length,
-        sessionDuration: new Date() - new Date(userData.startTime),
-        targetsFound: userData.targetsFound,
-        requiredKeys: userData.requiredKeys
-    };
-    
-    // Save to localStorage only
-    localStorage.setItem('cmkl_openhouse_data', JSON.stringify(dataToSave));
-    console.log('💾 Data saved locally:', dataToSave);
-}
 
 // Add CSS for animations
 const style = document.createElement('style');
@@ -368,7 +345,7 @@ function handleTargetFound(targetIndex) {
     const targetName = targetNames[targetIndex] || 'Unknown Target';
     const targetType = targetTypes[targetIndex];
     
-    console.log(`🎯 TARGET FOUND: ${targetName} (Index: ${targetIndex})`);
+    console.log(`🎯 TARGET FOUND: ${targetName}`);
     
     // Show target detection indicator
     const indicator = document.getElementById('target-indicator');
@@ -379,55 +356,48 @@ function handleTargetFound(targetIndex) {
         indicator.style.display = 'none';
     }, 3000);
     
-    // First, hide ALL buttons to prevent wrong button showing
+    // Show appropriate collect button
+    const keyName = targetIndex === 0 ? 'Engineering Access Key' : 'Science Lab Key';
+    const buttonId = targetIndex === 0 ? 'collect-engineering-btn' : 'collect-science-btn';
+    
+    // Hide all buttons first
     const allButtons = document.querySelectorAll('.collect-button');
     allButtons.forEach(btn => {
         btn.classList.remove('show');
         btn.style.display = 'none';
-        if (btn.hideTimeout) {
-            clearTimeout(btn.hideTimeout);
-        }
+        if (btn.hideTimeout) clearTimeout(btn.hideTimeout);
     });
     
-    // Show appropriate collect button if key not already collected
-    const keyName = targetIndex === 0 ? 'Engineering Access Key' : 'Science Lab Key';
-    const buttonId = targetIndex === 0 ? 'collect-engineering-btn' : 'collect-science-btn';
-    
-    console.log(`🎯 Target ${targetIndex} → Key: ${keyName} → Button: ${buttonId}`);
-    console.log(`Already collected keys:`, userData.collectedKeys);
-    
-    if (!userData.collectedKeys.includes(keyName)) {
-        const correctButton = document.getElementById(buttonId);
-        console.log(`Button element found:`, correctButton);
+    // Show correct button (server will validate if key already collected)
+    const correctButton = document.getElementById(buttonId);
+    if (correctButton) {
+        correctButton.classList.add('show');
+        correctButton.style.display = 'block';
         
-        if (correctButton) {
-            correctButton.classList.add('show');
-            correctButton.style.display = 'block'; // Force show
-            console.log(`✅ CORRECT BUTTON NOW VISIBLE: ${buttonId}`);
-            
-            // Hide button after 60 seconds if not clicked
-            correctButton.hideTimeout = setTimeout(() => {
-                if (correctButton.classList.contains('show') && !userData.collectedKeys.includes(keyName)) {
-                    correctButton.classList.remove('show');
-                    correctButton.style.display = 'none';
-                    showMessage('⏰ Collect button timed out - scan target again to collect key', '#FF9800');
-                }
-            }, 60000); // 1 minute
-        } else {
-            console.error(`❌ Button not found: ${buttonId}`);
-        }
-    } else {
-        console.log(`Key already collected: ${keyName}`);
+        // Auto-hide after timeout
+        correctButton.hideTimeout = setTimeout(() => {
+            if (correctButton.classList.contains('show')) {
+                correctButton.classList.remove('show');
+                correctButton.style.display = 'none';
+                showMessage('⏰ Collect button timed out - scan target again', '#FF9800');
+            }
+        }, 60000);
     }
     
-    // Record target detection
-    userData.interactions.push({
-        type: 'target_detected',
-        targetIndex: targetIndex,
-        targetName: targetName,
-        targetType: targetType,
-        timestamp: new Date().toISOString()
+    // Record interaction securely
+    recordInteractionSecurely('target_detected', {
+        targetIndex,
+        targetName,
+        targetType
     });
+    
+    // Update local state
+    if (!clientState.targetsFound) clientState.targetsFound = [];
+    if (!clientState.targetsFound.includes(targetType)) {
+        clientState.targetsFound.push(targetType);
+        clientState.targetsFoundCount = clientState.targetsFound.length;
+        updateTargetStatus();
+    }
 }
 
 // Handle AR target lost
@@ -436,22 +406,13 @@ function handleTargetLost(targetIndex) {
     const targetName = targetNames[targetIndex] || 'Unknown Target';
     
     console.log(`Target ${targetIndex} (${targetName}) lost`);
-    
-    // Keep button visible even when target is lost - user might want to collect
-    // Button will only disappear after timeout or when key is collected
+    // Keep button visible - user might still want to collect
 }
 
-// Debug function - removed auto-showing buttons
-
 // Initialize app when DOM loads
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('CMKL University Multi-Target AR Experience loaded - Fresh Session');
-    initializeApp();
-    
-    // Buttons will only show when targets are detected
-    
-    // Auto-save data locally every 30 seconds
-    setInterval(autoSaveData, 30000);
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🔒 CMKL Secure AR Experience loading...');
+    await initializeApp();
     
     // Set up target detection handlers
     setTimeout(() => {

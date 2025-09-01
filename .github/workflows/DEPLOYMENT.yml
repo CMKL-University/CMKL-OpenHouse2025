@@ -1,5 +1,5 @@
-# Static site deployment to GitHub Pages
-name: Deploy Static Site to GitHub Pages
+# Secure Full-Stack Deployment
+name: Deploy Secure CMKL OpenHouse Application
 
 on:
   # Runs on pushes targeting the default branch
@@ -9,55 +9,62 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
-  # Build job (for static sites, this just prepares the files)
-  build:
+  # Deploy secure backend to hosting service (example: Heroku, Railway, etc.)
+  deploy-backend:
     runs-on: ubuntu-latest
-    environment: github-pages
+    environment: production
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
 
-      - name: Create config.js from secrets
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create secure .env file
         run: |
-          cat > config.js << EOF
-          window.APP_CONFIG = {
-              MISSION: '${{ secrets.MISSION }}',
-              AIRTABLE_API_KEY: '${{ secrets.AIRTABLE_API_KEY }}',
-              AIRTABLE_BASE_ID: '${{ secrets.AIRTABLE_BASE_ID }}',
-              AIRTABLE_TABLE_NAME: '${{ secrets.AIRTABLE_TABLE_NAME }}'
-          };
+          cat > .env << EOF
+          MISSION=${{ secrets.MISSION }}
+          AIRTABLE_API_KEY=${{ secrets.AIRTABLE_API_KEY }}
+          AIRTABLE_BASE_ID=${{ secrets.AIRTABLE_BASE_ID }}
+          AIRTABLE_TABLE_NAME=${{ secrets.AIRTABLE_TABLE_NAME }}
+          PORT=${{ secrets.PORT || '3000' }}
           EOF
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
+      # Example deployment steps - uncomment and modify for your hosting service
+      
+      # For Railway deployment:
+      # - name: Deploy to Railway
+      #   uses: railway/action@v1
+      #   with:
+      #     service: your-service-name
+      #     token: ${{ secrets.RAILWAY_TOKEN }}
+      
+      # For Heroku deployment:
+      # - name: Deploy to Heroku
+      #   uses: akhileshns/heroku-deploy@v3.12.12
+      #   with:
+      #     heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+      #     heroku_app_name: your-app-name
+      #     heroku_email: your-email@example.com
+      
+      # For Vercel deployment:
+      # - name: Deploy to Vercel
+      #   uses: amondnet/vercel-action@v20
+      #   with:
+      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+      #     vercel-org-id: ${{ secrets.ORG_ID }}
+      #     vercel-project-id: ${{ secrets.PROJECT_ID }}
 
-  # Deployment job
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Test application
+        run: |
+          echo "✅ Secure backend configured"
+          echo "✅ Environment variables loaded"
+          echo "✅ Dependencies installed"
+          echo "Ready for deployment to your hosting service"

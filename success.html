@@ -507,74 +507,75 @@
             setInterval(createParticle, 1500);
         }
         
-        // Airtable Configuration - loaded from config.js
-        const AIRTABLE_API_KEY = window.APP_CONFIG?.AIRTABLE_API_KEY || 'your-api-key-here';
-        const AIRTABLE_BASE_ID = window.APP_CONFIG?.AIRTABLE_BASE_ID || 'your-base-id-here';
-        const AIRTABLE_TABLE_NAME = window.APP_CONFIG?.AIRTABLE_TABLE_NAME || 'Table%201';
+        // Secure API configuration - no sensitive data exposed
+        const API_BASE = window.APP_CONFIG?.API_BASE || '/api';
         
-        // Function to make direct API calls to Airtable
-        async function airtableRequest(method, endpoint, data = null) {
-            const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${endpoint}`;
+        // Function to make secure API calls through backend
+        async function secureApiRequest(endpoint, data = null, method = 'POST') {
+            const sessionId = window.currentSessionId || null;
             
             const options = {
                 method: method,
                 headers: {
-                    'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
                     'Content-Type': 'application/json'
                 }
             };
             
             if (data) {
-                options.body = JSON.stringify(data);
+                options.body = JSON.stringify({
+                    sessionId,
+                    ...data
+                });
             }
             
-            const response = await fetch(url, options);
+            const response = await fetch(`${API_BASE}${endpoint}`, options);
             
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Airtable API error: ${response.status} - ${errorText}`);
+                throw new Error(`API error: ${response.status} - ${errorText}`);
             }
             
             return await response.json();
         }
         
-        // Function to update key status in Airtable
+        // Function to update key status via secure backend
         async function updateKeyStatus(keyNumber) {
             try {
                 const recordId = localStorage.getItem('airtableRecordId');
                 const userEmail = localStorage.getItem('userEmail');
                 
                 if (!recordId || !userEmail) {
-                    console.warn('Missing user data - cannot update Airtable');
+                    console.warn('Missing user data - cannot update status');
                     return;
                 }
                 
                 const keyField = `key${keyNumber} status`;
-                const updateData = {
-                    records: [
-                        {
-                            id: recordId,
-                            fields: {
-                                [keyField]: 'scanned'
-                            }
-                        }
-                    ]
-                };
                 
-                const response = await airtableRequest('PATCH', AIRTABLE_TABLE_NAME, updateData);
+                const response = await secureApiRequest('/airtable/update', {
+                    recordId: recordId,
+                    fields: {
+                        [keyField]: 'scanned'
+                    }
+                });
                 
-                console.log(`Key ${keyNumber} status updated in Airtable:`, response.records[0].fields);
-                
-                // Update local storage
-                const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
-                keyStatuses[`key${keyNumber}`] = 'scanned';
-                localStorage.setItem('userKeyStatuses', JSON.stringify(keyStatuses));
-                
-                return response.records[0];
+                if (response.success) {
+                    console.log(`Key ${keyNumber} status updated successfully`);
+                    
+                    // Update local storage
+                    const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
+                    keyStatuses[`key${keyNumber}`] = 'scanned';
+                    localStorage.setItem('userKeyStatuses', JSON.stringify(keyStatuses));
+                    
+                    return response;
+                } else {
+                    console.log(`Key ${keyNumber} status update disabled: ${response.message}`);
+                    return null;
+                }
                 
             } catch (error) {
-                console.error('Failed to update key status in Airtable:', error);
-                throw error;
+                console.error('Failed to update key status:', error);
+                // Don't throw error - allow success page to continue
+                return null;
             }
         }
         

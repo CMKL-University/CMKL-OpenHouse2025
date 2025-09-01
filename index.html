@@ -1617,85 +1617,65 @@
         document.addEventListener('DOMContentLoaded', setupTriangleMovement);
         
         
-        // Airtable Configuration - loaded from config.js
-        const AIRTABLE_API_KEY = window.APP_CONFIG?.AIRTABLE_API_KEY || 'your-api-key-here';
-        const AIRTABLE_BASE_ID = window.APP_CONFIG?.AIRTABLE_BASE_ID || 'your-base-id-here';
-        const AIRTABLE_TABLE_NAME = window.APP_CONFIG?.AIRTABLE_TABLE_NAME || 'Table%201';
+        // Secure API configuration - no sensitive data exposed
+        const API_BASE = window.APP_CONFIG?.API_BASE || '/api';
         
-        // Function to make direct API calls to Airtable
-        async function airtableRequest(method, endpoint, data = null) {
-            const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${endpoint}`;
+        // Function to make secure API calls through backend
+        async function secureApiRequest(endpoint, data = null, method = 'POST') {
+            const sessionId = window.currentSessionId || null;
             
             const options = {
                 method: method,
                 headers: {
-                    'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
                     'Content-Type': 'application/json'
                 }
             };
             
             if (data) {
-                options.body = JSON.stringify(data);
+                options.body = JSON.stringify({
+                    sessionId,
+                    ...data
+                });
             }
             
-            const response = await fetch(url, options);
+            const response = await fetch(`${API_BASE}${endpoint}`, options);
             
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Airtable API error: ${response.status} - ${errorText}`);
+                throw new Error(`API error: ${response.status} - ${errorText}`);
             }
             
             return await response.json();
         }
         
-        // Function to create or update user record in Airtable
+        // Function to create or update user record via secure backend
         async function createOrUpdateUser(email, lastName) {
             try {
-                // First, check if user already exists
-                addDebugLog('Building search query...', 'info');
-                const filterFormula = encodeURIComponent(`{email} = "${email}"`);
-                addDebugLog('Sending search request to System...', 'info');
+                addDebugLog('Sending user data to secure backend...', 'info');
                 
-                const searchResponse = await airtableRequest('GET', `${AIRTABLE_TABLE_NAME}?filterByFormula=${filterFormula}`);
+                const response = await secureApiRequest('/airtable/submit', {
+                    fields: {
+                        'email': email,
+                        'lastname': lastName,
+                        'key1 status': 'not_scanned',
+                        'key2 status': 'not_scanned',
+                        'key3 status': 'not_scanned'
+                    }
+                });
                 
-                if (searchResponse.records && searchResponse.records.length > 0) {
-                    // User exists, return existing record
-                    addDebugLog(`Existing user found: ${email}`, 'success');
-                    addDebugLog(`Record ID: ${searchResponse.records[0].id}`, 'info');
-                    addDebugLog('Returning existing user data', 'success');
-                    console.log('User already exists:', searchResponse.records[0].fields);
-                    return searchResponse.records[0];
+                if (response.success) {
+                    addDebugLog(`User data processed: ${email}`, 'success');
+                    addDebugLog(`Record ID: ${response.recordId}`, 'info');
+                    return { id: response.recordId, fields: { email, lastname: lastName } };
                 } else {
-                    // Create new user record
-                    addDebugLog('No existing user found', 'info');
-                    addDebugLog('Creating new user record...', 'info');
-                    
-                    const createData = {
-                        records: [
-                            {
-                                fields: {
-                                    'email': email,
-                                    'lastname': lastName,
-                                    'key1 status': 'not_scanned',
-                                    'key2 status': 'not_scanned',
-                                    'key3 status': 'not_scanned'
-                                }
-                            }
-                        ]
-                    };
-                    
-                    addDebugLog('Sending create request to System...', 'info');
-                    const createResponse = await airtableRequest('POST', AIRTABLE_TABLE_NAME, createData);
-                    
-                    addDebugLog(`New user created: ${email}`, 'success');
-                    addDebugLog(`New record ID: ${createResponse.records[0].id}`, 'success');
-                    console.log('New user created:', createResponse.records[0].fields);
-                    return createResponse.records[0];
+                    addDebugLog(`Data submission disabled: ${response.message}`, 'info');
+                    return { id: 'local_session', fields: { email, lastname: lastName } };
                 }
             } catch (error) {
                 addDebugLog(`System error: ${error.message}`, 'error');
                 console.error('System error:', error);
-                throw error;
+                // Don't throw error - allow AR experience to continue
+                return { id: 'local_session', fields: { email, lastname: lastName } };
             }
         }
         
@@ -1799,7 +1779,7 @@
                 addDebugLog('Initializing System connection...', 'info');
                 updateProgress(25, 'CONNECTING TO DATABASE...');
                 await delay(800);
-                addDebugLog(`Table: ${AIRTABLE_TABLE_NAME}`, 'info');
+                addDebugLog('Connecting to secure database...', 'info');
                 
                 // Step 3: Check for existing user
                 addDebugLog('Checking for existing user record...', 'info');

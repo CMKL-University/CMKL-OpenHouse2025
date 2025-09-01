@@ -19,13 +19,24 @@ A cyberpunk-themed AR web application with MindAR integration and Airtable backe
    cp config.example.js config.js
    ```
 
-2. Edit `config.js` with your Airtable credentials:
-   ```javascript
-   const config = {
-       AIRTABLE_API_KEY: 'your-actual-api-key',
-       AIRTABLE_BASE_ID: 'your-actual-base-id', 
-       AIRTABLE_TABLE_NAME: 'Table%201'
-   };
+2. Create a `.env` file from the example:
+   ```bash
+   cp .env.example .env
+   ```
+   
+3. Edit `.env` with your secure configuration:
+   ```bash
+   MISSION=DISABLE
+   AIRTABLE_API_KEY=your_actual_api_key_here
+   AIRTABLE_BASE_ID=your_actual_base_id_here
+   AIRTABLE_TABLE_NAME=Table%201
+   PORT=3000
+   ```
+
+4. Install dependencies and start the secure server:
+   ```bash
+   npm install
+   npm start
    ```
 
 ### 2. Airtable Setup
