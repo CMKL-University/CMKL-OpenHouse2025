@@ -1853,7 +1853,12 @@
                 document.body.style.opacity = '0';
                 
                 setTimeout(() => {
-                    window.location.href = 'page2.html';
+                    // Check mission status from config
+                    if (window.APP_CONFIG && window.APP_CONFIG.MISSION === 'ENABLE') {
+                        window.location.href = 'page2.html';
+                    } else {
+                        window.location.href = 'september20.html';
+                    }
                 }, 500);
                 
             } catch (error) {
