@@ -4,6 +4,7 @@
 .env.development
 .env.production
 .claude
+config.js
 # Configuration files with sensitive data
 # config.js is now secure and should be committed
 
