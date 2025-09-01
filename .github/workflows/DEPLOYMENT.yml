@@ -37,6 +37,25 @@ jobs:
           PORT=${{ secrets.PORT || '3000' }}
           EOF
 
+      - name: Verify secure config.js exists
+        run: |
+          if [ ! -f "config.js" ]; then
+            echo "❌ Error: Secure config.js file not found!"
+            echo "The repository should contain a secure config.js that loads from backend API"
+            exit 1
+          fi
+          echo "✅ Secure config.js found"
+          
+      - name: Validate secure frontend configuration
+        run: |
+          # Check that config.js doesn't contain any hardcoded API keys
+          if grep -q "pato8jE2ZjYvxGVU4\|your.*api.*key\|your.*base.*id" config.js; then
+            echo "❌ Error: Found exposed API keys in config.js!"
+            echo "The config.js file should only contain safe configuration"
+            exit 1
+          fi
+          echo "✅ Frontend configuration is secure"
+
       # Example deployment steps - uncomment and modify for your hosting service
       
       # For Railway deployment:
