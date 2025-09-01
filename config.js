@@ -1,37 +1,20 @@
-// Secure frontend configuration - NO SENSITIVE DATA
-// All API keys and sensitive config moved to backend
+// Configuration for local development
+// Note: During deployment, this file will be replaced with secrets from GitHub Actions
 
-const config = {
-    // API endpoints
-    API_BASE: window.location.origin + '/api',
-    
-    // Feature flags (loaded from server)
-    features: {
-        dataSubmission: false // Will be loaded from server
-    },
+window.APP_CONFIG = {
+    MISSION: 'ENABLE', // Local development default
+    AIRTABLE_API_KEY: '', // Will be populated during deployment
+    AIRTABLE_BASE_ID: '', // Will be populated during deployment  
+    AIRTABLE_TABLE_NAME: '', // Will be populated during deployment
     
     // UI configuration
     ui: {
         targetTimeout: 60000, // 1 minute
         messageDisplayTime: 3000 // 3 seconds
+    },
+    
+    // Feature flags
+    features: {
+        dataSubmission: false // Disabled for local dev without API keys
     }
 };
-
-// Load secure configuration from server
-async function loadSecureConfig() {
-    try {
-        const response = await fetch(`${config.API_BASE}/config`);
-        if (response.ok) {
-            const serverConfig = await response.json();
-            config.mission = serverConfig.mission;
-            config.features = { ...config.features, ...serverConfig.features };
-        }
-    } catch (error) {
-        console.warn('Failed to load server configuration:', error);
-    }
-}
-
-// Initialize configuration on page load
-document.addEventListener('DOMContentLoaded', loadSecureConfig);
-
-window.APP_CONFIG = config;

@@ -47,46 +47,29 @@ jobs:
           AIRTABLE_TABLE_NAME=${{ secrets.AIRTABLE_TABLE_NAME }}
           EOF
 
-      - name: Create secure config.js (no API keys exposed)
+      - name: Create config.js with GitHub secrets
         run: |
           cat > config.js << 'EOF'
-          // Secure frontend configuration - NO SENSITIVE DATA
-          // All API keys and sensitive config moved to backend
+          // Configuration for static GitHub Pages deployment
+          // Note: In production, consider using a backend API to hide sensitive keys
           
-          const config = {
-              // API endpoints
-              API_BASE: window.location.origin + '/api',
-              
-              // Feature flags (loaded from server)
-              features: {
-                  dataSubmission: false // Will be loaded from server
-              },
+          window.APP_CONFIG = {
+              MISSION: '${{ secrets.MISSION }}',
+              AIRTABLE_API_KEY: '${{ secrets.AIRTABLE_API_KEY }}',
+              AIRTABLE_BASE_ID: '${{ secrets.AIRTABLE_BASE_ID }}',
+              AIRTABLE_TABLE_NAME: '${{ secrets.AIRTABLE_TABLE_NAME }}',
               
               // UI configuration
               ui: {
                   targetTimeout: 60000, // 1 minute
                   messageDisplayTime: 3000 // 3 seconds
+              },
+              
+              // Feature flags
+              features: {
+                  dataSubmission: true // Enable direct Airtable submission
               }
           };
-          
-          // Load secure configuration from server
-          async function loadSecureConfig() {
-              try {
-                  const response = await fetch(`${config.API_BASE}/config`);
-                  if (response.ok) {
-                      const serverConfig = await response.json();
-                      config.mission = serverConfig.mission;
-                      config.features = { ...config.features, ...serverConfig.features };
-                  }
-              } catch (error) {
-                  console.warn('Failed to load server configuration:', error);
-              }
-          }
-          
-          // Initialize configuration on page load
-          document.addEventListener('DOMContentLoaded', loadSecureConfig);
-          
-          window.APP_CONFIG = config;
           EOF
 
       - name: Upload artifact

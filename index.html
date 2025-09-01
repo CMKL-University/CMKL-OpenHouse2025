@@ -1617,58 +1617,47 @@
         document.addEventListener('DOMContentLoaded', setupTriangleMovement);
         
         
-        // Secure API configuration - no sensitive data exposed
-        const API_BASE = window.APP_CONFIG?.API_BASE || '/api';
+        // Direct Airtable API configuration for static deployment
+        const AIRTABLE_BASE_URL = `https://api.airtable.com/v0/${window.APP_CONFIG?.AIRTABLE_BASE_ID}/${window.APP_CONFIG?.AIRTABLE_TABLE_NAME}`;
         
-        // Function to make secure API calls through backend
-        async function secureApiRequest(endpoint, data = null, method = 'POST') {
-            const sessionId = window.currentSessionId || null;
-            
-            const options = {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            };
-            
-            if (data) {
-                options.body = JSON.stringify({
-                    sessionId,
-                    ...data
-                });
-            }
-            
-            const response = await fetch(`${API_BASE}${endpoint}`, options);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`API error: ${response.status} - ${errorText}`);
-            }
-            
-            return await response.json();
-        }
-        
-        // Function to create or update user record via secure backend
+        // Function to make direct Airtable API calls
         async function createOrUpdateUser(email, lastName) {
+            // Check if data submission is enabled and we have API credentials
+            if (!window.APP_CONFIG?.features?.dataSubmission || !window.APP_CONFIG?.AIRTABLE_API_KEY) {
+                addDebugLog('Data submission disabled or no API key - running in demo mode', 'info');
+                return { id: 'demo_session', fields: { email, lastname: lastName } };
+            }
+            
             try {
-                addDebugLog('Sending user data to secure backend...', 'info');
+                addDebugLog('Sending user data to Airtable...', 'info');
                 
-                const response = await secureApiRequest('/airtable/submit', {
-                    fields: {
-                        'email': email,
-                        'lastname': lastName,
-                        'key1 status': 'not_scanned',
-                        'key2 status': 'not_scanned',
-                        'key3 status': 'not_scanned'
-                    }
+                const response = await fetch(AIRTABLE_BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${window.APP_CONFIG.AIRTABLE_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fields: {
+                            'email': email,
+                            'lastname': lastName,
+                            'key1 status': 'not_scanned',
+                            'key2 status': 'not_scanned',
+                            'key3 status': 'not_scanned'
+                        }
+                    })
                 });
                 
-                if (response.success) {
+                if (response.ok) {
+                    const data = await response.json();
                     addDebugLog(`User data processed: ${email}`, 'success');
-                    addDebugLog(`Record ID: ${response.recordId}`, 'info');
-                    return { id: response.recordId, fields: { email, lastname: lastName } };
+                    addDebugLog(`Record ID: ${data.id}`, 'info');
+                    return { id: data.id, fields: data.fields };
                 } else {
-                    addDebugLog(`Data submission disabled: ${response.message}`, 'info');
+                    const errorText = await response.text();
+                    addDebugLog(`Airtable error: ${response.status}`, 'error');
+                    console.error('Airtable error:', errorText);
+                    // Don't throw error - allow AR experience to continue
                     return { id: 'local_session', fields: { email, lastname: lastName } };
                 }
             } catch (error) {
