@@ -4,8 +4,8 @@
 .env.development
 .env.production
 .claude
-# Configuration files with sensitive data
-config.js
+# Configuration files with sensitive data (legacy - config.js is now secure)
+# config.js - REMOVED: now contains only safe frontend configuration
 
 # Logs
 *.log
