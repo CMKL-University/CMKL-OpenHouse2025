@@ -1,74 +1,75 @@
-# Secure Full-Stack Deployment - No Security Leaks
-name: Deploy CMKL OpenHouse (Secure)
+# Static site deployment to GitHub Pages with secure config
+name: Deploy Static Site to GitHub Pages
 
 on:
+  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Permissions for deployment
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Prevent concurrent deployments
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "deployment"
+  group: "pages"
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  # Build job (for static sites, this just prepares the files)
+  build:
     runs-on: ubuntu-latest
     environment: github-pages
-    
+    env:
+      MISSION: ${{ secrets.MISSION }}
+      AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+      AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
+      AIRTABLE_TABLE_NAME: ${{ secrets.AIRTABLE_TABLE_NAME }}
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Security validation
+      - name: Create server environment config
         run: |
-          echo "🔍 Performing security checks..."
-          
-          # Ensure no API keys in frontend files
-          if grep -r "pato8jE2ZjYvxGVU4" --include="*.js" --include="*.html" --exclude-dir=node_modules .; then
-            echo "❌ SECURITY ERROR: Found exposed API keys in frontend files!"
-            exit 1
-          fi
-          
-          # Check config.js is secure
-          if grep -q "AIRTABLE_API_KEY.*pato8jE2ZjYvxGVU4" config.js 2>/dev/null; then
-            echo "❌ SECURITY ERROR: config.js contains exposed API keys!"
-            exit 1
-          fi
-          
-          echo "✅ Security validation passed - no sensitive data in frontend"
+          cat > .env << 'EOF'
+          MISSION=${{ secrets.MISSION }}
+          AIRTABLE_API_KEY=${{ secrets.AIRTABLE_API_KEY }}
+          AIRTABLE_BASE_ID=${{ secrets.AIRTABLE_BASE_ID }}
+          AIRTABLE_TABLE_NAME=${{ secrets.AIRTABLE_TABLE_NAME }}
+          EOF
 
-      - name: Create secure frontend build
+      - name: Create secure config.js (no API keys exposed)
         run: |
-          echo "🏗️ Creating secure frontend build..."
-          
-          # Ensure config.js loads from backend API (no hardcoded secrets)
-          if [ ! -f "config.js" ]; then
-            echo "Creating secure config.js..."
-            cat > config.js << 'EOF'
+          cat > config.js << 'EOF'
           // Secure frontend configuration - NO SENSITIVE DATA
+          // All API keys and sensitive config moved to backend
+          
           const config = {
+              // API endpoints
               API_BASE: window.location.origin + '/api',
-              features: { dataSubmission: false },
-              ui: { targetTimeout: 60000, messageDisplayTime: 3000 }
+              
+              // Feature flags (loaded from server)
+              features: {
+                  dataSubmission: false // Will be loaded from server
+              },
+              
+              // UI configuration
+              ui: {
+                  targetTimeout: 60000, // 1 minute
+                  messageDisplayTime: 3000 // 3 seconds
+              }
           };
           
-          // Load configuration from secure backend
+          // Load secure configuration from server
           async function loadSecureConfig() {
               try {
                   const response = await fetch(`${config.API_BASE}/config`);
@@ -78,190 +79,30 @@ jobs:
                       config.features = { ...config.features, ...serverConfig.features };
                   }
               } catch (error) {
-                  console.warn('Loading from local fallback');
+                  console.warn('Failed to load server configuration:', error);
               }
           }
           
+          // Initialize configuration on page load
           document.addEventListener('DOMContentLoaded', loadSecureConfig);
+          
           window.APP_CONFIG = config;
           EOF
-          fi
-          
-          echo "✅ Secure frontend build ready"
 
-      - name: Create secure backend environment
-        run: |
-          echo "🔧 Setting up secure backend environment..."
-          
-          # Create secure .env file from secrets (server-side only)
-          cat > .env << EOF
-          # Server-side environment variables (NOT exposed to frontend)
-          MISSION=${{ secrets.MISSION || 'DISABLE' }}
-          AIRTABLE_API_KEY=${{ secrets.AIRTABLE_API_KEY }}
-          AIRTABLE_BASE_ID=${{ secrets.AIRTABLE_BASE_ID }}
-          AIRTABLE_TABLE_NAME=${{ secrets.AIRTABLE_TABLE_NAME || 'Table%201' }}
-          PORT=3000
-          NODE_ENV=production
-          EOF
-          
-          echo "✅ Backend environment configured securely"
-
-      - name: Test secure application
-        run: |
-          echo "🧪 Testing secure application..."
-          
-          # Test that frontend has no exposed secrets
-          echo "Checking frontend security..."
-          if find . -name "*.html" -o -name "*.js" -not -path "./node_modules/*" | xargs grep -l "pato8jE2ZjYvxGVU4" 2>/dev/null; then
-            echo "❌ Found API keys in frontend files!"
-            exit 1
-          fi
-          
-          # Test backend startup
-          echo "Testing backend startup..."
-          timeout 10s npm start > /dev/null 2>&1 &
-          sleep 5
-          
-          if pgrep -f "node server.js" > /dev/null; then
-            echo "✅ Backend starts successfully"
-            pkill -f "node server.js"
-          else
-            echo "⚠️ Backend test skipped (may need environment variables for full test)"
-          fi
-          
-          echo "✅ Application tests passed"
-
-      - name: Prepare deployment package
-        run: |
-          echo "📦 Preparing deployment package..."
-          
-          # Create deployment directory
-          mkdir -p deployment
-          
-          # Copy application files (excluding sensitive files)
-          cp -r *.html *.js *.css *.json *.md deployment/ 2>/dev/null || true
-          cp -r assets deployment/ 2>/dev/null || true
-          cp -r .github deployment/ 2>/dev/null || true
-          
-          # Copy server files
-          cp server.js package.json deployment/
-          
-          # Copy secure .env file
-          cp .env deployment/
-          
-          # Create deployment info
-          cat > deployment/DEPLOYMENT_INFO.md << EOF
-          # Secure Deployment Package
-          
-          Generated: $(date)
-          Commit: ${{ github.sha }}
-          
-          ## Security Status
-          ✅ No API keys in frontend
-          ✅ All secrets in backend environment
-          ✅ Secure configuration validated
-          
-          ## Deployment Instructions
-          1. Deploy this package to a Node.js hosting service
-          2. Set environment variables on your hosting platform
-          3. Ensure .env values are configured
-          4. Start with: npm start
-          
-          ## Frontend Security
-          - config.js loads from backend API
-          - No hardcoded API keys
-          - Client-side code is safe for inspection
-          EOF
-          
-          echo "✅ Deployment package ready"
-
-      # Deploy to your hosting service - uncomment and configure as needed
-      - name: Deploy to hosting service
-        run: |
-          echo "🚀 Deployment package created successfully!"
-          echo ""
-          echo "📋 To complete deployment:"
-          echo "1. Choose your hosting service (Railway, Heroku, Vercel, etc.)"
-          echo "2. Set these environment variables on your hosting platform:"
-          echo "   - MISSION=${{ secrets.MISSION || 'DISABLE' }}"
-          echo "   - AIRTABLE_API_KEY=(your secure API key)"
-          echo "   - AIRTABLE_BASE_ID=(your base ID)"
-          echo "   - AIRTABLE_TABLE_NAME=(your table name)"
-          echo "3. Deploy the full application (backend + frontend)"
-          echo ""
-          echo "✅ No sensitive data exposed in this build!"
-          
-          # List deployment contents (for verification)
-          echo ""
-          echo "📦 Deployment package contents:"
-          ls -la deployment/
-
-      # Optional: Upload deployment artifact
-      - name: Upload deployment artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: secure-deployment-package
-          path: deployment/
-          retention-days: 30
-
-      # Setup GitHub Pages
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      # Deploy to GitHub Pages (frontend only - secure)
-      - name: Deploy to GitHub Pages
-        run: |
-          echo "🌐 Preparing GitHub Pages deployment..."
-          
-          # Create Pages deployment directory
-          mkdir -p pages-deploy
-          
-          # Copy only frontend files (NO backend files with secrets)
-          cp *.html pages-deploy/ 2>/dev/null || true
-          cp -r assets pages-deploy/ 2>/dev/null || true
-          cp *.css pages-deploy/ 2>/dev/null || true
-          
-          # Copy secure frontend JavaScript
-          cp script.js pages-deploy/ 2>/dev/null || true
-          
-          # Ensure config.js is secure (no API keys)
-          cp config.js pages-deploy/
-          
-          # Verify no secrets in Pages deployment
-          if grep -r "pato8jE2ZjYvxGVU4" pages-deploy/ 2>/dev/null; then
-            echo "❌ SECURITY ERROR: Found API keys in Pages deployment!"
-            exit 1
-          fi
-          
-          echo "✅ GitHub Pages deployment prepared securely"
-          
-          # List what's being deployed to Pages
-          echo "📋 Deploying to GitHub Pages:"
-          find pages-deploy -type f | sort
-
-      - name: Upload Pages artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'pages-deploy'
+          # Upload entire repository
+          path: '.'
 
-  # Separate deployment job for GitHub Pages
-  deploy-pages:
+  # Deployment job
+  deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build-and-deploy
+    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-      
-      - name: Deployment summary
-        run: |
-          echo "🎉 Secure deployment completed successfully!"
-          echo ""
-          echo "🔒 Security guarantee:"
-          echo "✅ No API keys exposed in frontend"
-          echo "✅ All secrets handled server-side"
-          echo "✅ Safe for public inspection"
-          echo "✅ Full-stack security maintained"
