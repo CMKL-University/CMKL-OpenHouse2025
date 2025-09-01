@@ -1,33 +1,33 @@
 # SECURITY WARNING: This deployment is now DISABLED
 # The old insecure static site deployment has been replaced with a secure backend
-name: DEPRECATED - Insecure Deployment Disabled
+# name: DEPRECATED - Insecure Deployment Disabled
 
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+# on:
+#   # Runs on pushes targeting the default branch
+#   push:
+#     branches: ["main"]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+#   # Allows you to run this workflow manually from the Actions tab
+#   workflow_dispatch:
 
-jobs:
-  security-warning:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Security Warning
-        run: |
-          echo "🚨 SECURITY WARNING: This deployment workflow has been DISABLED"
-          echo ""
-          echo "❌ The old static site deployment exposed API keys in config.js"
-          echo "✅ This application now requires a secure backend deployment"
-          echo ""
-          echo "📋 To deploy securely:"
-          echo "1. Use a hosting service that supports Node.js backends (Railway, Heroku, Vercel)"
-          echo "2. Set environment variables on your hosting platform"
-          echo "3. Deploy the full-stack application, not just static files"
-          echo ""
-          echo "🔗 See DEPLOYMENT.md for detailed instructions"
-          echo ""
-          echo "⚠️  DO NOT use GitHub Pages or static site deployment"
-          echo "⚠️  API keys MUST be kept server-side only"
-          exit 1
+# jobs:
+#   security-warning:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Security Warning
+#         run: |
+#           echo "🚨 SECURITY WARNING: This deployment workflow has been DISABLED"
+#           echo ""
+#           echo "❌ The old static site deployment exposed API keys in config.js"
+#           echo "✅ This application now requires a secure backend deployment"
+#           echo ""
+#           echo "📋 To deploy securely:"
+#           echo "1. Use a hosting service that supports Node.js backends (Railway, Heroku, Vercel)"
+#           echo "2. Set environment variables on your hosting platform"
+#           echo "3. Deploy the full-stack application, not just static files"
+#           echo ""
+#           echo "🔗 See DEPLOYMENT.md for detailed instructions"
+#           echo ""
+#           echo "⚠️  DO NOT use GitHub Pages or static site deployment"
+#           echo "⚠️  API keys MUST be kept server-side only"
+#           exit 1
