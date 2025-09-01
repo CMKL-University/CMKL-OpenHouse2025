@@ -37,6 +37,7 @@ jobs:
         run: |
           cat > config.js << EOF
           window.APP_CONFIG = {
+              MISSION: '${{ secrets.MISSION }}',
               AIRTABLE_API_KEY: '${{ secrets.AIRTABLE_API_KEY }}',
               AIRTABLE_BASE_ID: '${{ secrets.AIRTABLE_BASE_ID }}',
               AIRTABLE_TABLE_NAME: '${{ secrets.AIRTABLE_TABLE_NAME }}'
