@@ -1654,7 +1654,7 @@
                 // First, check if user already exists
                 addDebugLog('Building search query...', 'info');
                 const filterFormula = encodeURIComponent(`{email} = "${email}"`);
-                addDebugLog('Sending search request to Airtable...', 'info');
+                addDebugLog('Sending search request to System...', 'info');
                 
                 const searchResponse = await airtableRequest('GET', `${AIRTABLE_TABLE_NAME}?filterByFormula=${filterFormula}`);
                 
@@ -1684,7 +1684,7 @@
                         ]
                     };
                     
-                    addDebugLog('Sending create request to Airtable...', 'info');
+                    addDebugLog('Sending create request to System...', 'info');
                     const createResponse = await airtableRequest('POST', AIRTABLE_TABLE_NAME, createData);
                     
                     addDebugLog(`New user created: ${email}`, 'success');
@@ -1693,8 +1693,8 @@
                     return createResponse.records[0];
                 }
             } catch (error) {
-                addDebugLog(`Airtable error: ${error.message}`, 'error');
-                console.error('Airtable error:', error);
+                addDebugLog(`System error: ${error.message}`, 'error');
+                console.error('System error:', error);
                 throw error;
             }
         }
@@ -1795,11 +1795,10 @@
                 addDebugLog(`Email: ${emailValue}`, 'success');
                 addDebugLog(`Last Name: ${lastNameValue}`, 'success');
                 
-                // Step 2: Initialize Airtable connection
-                addDebugLog('Initializing Airtable connection...', 'info');
+                // Step 2: Initialize System connection
+                addDebugLog('Initializing System connection...', 'info');
                 updateProgress(25, 'CONNECTING TO DATABASE...');
                 await delay(800);
-                addDebugLog(`Base ID: ${AIRTABLE_BASE_ID.substring(0, 8)}...`, 'info');
                 addDebugLog(`Table: ${AIRTABLE_TABLE_NAME}`, 'info');
                 
                 // Step 3: Check for existing user

@@ -631,7 +631,7 @@
             <!-- Assets -->
             <a-assets>
                 <a-asset-item id="bearModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/bear/scene.gltf"></a-asset-item>
-                <a-asset-item id="raccoonModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf"></a-asset-item>
+                <a-asset-item id="key1Model" src="model/key1.glb"></a-asset-item>
             </a-assets>
 
             <!-- Camera -->
@@ -643,7 +643,7 @@
                     rotation="0 0 0" 
                     position="0 -0.25 0" 
                     scale="0.05 0.05 0.05" 
-                    src="#raccoonModel" 
+                    src="#key1Model" 
                     animation-mixer
                     id="model1">
                 </a-gltf-model>
@@ -1077,12 +1077,13 @@
             statusIcon.style.background = '#00ff41';
             statusIcon.style.animation = 'pulseGreen 0.5s ease-in-out 3';
             
-            // Show success overlay
+            // Wait 5 seconds before showing success overlay
             setTimeout(() => {
+                // Show success overlay
                 const successOverlay = document.getElementById('successOverlay');
                 successOverlay.style.display = 'flex';
                 
-                // Navigate to success page after delay
+                // Navigate to success page after additional delay
                 setTimeout(() => {
                     // Store success data
                     localStorage.setItem('keyFound', 'true');

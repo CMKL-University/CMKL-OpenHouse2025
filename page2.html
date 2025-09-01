@@ -376,6 +376,53 @@
             }
         }
         
+        /* Rules Button */
+        .rules-button {
+            position: absolute;
+            top: 35px;
+            right: 20px;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #00ff41, #008b22);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
+        
+        .rules-button:hover {
+            background: linear-gradient(135deg, #00ff60, #00a030);
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.8);
+            transform: translateY(-2px);
+            animation: rulesGlitch 0.3s ease-in-out;
+        }
+        
+        @keyframes rulesGlitch {
+            0%, 100% { 
+                transform: translateY(-2px);
+                filter: brightness(1);
+            }
+            25% { 
+                transform: translateY(-2px) translateX(-1px);
+                filter: brightness(1.2) hue-rotate(15deg);
+            }
+            50% { 
+                transform: translateY(-2px) translateX(1px);
+                filter: brightness(0.9) hue-rotate(-15deg);
+            }
+            75% { 
+                transform: translateY(-2px) translateX(-0.5px);
+                filter: brightness(1.1) hue-rotate(10deg);
+            }
+        }
+        
         /* 3D Cube icon positioning */
         .card-icon {
             position: absolute;
@@ -1129,6 +1176,11 @@
             <span>LOGOUT</span>
         </div>
         
+        <!-- Rules Button -->
+        <div class="rules-button" onclick="showRules()">
+            <span>RULES</span>
+        </div>
+        
         <!-- Scan Lines -->
         <div class="scan-lines"></div>
         
@@ -1178,10 +1230,6 @@
             </div>
         </div>
         
-        <!-- Bottom navigation -->
-        <div class="bottom-nav">
-            <div class="bottom-nav-card cyberpunk-element" onclick="showRules()"></div>
-        </div>
         
         <!-- Matrix background elements -->
         <div class="matrix-element-1 cyberpunk-element"></div>
