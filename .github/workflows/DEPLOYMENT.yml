@@ -1,5 +1,6 @@
-# Secure Full-Stack Deployment
-name: Deploy Secure CMKL OpenHouse Application
+# SECURITY WARNING: This deployment is now DISABLED
+# The old insecure static site deployment has been replaced with a secure backend
+name: DEPRECATED - Insecure Deployment Disabled
 
 on:
   # Runs on pushes targeting the default branch
@@ -10,97 +11,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Deploy secure backend to hosting service (example: Heroku, Railway, etc.)
-  deploy-backend:
+  security-warning:
     runs-on: ubuntu-latest
-    environment: production
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Create secure .env file
+      - name: Security Warning
         run: |
-          cat > .env << EOF
-          MISSION=${{ secrets.MISSION }}
-          AIRTABLE_API_KEY=${{ secrets.AIRTABLE_API_KEY }}
-          AIRTABLE_BASE_ID=${{ secrets.AIRTABLE_BASE_ID }}
-          AIRTABLE_TABLE_NAME=${{ secrets.AIRTABLE_TABLE_NAME }}
-          PORT=${{ secrets.PORT || '3000' }}
-          EOF
-
-      - name: Debug and verify repository contents
-        run: |
-          echo "📁 Current directory contents:"
-          ls -la
+          echo "🚨 SECURITY WARNING: This deployment workflow has been DISABLED"
           echo ""
-          echo "🔍 Looking for config files:"
-          find . -name "config.js" -o -name "*.config.js" 2>/dev/null || true
+          echo "❌ The old static site deployment exposed API keys in config.js"
+          echo "✅ This application now requires a secure backend deployment"
           echo ""
-          
-      - name: Verify secure config.js exists
-        run: |
-          if [ ! -f "config.js" ]; then
-            echo "❌ Error: Secure config.js file not found in repository root!"
-            echo "📁 Files in current directory:"
-            ls -la
-            echo ""
-            echo "🔍 Searching for config.js files:"
-            find . -name "config.js" 2>/dev/null || echo "No config.js files found"
-            exit 1
-          fi
-          echo "✅ Secure config.js found"
-          
-      - name: Validate secure frontend configuration
-        run: |
-          echo "🔍 Checking config.js content for security..."
-          # Check that config.js doesn't contain any hardcoded API keys
-          if grep -q "pato8jE2ZjYvxGVU4\|your.*api.*key\|your.*base.*id" config.js; then
-            echo "❌ Error: Found exposed API keys in config.js!"
-            echo "📄 Problematic content:"
-            grep -n "pato8jE2ZjYvxGVU4\|your.*api.*key\|your.*base.*id" config.js || true
-            exit 1
-          fi
-          echo "✅ Frontend configuration is secure - no API keys found"
-          echo "📄 Config.js preview (first 10 lines):"
-          head -10 config.js
-
-      # Example deployment steps - uncomment and modify for your hosting service
-      
-      # For Railway deployment:
-      # - name: Deploy to Railway
-      #   uses: railway/action@v1
-      #   with:
-      #     service: your-service-name
-      #     token: ${{ secrets.RAILWAY_TOKEN }}
-      
-      # For Heroku deployment:
-      # - name: Deploy to Heroku
-      #   uses: akhileshns/heroku-deploy@v3.12.12
-      #   with:
-      #     heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-      #     heroku_app_name: your-app-name
-      #     heroku_email: your-email@example.com
-      
-      # For Vercel deployment:
-      # - name: Deploy to Vercel
-      #   uses: amondnet/vercel-action@v20
-      #   with:
-      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-      #     vercel-org-id: ${{ secrets.ORG_ID }}
-      #     vercel-project-id: ${{ secrets.PROJECT_ID }}
-
-      - name: Test application
-        run: |
-          echo "✅ Secure backend configured"
-          echo "✅ Environment variables loaded"
-          echo "✅ Dependencies installed"
-          echo "Ready for deployment to your hosting service"
+          echo "📋 To deploy securely:"
+          echo "1. Use a hosting service that supports Node.js backends (Railway, Heroku, Vercel)"
+          echo "2. Set environment variables on your hosting platform"
+          echo "3. Deploy the full-stack application, not just static files"
+          echo ""
+          echo "🔗 See DEPLOYMENT.md for detailed instructions"
+          echo ""
+          echo "⚠️  DO NOT use GitHub Pages or static site deployment"
+          echo "⚠️  API keys MUST be kept server-side only"
+          exit 1
