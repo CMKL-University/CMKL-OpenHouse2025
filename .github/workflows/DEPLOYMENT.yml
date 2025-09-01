@@ -3,9 +3,13 @@
 name: DEPRECATED - Insecure Deployment Disabled
 
 on:
-  # Only allow manual trigger to show security warning
-  # DO NOT trigger on push - this workflow is DEPRECATED
+  # Manual trigger only to show security warning
   workflow_dispatch:
+    inputs:
+      show_warning:
+        description: 'Show security warning about deprecated deployment'
+        required: false
+        default: 'true'
 
 jobs:
   security-warning:
