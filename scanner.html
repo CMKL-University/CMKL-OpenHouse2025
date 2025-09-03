@@ -101,15 +101,14 @@
             z-index: 1 !important;
         }
         
-        /* Show AR rendering canvas for 3D models */
+        /* Hide AR rendering canvas but keep video */
         .ar-scene canvas,
         a-scene canvas,
         a-scene canvas.a-canvas {
-            opacity: 1 !important;
-            visibility: visible !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
             position: absolute !important;
-            z-index: 2 !important;
-            pointer-events: none !important;
+            z-index: -1 !important;
         }
         
         /* Scanner UI Overlay - Transparent to show camera */
@@ -687,7 +686,7 @@
                     rotation="0 0 0" 
                     position="0 -0.25 0" 
                     scale="0.05 0.05 0.05" 
-                    src="#bearModel" 
+                    src="#key1Model" 
                     animation-mixer
                     id="model1">
                 </a-gltf-model>
