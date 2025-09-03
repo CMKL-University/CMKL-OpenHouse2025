@@ -3,7 +3,7 @@
 
 const config = {
     // API endpoints
-    API_BASE: 'http://localhost:8080/api',
+    API_BASE: 'http://localhost:3000/api',
     
     // Feature flags (loaded from server)
     features: {
