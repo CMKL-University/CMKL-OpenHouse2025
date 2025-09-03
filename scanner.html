@@ -14,6 +14,9 @@
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
+    <!-- Global error handler -->
+    <script src="global-error-handler.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -1162,10 +1165,10 @@
             }, 1000);
         }
 
-        function collectKey() {
+        async function collectKey() {
             console.log('Collecting key:', currentTargetIndex);
             
-            // Store success data
+            // Store success data locally first
             localStorage.setItem('keyFound', 'true');
             localStorage.setItem('targetIndex', currentTargetIndex);
             localStorage.setItem('timestamp', Date.now());
@@ -1180,10 +1183,71 @@
             `;
             collectBtn.style.pointerEvents = 'none';
             
+            // Update Airtable with key collection
+            await updateKeyStatusInAirtable(currentTargetIndex);
+            
             // Navigate to success page after delay
             setTimeout(() => {
                 window.location.href = 'success.html';
             }, 1500);
+        }
+
+        async function updateKeyStatusInAirtable(targetIndex) {
+            try {
+                // Get user data from localStorage
+                const recordId = localStorage.getItem('airtableRecordId');
+                if (!recordId || recordId === 'demo_session' || recordId === 'local_session') {
+                    console.log('No Airtable record ID found, skipping update');
+                    return;
+                }
+                
+                // Map target index to key field name
+                const keyFieldMapping = {
+                    0: 'key1 status',
+                    1: 'key2 status', 
+                    2: 'key3 status'
+                };
+                
+                const keyField = keyFieldMapping[targetIndex];
+                if (!keyField) {
+                    console.error('Unknown target index:', targetIndex);
+                    return;
+                }
+                
+                console.log(`Updating ${keyField} to "scanned" for record ${recordId}`);
+                
+                // Call API to update key status
+                const response = await fetch('http://localhost:3000/api/airtable/update-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        recordId: recordId,
+                        keyField: keyField,
+                        status: 'scanned'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Key status updated successfully:', data);
+                    
+                    // Update local storage with new status
+                    const userKeyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
+                    const keyNumber = targetIndex + 1;
+                    userKeyStatuses[`key${keyNumber}`] = 'scanned';
+                    localStorage.setItem('userKeyStatuses', JSON.stringify(userKeyStatuses));
+                    
+                } else {
+                    const errorData = await response.json();
+                    console.error('Failed to update key status:', errorData);
+                }
+                
+            } catch (error) {
+                console.error('Error updating key status in Airtable:', error);
+                // Don't block the UI - continue with local storage only
+            }
         }
 
         function skipKey() {
