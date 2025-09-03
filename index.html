@@ -10,6 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.iife.js"></script>
     <!-- Configuration -->
     <script src="config.js"></script>
+    <!-- Global error handler -->
+    <script src="global-error-handler.js"></script>
     <style>
         * {
             margin: 0;
@@ -190,6 +192,20 @@
         .cyber-input:hover {
             border-color: #33E7FF;
             box-shadow: 0 0 15px rgba(107, 228, 240, 0.4);
+        }
+        
+        /* Error state for input fields */
+        .cyber-input.error {
+            border-color: #ff0040;
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.6);
+            background: rgba(139, 0, 0, 0.3);
+            animation: inputErrorShake 0.5s ease-in-out;
+        }
+        
+        @keyframes inputErrorShake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
         
         /* Cyberpunk corner decorations */
@@ -1631,29 +1647,13 @@
             try {
                 addDebugLog('Sending user data to server...', 'info');
                 
-                // Create session first
-                const sessionResponse = await fetch(`${window.APP_CONFIG.API_BASE}/session/create`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!sessionResponse.ok) {
-                    throw new Error('Failed to create session');
-                }
-                
-                const sessionData = await sessionResponse.json();
-                const sessionId = sessionData.sessionId;
-                
-                // Submit user data to Airtable via server
+                // Submit user data to Airtable via server (simplified - no session creation needed)
                 const response = await fetch(`${window.APP_CONFIG.API_BASE}/airtable/submit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        sessionId: sessionId,
                         fields: {
                             'email': email,
                             'lastname': lastName
@@ -1663,10 +1663,34 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    addDebugLog(`User data processed: ${email}`, 'success');
-                    addDebugLog(`Record ID: ${data.recordId}`, 'info');
-                    return { id: data.recordId, fields: { email, lastname: lastName } };
+                    if (data.success) {
+                        addDebugLog(`User data processed: ${email}`, 'success');
+                        addDebugLog(`Record ID: ${data.recordId}`, 'info');
+                        if (data.existing) {
+                            addDebugLog('Welcome back! Using existing account.', 'info');
+                        }
+                        return { id: data.recordId, fields: { email, lastname: lastName } };
+                    } else {
+                        // Handle specific error cases
+                        if (data.error === 'EMAIL_ALREADY_USED') {
+                            addDebugLog(`Email validation error: ${data.message}`, 'error');
+                            throw new Error(data.message);
+                        } else {
+                            addDebugLog(`Server error: ${data.message || 'Unknown error'}`, 'error');
+                            return { id: 'local_session', fields: { email, lastname: lastName } };
+                        }
+                    }
                 } else {
+                    // Handle HTTP error responses
+                    if (response.status === 409) {
+                        // Conflict - email already used with different name
+                        const errorData = await response.json();
+                        if (errorData.error === 'EMAIL_ALREADY_USED') {
+                            addDebugLog(`Email validation error: ${errorData.message}`, 'error');
+                            throw new Error(errorData.message);
+                        }
+                    }
+                    
                     const errorText = await response.text();
                     addDebugLog(`Server error: ${response.status}`, 'error');
                     console.error('Server error:', errorText);
@@ -1676,7 +1700,14 @@
             } catch (error) {
                 addDebugLog(`System error: ${error.message}`, 'error');
                 console.error('System error:', error);
-                // Don't throw error - allow AR experience to continue
+                
+                // For EMAIL_ALREADY_USED errors, throw them up to be handled by the caller
+                if (error.message.includes('already registered with a different name')) {
+                    throw error;
+                }
+                
+                // For other errors, don't throw - allow AR experience to continue
+                addDebugLog('Falling back to local session', 'warning');
                 return { id: 'local_session', fields: { email, lastname: lastName } };
             }
         }
@@ -1786,7 +1817,22 @@
                 // Step 3: Check for existing user
                 addDebugLog('Checking for existing user record...', 'info');
                 updateProgress(40, 'SEARCHING DATABASE...');
-                const userRecord = await createOrUpdateUser(emailValue, lastNameValue);
+                
+                let userRecord;
+                try {
+                    userRecord = await createOrUpdateUser(emailValue, lastNameValue);
+                } catch (error) {
+                    // Handle specific errors like EMAIL_ALREADY_USED
+                    addDebugLog(`Validation error: ${error.message}`, 'error');
+                    
+                    if (error.message.includes('already registered with a different name')) {
+                        triggerEmailValidationError(error.message);
+                    } else {
+                        hideLoadingScreen();
+                        showTerminalError(error.message);
+                    }
+                    return;
+                }
                 
                 // Step 4: Process user data
                 addDebugLog('Processing user data...', 'info');
@@ -1828,31 +1874,50 @@
                 // Step 7: Complete
                 updateProgress(100, 'COMPLETE!');
                 addDebugLog('System ready - launching AR experience...', 'success');
+                
+                // Clear any stored email validation errors on success
+                sessionStorage.removeItem('emailValidationError');
+                
                 await delay(1000);
                 
                 // Transition to page2
                 document.body.style.transition = 'opacity 0.5s ease-out';
                 document.body.style.opacity = '0';
                 
-                setTimeout(() => {
-                    // Check mission status from config
-                    if (window.APP_CONFIG && window.APP_CONFIG.MISSION === 'ENABLE') {
+                setTimeout(async () => {
+                    // Ensure config is loaded before navigation
+                    try {
+                        const configResponse = await fetch(`${window.APP_CONFIG.API_BASE}/config`);
+                        const serverConfig = await configResponse.json();
+                        
+                        if (serverConfig.mission === 'ENABLE') {
+                            window.location.href = 'page2.html';
+                        } else {
+                            window.location.href = 'september20.html';
+                        }
+                    } catch (error) {
+                        console.error('Failed to check mission status:', error);
+                        // Fallback to page2.html if can't reach server
                         window.location.href = 'page2.html';
-                    } else {
-                        window.location.href = 'september20.html';
                     }
                 }, 500);
                 
             } catch (error) {
                 console.error('Failed to create user:', error);
                 addDebugLog(`ERROR: ${error.message}`, 'error');
-                addDebugLog('System initialization failed', 'error');
-                updateProgress(currentProgress, 'ERROR OCCURRED');
                 
-                setTimeout(() => {
-                    hideLoadingScreen();
-                    showTerminalError('ERROR: Failed to create user profile. Please try again.');
-                }, 2000);
+                // Check if this is an email validation error
+                if (error.message.includes('already registered with a different name')) {
+                    triggerEmailValidationError(error.message);
+                } else {
+                    addDebugLog('System initialization failed', 'error');
+                    updateProgress(currentProgress, 'ERROR OCCURRED');
+                    
+                    setTimeout(() => {
+                        hideLoadingScreen();
+                        showTerminalError('ERROR: Failed to create user profile. Please try again.');
+                    }, 2000);
+                }
             }
         }
         
@@ -1861,8 +1926,51 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         
+        // Global error handler for email validation errors
+        function handleEmailValidationError(errorMessage) {
+            // Clear any existing loading screens
+            hideLoadingScreen();
+            
+            // Clear form inputs
+            const emailInput = document.getElementById('userEmail');
+            const lastNameInput = document.getElementById('userLastName');
+            if (emailInput) emailInput.value = '';
+            if (lastNameInput) lastNameInput.value = '';
+            
+            // Show the error
+            showTerminalError(`🚫 EMAIL ALREADY IN USE Please use a different email.`);
+        }
+        
+        // Function to trigger email validation error from anywhere in the app
+        function triggerEmailValidationError(errorMessage) {
+            if (typeof window.storeEmailValidationError === 'function') {
+                window.storeEmailValidationError(errorMessage);
+                // If we're not on index.html, the global handler will redirect
+                // If we are on index.html, handle it directly
+                const currentPath = window.location.pathname;
+                if (currentPath.endsWith('index.html') || currentPath.endsWith('/') || currentPath === '/') {
+                    handleEmailValidationError(errorMessage);
+                }
+            } else {
+                // Fallback if global handler isn't loaded
+                handleEmailValidationError(errorMessage);
+            }
+        }
+        
         // Terminal error popup function
         function showTerminalError(message) {
+            // Check if this is an email validation error and highlight the email field
+            if (message.includes('already registered with a different name')) {
+                const emailInput = document.getElementById('userEmail');
+                if (emailInput) {
+                    emailInput.classList.add('error');
+                    // Remove error class after animation
+                    setTimeout(() => {
+                        emailInput.classList.remove('error');
+                    }, 3000);
+                }
+            }
+            
             const errorDiv = document.createElement('div');
             errorDiv.style.cssText = `
                 position: fixed;
@@ -1871,12 +1979,14 @@
                 transform: translate(-50%, -50%);
                 background: linear-gradient(135deg, #ff0040, #8b0000);
                 color: white;
-                padding: 25px 35px;
+                padding: 40px 50px;
                 border: 3px solid #ff0040;
                 z-index: 2000;
-                font-size: 16px;
+                font-size: 14px;
+                line-height: 1.6;
                 text-align: center;
                 max-width: 80%;
+                min-width: 350px;
                 word-wrap: break-word;
                 font-family: 'Courier New', monospace;
                 font-weight: bold;
