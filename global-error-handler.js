@@ -10,14 +10,14 @@
         if (storedError) {
             sessionStorage.removeItem('emailValidationError');
             
-            // If we're not on index.html, redirect there
+            // If we're not on register.html, redirect there for email validation errors
             const currentPath = window.location.pathname;
-            if (!currentPath.endsWith('index.html') && !currentPath.endsWith('/') && currentPath !== '/') {
-                window.location.href = 'index.html';
+            if (!currentPath.endsWith('register.html')) {
+                window.location.href = 'register.html';
                 return;
             }
             
-            // If we're on index.html, show the error after a brief delay
+            // If we're on register.html, show the error after a brief delay
             setTimeout(() => {
                 if (typeof handleEmailValidationError === 'function') {
                     handleEmailValidationError(storedError);

@@ -2053,7 +2053,7 @@
             if (!userEmail || !userLastName) {
                 console.log('No user session found, redirecting to main page');
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'register.html';
                 }, 1000);
                 return false;
             }
@@ -2346,7 +2346,7 @@
                     duration: 0.8,
                     easing: 'ease-in'
                 }).finished.then(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'register.html';
                 });
             } else {
                 document.body.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-in';
@@ -2354,7 +2354,7 @@
                 document.body.style.transform = 'scale(0.8)';
                 
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'register.html';
                 }, 800);
             }
         }
