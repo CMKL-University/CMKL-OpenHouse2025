@@ -423,6 +423,192 @@
             }
         }
         
+        /* Action Buttons Container */
+        .action-buttons-container {
+            position: absolute;
+            left: 50%;
+            bottom: 120px;
+            transform: translateX(-50%);
+            width: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            z-index: 100;
+        }
+        
+        .action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.8;
+            user-select: none;
+            width: 80px;
+            height: 100px;
+            flex: 0 0 80px;
+        }
+        
+        .action-button:hover {
+            opacity: 1;
+            transform: translateY(-3px) scale(1.05);
+            filter: drop-shadow(0 0 15px #6be4f0);
+        }
+        
+        .action-button svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .action-button:hover svg {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+        
+        .action-button svg circle {
+            transition: all 0.3s ease;
+        }
+        
+        .action-button:hover svg circle {
+            stroke: #00ff41;
+            fill: rgba(0, 255, 65, 0.1);
+        }
+        
+        .action-button svg path {
+            transition: all 0.3s ease;
+        }
+        
+        .action-button:hover svg path {
+            stroke: #00ff41;
+        }
+        
+        .action-button svg rect {
+            transition: all 0.3s ease;
+        }
+        
+        .action-button:hover svg rect {
+            stroke: #00ff41;
+        }
+        
+        .button-text {
+            color: #6BE4F0;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(107, 228, 240, 0.5);
+            width: 80px;
+            word-wrap: break-word;
+            line-height: 1.2;
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-button:hover .button-text {
+            color: #00ff41;
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        /* Special Apply Button Styling */
+        .apply-button {
+            animation: applyPulse 2.5s ease-in-out infinite;
+            position: relative;
+        }
+        
+        .apply-button .apply-text {
+            color: #00D4AA;
+            text-shadow: 0 0 5px rgba(0, 212, 170, 0.6);
+            font-weight: 700;
+        }
+        
+        .apply-button:hover {
+            animation-play-state: paused;
+        }
+        
+        .apply-button:hover .apply-text {
+            color: #00ff88;
+            text-shadow: 0 0 12px rgba(0, 255, 136, 0.9);
+            transform: translateY(-3px);
+        }
+        
+        .apply-button:hover svg circle {
+            stroke: #00ff88;
+            fill: rgba(0, 255, 136, 0.2);
+        }
+        
+        .apply-button:hover svg path {
+            stroke: #00ff88;
+        }
+        
+        .apply-button svg {
+            filter: drop-shadow(0 0 8px rgba(0, 212, 170, 0.4));
+        }
+        
+        .apply-button:hover svg {
+            filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.7));
+            transform: scale(1.1);
+        }
+        
+        /* Enhanced pulse animation */
+        @keyframes applyPulse {
+            0% {
+                opacity: 0.8;
+                transform: translateY(0px) scale(1);
+            }
+            25% {
+                opacity: 0.9;
+                transform: translateY(-2px) scale(1.03);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-4px) scale(1.05);
+            }
+            75% {
+                opacity: 0.9;
+                transform: translateY(-2px) scale(1.03);
+            }
+            100% {
+                opacity: 0.8;
+                transform: translateY(0px) scale(1);
+            }
+        }
+        
+        
+        /* Glow effect */
+        .apply-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle, rgba(0, 212, 170, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: applyGlow 2.5s ease-in-out infinite;
+            z-index: -1;
+        }
+        
+        @keyframes applyGlow {
+            0%, 100% {
+                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
         /* Program Logos Row */
         .logos-row {
             position: absolute;
@@ -647,8 +833,88 @@
             opacity: 0.4;
         }
         
-        /* Responsive adjustments */
-        @media (max-width: 480px) {
+        /* iPhone SE and small devices (375x667) */
+        @media (max-width: 375px) and (max-height: 667px) {
+            .main-container {
+                max-width: 100vw;
+                max-height: 100vh;
+            }
+            
+            .header-section {
+                top: 50px;
+                width: 85vw;
+                height: 60px;
+            }
+            
+            .header-title {
+                font-size: 20px;
+                margin-bottom: 4px;
+            }
+            
+            .header-subtitle {
+                font-size: 8px;
+            }
+            
+            .nav-cards-container {
+                top: 130px;
+                width: 90vw;
+                max-width: 260px;
+                gap: 12px;
+            }
+            
+            .nav-card {
+                width: 100%;
+                height: 58px;
+                transform: scale(0.9);
+            }
+            
+            .action-buttons-container {
+                bottom: 95px;
+                width: 90vw;
+                max-width: 280px;
+                gap: 12px;
+            }
+            
+            .action-button {
+                width: 65px;
+                height: 80px;
+                flex: 0 0 65px;
+            }
+            
+            .action-button svg {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .button-text {
+                font-size: 9px;
+                width: 65px;
+                min-height: 18px;
+            }
+            
+            .apply-button .apply-text {
+                font-size: 9px;
+                width: 65px;
+                min-height: 18px;
+            }
+            
+            .apply-button::before {
+                width: 75px;
+                height: 75px;
+            }
+            
+            .logos-row {
+                bottom: 25px;
+                gap: 15px;
+            }
+            
+            .program-logo {
+                width: 12vh;
+            }
+        }
+
+        /* General small devices (up to 480px) */
+        @media (max-width: 480px) and (min-height: 668px) {
             .main-container {
                 max-width: 100vw;
                 max-height: 100vh;
@@ -668,6 +934,36 @@
             .nav-card {
                 width: 100%;
                 height: 70px;
+            }
+            
+            .action-buttons-container {
+                bottom: 170px;
+                width: 90vw;
+                max-width: 280px;
+                gap: 15px;
+            }
+            
+            .action-button {
+                width: 70px;
+                height: 90px;
+                flex: 0 0 70px;
+            }
+            
+            .action-button svg {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .button-text {
+                font-size: 10px;
+                width: 70px;
+                min-height: 20px;
+            }
+            
+            .apply-button .apply-text {
+                font-size: 10px;
+                width: 70px;
+                min-height: 20px;
             }
             
             .bottom-nav {
@@ -1200,6 +1496,274 @@
         .rules-body::-webkit-scrollbar-thumb:hover {
             background: #22B2B9;
         }
+
+        /* Orientation Warning Popup */
+        .orientation-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 6, 22, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .orientation-popup.show {
+            opacity: 1;
+        }
+
+        .orientation-content {
+            background: linear-gradient(135deg, #000616 0%, #001122 100%);
+            border: 2px solid #FF6B6B;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 90vw;
+            max-height: 90vh;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+            animation: orientationSlideIn 0.5s ease-out;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes orientationSlideIn {
+            from {
+                transform: scale(0.7) translateY(-50px);
+                opacity: 0;
+                filter: blur(5px);
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+                filter: blur(0px);
+            }
+        }
+
+        .orientation-header {
+            margin-bottom: 30px;
+        }
+
+        .warning-icon {
+            margin: 0 auto 20px;
+            animation: warningPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes warningPulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.5));
+            }
+            50% {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.8));
+            }
+        }
+
+        .orientation-title {
+            color: #FF6B6B;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(255, 107, 107, 0.8), 0 0 30px rgba(255, 107, 107, 0.3);
+            }
+        }
+
+        .phone-rotation-demo {
+            margin: 30px 0;
+        }
+
+        .phone-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .phone-device {
+            border: 3px solid #6BE4F0;
+            border-radius: 8px;
+            background: #000616;
+            box-shadow: 0 0 15px rgba(107, 228, 240, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .phone-device.landscape {
+            width: 80px;
+            height: 50px;
+            opacity: 0.6;
+            animation: phoneShake 1s ease-in-out infinite;
+        }
+
+        .phone-device.portrait {
+            width: 50px;
+            height: 80px;
+            opacity: 1;
+            animation: phoneGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes phoneShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        @keyframes phoneGlow {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(107, 228, 240, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(107, 228, 240, 0.6), 0 0 35px rgba(107, 228, 240, 0.2);
+            }
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6BE4F0 0%, #22B2B9 100%);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px;
+        }
+
+        .screen-content {
+            font-size: 16px;
+            filter: brightness(0.8);
+        }
+
+        .rotation-arrow {
+            animation: rotateArrow 2s ease-in-out infinite;
+        }
+
+        @keyframes rotateArrow {
+            0%, 100% {
+                transform: rotate(0deg) scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: rotate(90deg) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .orientation-message {
+            margin-top: 20px;
+        }
+
+        .orientation-message p {
+            color: #6BE4F0;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Floating particles background */
+        .orientation-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #6BE4F0;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: floatParticle 6s linear infinite;
+        }
+
+        .floating-particle:nth-child(1) {
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-particle:nth-child(2) {
+            left: 30%;
+            animation-delay: 1.2s;
+        }
+
+        .floating-particle:nth-child(3) {
+            left: 50%;
+            animation-delay: 2.4s;
+        }
+
+        .floating-particle:nth-child(4) {
+            left: 70%;
+            animation-delay: 3.6s;
+        }
+
+        .floating-particle:nth-child(5) {
+            left: 90%;
+            animation-delay: 4.8s;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                top: 100%;
+                opacity: 0;
+                transform: translateX(0);
+            }
+            10% {
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateX(20px);
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                top: -10%;
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+        }
+
+        /* Hide popup in portrait mode */
+        @media (orientation: portrait) {
+            .orientation-popup {
+                display: none !important;
+            }
+        }
+
+        /* Show popup only in landscape mode */
+        @media (orientation: landscape) {
+            .orientation-popup.landscape-detected {
+                display: flex !important;
+            }
+        }
+
+        /* Adjust action buttons for smaller viewport heights */
+        @media (max-height: 790px) {
+            .action-buttons-container {
+                bottom: 150px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1268,6 +1832,46 @@
             </div>
         </div>
         
+        <!-- Action Buttons Row -->
+        <div class="action-buttons-container">
+            <div class="action-button" onclick="showProgramDetails()">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="40" r="38" stroke="#6BE4F0" stroke-width="2" fill="rgba(107, 228, 240, 0.1)"/>
+                    <path d="M30 25H50C52.2091 25 54 26.7909 54 29V51C54 53.2091 52.2091 55 50 55H30C27.7909 55 26 53.2091 26 51V29C26 26.7909 27.7909 25 30 25Z" stroke="#6BE4F0" stroke-width="2" fill="none"/>
+                    <path d="M30 35H50" stroke="#6BE4F0" stroke-width="2"/>
+                    <path d="M30 41H46" stroke="#6BE4F0" stroke-width="2"/>
+                    <path d="M30 47H42" stroke="#6BE4F0" stroke-width="2"/>
+                </svg>
+                <div class="button-text">Program Details</div>
+            </div>
+            
+            <div class="action-button apply-button" onclick="showApply()">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="40" r="38" stroke="#00D4AA" stroke-width="2" fill="rgba(0, 212, 170, 0.15)"/>
+                    <path d="M25 35L35 45L55 25" stroke="#00D4AA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M40 55C47.732 55 54 48.732 54 41C54 33.268 47.732 27 40 27" stroke="#00D4AA" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div class="button-text apply-text">Apply</div>
+            </div>
+            
+            <div class="action-button" onclick="showAgenda()">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="40" r="38" stroke="#6BE4F0" stroke-width="2" fill="rgba(107, 228, 240, 0.1)"/>
+                    <rect x="28" y="22" width="24" height="32" rx="2" stroke="#6BE4F0" stroke-width="2" fill="none"/>
+                    <path d="M32 18V26" stroke="#6BE4F0" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M48 18V26" stroke="#6BE4F0" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M28 30H52" stroke="#6BE4F0" stroke-width="2"/>
+                    <circle cx="34" cy="36" r="1.5" fill="#6BE4F0"/>
+                    <circle cx="40" cy="36" r="1.5" fill="#6BE4F0"/>
+                    <circle cx="46" cy="36" r="1.5" fill="#6BE4F0"/>
+                    <circle cx="34" cy="42" r="1.5" fill="#6BE4F0"/>
+                    <circle cx="40" cy="42" r="1.5" fill="#6BE4F0"/>
+                    <circle cx="46" cy="42" r="1.5" fill="#6BE4F0"/>
+                    <circle cx="34" cy="48" r="1.5" fill="#6BE4F0"/>
+                </svg>
+                <div class="button-text">Agenda</div>
+            </div>
+        </div>
         
         <!-- Program Logos Row -->
         <div class="logos-row">
@@ -1293,6 +1897,55 @@
         
         <!-- Bottom decorative border -->
         <div class="bottom-border cyberpunk-element"></div>
+    </div>
+    
+    <!-- Orientation Warning Popup -->
+    <div id="orientationWarning" class="orientation-popup">
+        <div class="orientation-content">
+            <div class="orientation-header">
+                <div class="warning-icon">
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="30" cy="30" r="28" stroke="#FF6B6B" stroke-width="3" fill="none"/>
+                        <path d="M30 15V35" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="30" cy="45" r="2" fill="#FF6B6B"/>
+                    </svg>
+                </div>
+                <h2 class="orientation-title">Portrait Mode Required</h2>
+            </div>
+            
+            <div class="phone-rotation-demo">
+                <div class="phone-container">
+                    <div class="phone-device landscape">
+                        <div class="phone-screen">
+                            <div class="screen-content">📱</div>
+                        </div>
+                    </div>
+                    <div class="rotation-arrow">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 10C15 10 11 14 11 19C11 24 15 28 20 28C25 28 29 24 29 19" stroke="#6BE4F0" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <path d="M25 15L29 19L25 23" stroke="#6BE4F0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="phone-device portrait">
+                        <div class="phone-screen">
+                            <div class="screen-content">📱</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="orientation-message">
+                <p>Please rotate your device to portrait mode for the best experience</p>
+            </div>
+        </div>
+        
+        <div class="orientation-background">
+            <div class="floating-particle"></div>
+            <div class="floating-particle"></div>
+            <div class="floating-particle"></div>
+            <div class="floating-particle"></div>
+            <div class="floating-particle"></div>
+        </div>
     </div>
 
     <!-- Rules Popup Modal -->
@@ -1720,6 +2373,18 @@
             window.open('https://cmkl.ac.th', '_blank');
         }
         
+        function showProgramDetails() {
+            window.open('https://cmkl.ac.th/programs/', '_blank');
+        }
+        
+        function showAgenda() {
+            window.open('https://cmkl.ac.th/events/', '_blank');
+        }
+        
+        function showApply() {
+            window.open('https://cmkl.ac.th/admissions/', '_blank');
+        }
+        
         function showRules() {
             const modal = document.getElementById('rulesModal');
             modal.style.display = 'flex';
@@ -1950,6 +2615,37 @@
                     }, 300);
                 }
             }, 8000); // Glitch every 8 seconds
+        });
+        
+        // Orientation Detection and Warning
+        function checkOrientation() {
+            const orientationPopup = document.getElementById('orientationWarning');
+            
+            if (window.innerHeight < window.innerWidth) {
+                // Landscape mode detected
+                orientationPopup.classList.add('landscape-detected', 'show');
+            } else {
+                // Portrait mode detected
+                orientationPopup.classList.remove('landscape-detected', 'show');
+            }
+        }
+
+        // Initialize orientation check
+        function initOrientationCheck() {
+            checkOrientation();
+            
+            // Listen for orientation changes
+            window.addEventListener('orientationchange', function() {
+                setTimeout(checkOrientation, 100); // Delay to ensure proper detection
+            });
+            
+            // Also listen for resize events (for desktop testing)
+            window.addEventListener('resize', checkOrientation);
+        }
+
+        // Initialize orientation detection when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initOrientationCheck();
         });
     </script>
 </body>

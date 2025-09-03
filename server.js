@@ -10,10 +10,10 @@ const PORT = process.env.PORT || 3000;
 
 // Secure server-side configuration - loaded from environment variables
 const SERVER_CONFIG = {
-    MISSION: process.env.MISSION || 'DISABLE',
+    MISSION: process.env.MISSION || 'ENABLE',
     AIRTABLE_API_KEY: process.env.AIRTABLE_API_KEY,
     AIRTABLE_BASE_ID: process.env.AIRTABLE_BASE_ID,
-    AIRTABLE_TABLE_NAME: process.env.AIRTABLE_TABLE_NAME || 'Table%201'
+    AIRTABLE_TABLE_NAME: process.env.AIRTABLE_TABLE_NAME || 'Table 1'
 };
 
 // Validate required environment variables
@@ -196,7 +196,7 @@ app.get('/api/session/:sessionId/progress', (req, res) => {
 
 // Secure Airtable endpoints
 async function makeAirtableRequest(method, endpoint, data = null) {
-    const url = `https://api.airtable.com/v0/${SERVER_CONFIG.AIRTABLE_BASE_ID}/${SERVER_CONFIG.AIRTABLE_TABLE_NAME}${endpoint}`;
+    const url = `https://api.airtable.com/v0/${SERVER_CONFIG.AIRTABLE_BASE_ID}/${encodeURIComponent(SERVER_CONFIG.AIRTABLE_TABLE_NAME)}${endpoint}`;
     
     const options = {
         method,
@@ -211,13 +211,31 @@ async function makeAirtableRequest(method, endpoint, data = null) {
     }
     
     try {
-        const response = await fetch(url, options);
+        console.log('Making Airtable request to:', url);
+        console.log('Request data:', data ? JSON.stringify(data, null, 2) : 'No data');
+        
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
         if (!response.ok) {
-            throw new Error(`Airtable API error: ${response.status}`);
+            const errorText = await response.text();
+            console.error(`Airtable API error ${response.status}:`, errorText);
+            throw new Error(`Airtable API error: ${response.status} - ${errorText}`);
         }
         return await response.json();
     } catch (error) {
         console.error('Airtable request failed:', error);
+        if (error.name === 'AbortError') {
+            throw new Error('Airtable request timeout - check network connection');
+        }
         throw error;
     }
 }
@@ -248,13 +266,15 @@ app.post('/api/airtable/submit', async (req, res) => {
             }
         }
         
-        // Create new user record
+        // Create new user record with your actual Table 1 structure
         const result = await makeAirtableRequest('POST', '', {
             records: [{
                 fields: {
-                    ...fields,
-                    sessionId,
-                    timestamp: new Date().toISOString()
+                    'email': fields.email,
+                    'lastname': fields.lastname,
+                    'key1 status': 'not_scanned',
+                    'key2 status': 'not_scanned', 
+                    'key3 status': 'not_scanned'
                 }
             }]
         });
@@ -262,7 +282,13 @@ app.post('/api/airtable/submit', async (req, res) => {
         res.json({ success: true, recordId: result.records[0].id });
     } catch (error) {
         console.error('Failed to submit to Airtable:', error);
-        res.status(500).json({ error: 'Failed to submit data' });
+        console.log('Falling back to offline mode');
+        // Return success even if Airtable fails - allow AR experience to continue
+        res.json({ 
+            success: true, 
+            recordId: 'offline_session_' + Date.now(),
+            message: 'Running in offline mode - data not stored remotely'
+        });
     }
 });
 
@@ -293,7 +319,13 @@ app.post('/api/airtable/update', async (req, res) => {
         res.json({ success: true, record: result.records[0] });
     } catch (error) {
         console.error('Failed to update Airtable record:', error);
-        res.status(500).json({ error: 'Failed to update record' });
+        console.log('Falling back to offline mode for update');
+        // Return success even if Airtable fails - allow AR experience to continue
+        res.json({ 
+            success: true, 
+            record: { id: recordId, fields: fields },
+            message: 'Running in offline mode - data not updated remotely'
+        });
     }
 });
 

@@ -18,7 +18,7 @@ app.get('/api/config', (req, res) => {
     try {
         // Send only non-sensitive configuration to frontend
         const config = {
-            mission: process.env.MISSION || 'DISABLE',
+            mission: process.env.MISSION || 'ENABLE',
             features: {
                 dataSubmission: !!(process.env.AIRTABLE_API_KEY && process.env.AIRTABLE_BASE_ID && process.env.AIRTABLE_TABLE_NAME)
             },

@@ -3,7 +3,7 @@
 
 const config = {
     // API endpoints
-    API_BASE: window.location.origin + '/api',
+    API_BASE: 'http://localhost:8080/api',
     
     // Feature flags (loaded from server)
     features: {
@@ -24,10 +24,15 @@ async function loadSecureConfig() {
         if (response.ok) {
             const serverConfig = await response.json();
             config.mission = serverConfig.mission;
+            config.MISSION = serverConfig.mission; // Also set uppercase version for compatibility
             config.features = { ...config.features, ...serverConfig.features };
+            console.log('Server config loaded:', serverConfig);
         }
     } catch (error) {
         console.warn('Failed to load server configuration:', error);
+        // Fallback to paused mode
+        config.mission = 'DISABLE';
+        config.MISSION = 'DISABLE';
     }
 }
 
