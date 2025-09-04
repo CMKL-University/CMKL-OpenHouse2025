@@ -2,8 +2,10 @@
 // All API keys and sensitive config moved to backend
 
 const config = {
-    // API endpoints
-    API_BASE: 'http://localhost:3000/api',
+    // API endpoints - auto-detect environment
+    API_BASE: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'http://localhost:3000/api' 
+        : '/api',
     
     // Feature flags (loaded from server)
     features: {
