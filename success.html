@@ -551,11 +551,10 @@
                 
                 const keyField = `key${keyNumber} status`;
                 
-                const response = await secureApiRequest('/airtable/update', {
+                const response = await secureApiRequest('/airtable/update-key', {
                     recordId: recordId,
-                    fields: {
-                        [keyField]: 'scanned'
-                    }
+                    keyField: keyField,
+                    status: 'scanned'
                 });
                 
                 if (response.success) {

@@ -20,9 +20,9 @@
         background: rgba(0, 6, 22, 0.9);
         border: 2px solid #00ff41;
         border-radius: 12px;
-        padding: 10px 15px;
+        padding: 16px 24px;
         color: #00ff41;
-        font-size: 12px;
+        font-size: 16px;
         font-weight: bold;
         text-align: center;
         z-index: 1000;
@@ -44,205 +44,13 @@
         color: #ff4444;
         box-shadow: 0 4px 20px rgba(255, 68, 68, 0.3);
       }
-
-      /* Custom Scanning Overlay - like old scanner.html */
-      #custom-scanning-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        /* background: #000616; */
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 1001;
-        font-family: 'Arial', sans-serif;
-      }
-
-      #custom-scanning-overlay.hidden {
-        display: none;
-      }
-
-      .scanning-content {
-        text-align: center;
-        color: #6BE4F0;
-      }
-
-      .scanning-title {
-        font-size: 28px;
-        font-weight: bold;
-        margin-bottom: 20px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-      }
-
-      .scanning-instruction {
-        font-size: 18px;
-        margin-bottom: 30px;
-        opacity: 0.8;
-      }
-
-      .scanner-frame {
-        width: 250px;
-        height: 250px;
-        border: 3px solid #6BE4F0;
-        border-radius: 20px;
-        position: relative;
-        margin: 20px auto;
-        overflow: hidden;
-        animation: scannerPulse 2s ease-in-out infinite;
-      }
-
-      @keyframes scannerPulse {
-        0%, 100% { 
-          border-color: #6BE4F0;
-          box-shadow: 0 0 20px rgba(107, 228, 240, 0.3);
-        }
-        50% { 
-          border-color: #00ff41;
-          box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
-        }
-      }
-
-      /* Scanning Line Animation */
-      .scanner-line {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, #00ff41, transparent);
-        animation: scanLine 2s linear infinite;
-      }
-
-      @keyframes scanLine {
-        0% {
-          transform: translateY(-3px);
-          opacity: 0;
-        }
-        10% {
-          opacity: 1;
-        }
-        90% {
-          opacity: 1;
-        }
-        100% {
-          transform: translateY(250px);
-          opacity: 0;
-        }
-      }
-
-      .scanner-corners {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        pointer-events: none;
-      }
-
-      .scanner-corner {
-        position: absolute;
-        width: 30px;
-        height: 30px;
-        border: 3px solid #00ff41;
-      }
-
-      .scanner-corner.top-left {
-        top: 10px;
-        left: 10px;
-        border-right: none;
-        border-bottom: none;
-      }
-
-      .scanner-corner.top-right {
-        top: 10px;
-        right: 10px;
-        border-left: none;
-        border-bottom: none;
-      }
-
-      .scanner-corner.bottom-left {
-        bottom: 10px;
-        left: 10px;
-        border-right: none;
-        border-top: none;
-      }
-
-      .scanner-corner.bottom-right {
-        bottom: 10px;
-        right: 10px;
-        border-left: none;
-        border-top: none;
-      }
-
-      .scanning-hint {
-        font-size: 16px;
-        color: #00ff41;
-        margin-top: 20px;
-        opacity: 0.7;
-      }
-
-      /* Back Button */
-      .back-button {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 6, 22, 0.9);
-        border: 2px solid #6BE4F0;
-        border-radius: 12px;
-        padding: 12px 24px;
-        color: #6BE4F0;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        z-index: 1002;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 20px rgba(107, 228, 240, 0.3);
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-      }
-
-      .back-button:hover {
-        background: rgba(107, 228, 240, 0.1);
-        border-color: #00ff41;
-        color: #00ff41;
-        transform: translateX(-50%) translateY(-2px);
-        box-shadow: 0 6px 25px rgba(0, 255, 65, 0.4);
-      }
-
     </style>
   </head>
   <body>
-    <!-- Custom Scanning Overlay -->
-    <div id="custom-scanning-overlay">
-      <div class="scanning-content">
-        <!-- <div class="scanning-title">AR Key Scanner</div> -->
-        <!-- <div class="scanning-instruction">Point your camera at the AR target</div> -->
-        <div class="scanner-frame">
-          <div class="scanner-line"></div>
-          <!-- <div class="scanner-corners">
-            <div class="scanner-corner top-left"></div>
-            <div class="scanner-corner top-right"></div>
-            <div class="scanner-corner bottom-left"></div>
-            <div class="scanner-corner bottom-right"></div>
-          </div> -->
-        </div>
-        <div class="scanning-hint">Align the target within the frame</div>
-      </div>
-    </div>
-
     <div id="status" class="status-overlay">SCANNING FOR KEYS...</div>
     
-    <!-- Back Button -->
-    <a href="page2.html" class="back-button">← Back to Portal</a>
-    
     <a-scene 
-      mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/band.mind; maxTrack: 2; uiScanning: #custom-scanning-overlay" 
+      mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/band.mind; maxTrack: 2" 
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 

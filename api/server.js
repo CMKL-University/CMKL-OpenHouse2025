@@ -366,6 +366,76 @@ app.post('/api/airtable/update-key', async (req, res) => {
     }
 });
 
+// Get user data endpoint
+app.get('/api/airtable/user/:email', async (req, res) => {
+    try {
+        if (!AIRTABLE_CONFIG.apiKey || !AIRTABLE_CONFIG.baseId) {
+            return res.status(503).json({ 
+                success: false, 
+                error: 'Configuration error',
+                message: 'Airtable integration is required but not configured. Please contact administrator.' 
+            });
+        }
+
+        const { email } = req.params;
+        
+        if (!email) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Missing required parameter: email' 
+            });
+        }
+
+        // Search for user by email
+        const escapedEmail = email.replace(/"/g, '""');
+        const searchUrl = `${AIRTABLE_CONFIG.baseUrl}/${AIRTABLE_CONFIG.baseId}/${encodeURIComponent(AIRTABLE_CONFIG.tableName)}?filterByFormula={email}="${escapedEmail}"`;
+        
+        console.log(`Searching for user data for ${email}`);
+        
+        const searchResult = await withRetry(async () => {
+            return await airtableRequest(searchUrl);
+        });
+
+        if (searchResult.records && searchResult.records.length > 0) {
+            const userRecord = searchResult.records[0];
+            const fields = userRecord.fields;
+            
+            // Extract key statuses
+            const keyStatuses = {
+                key1: fields['key1 status'] || 'not_scanned',
+                key2: fields['key2 status'] || 'not_scanned', 
+                key3: fields['key3 status'] || 'not_scanned',
+                key4: fields['key4 status'] || 'not_scanned'
+            };
+
+            res.json({ 
+                success: true, 
+                message: 'User data retrieved successfully',
+                data: {
+                    recordId: userRecord.id,
+                    email: fields.email,
+                    lastName: fields.lastname,
+                    keyStatuses: keyStatuses
+                }
+            });
+        } else {
+            res.status(404).json({ 
+                success: false, 
+                error: 'User not found',
+                message: 'No user found with the provided email address'
+            });
+        }
+
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Internal server error',
+            message: 'Failed to retrieve user data'
+        });
+    }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({ 
