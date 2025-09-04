@@ -20,6 +20,10 @@
     {
       "src": "svg/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "model/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
