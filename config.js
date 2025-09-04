@@ -21,8 +21,10 @@ const config = {
 
 // Load secure configuration from server
 async function loadSecureConfig() {
+    console.log('Loading config from:', config.API_BASE);
+    console.log('Current hostname:', window.location.hostname);
     try {
-        const response = await fetch(`${config.API_BASE}/config`);
+        const response = await fetch(`${config.API_BASE}/config?v=${Date.now()}`);
         if (response.ok) {
             const serverConfig = await response.json();
             config.mission = serverConfig.mission;
