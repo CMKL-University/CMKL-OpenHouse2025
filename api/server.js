@@ -17,27 +17,35 @@ if (process.env.AIRTABLE_API_KEY && process.env.AIRTABLE_BASE_ID) {
     base = Airtable.base(process.env.AIRTABLE_BASE_ID || 'appBWW2jchcr1OW3Q');
 }
 
-// Rate limit helper function
+// Rate limit helper function - following Airtable documentation
 async function withRetry(fn, maxRetries = 3, baseDelay = 1000) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             return await fn();
         } catch (error) {
-            // Check if it's a rate limit error
+            console.log(`Attempt ${attempt}/${maxRetries} failed:`, error.message);
+            
+            // Check if it's a rate limit error (429)
             if (error.statusCode === 429 || (error.error && error.error.indexOf('Rate limit') !== -1)) {
                 if (attempt === maxRetries) {
-                    throw error; // Last attempt, give up
+                    throw new Error('Rate limit exceeded after maximum retries');
                 }
                 
-                // Exponential backoff: wait longer each time
-                const delay = baseDelay * Math.pow(2, attempt - 1);
-                console.log(`Rate limited (attempt ${attempt}/${maxRetries}). Waiting ${delay}ms before retry...`);
+                // Airtable documentation says wait 30 seconds for rate limits
+                const delay = 30000; // 30 seconds
+                console.log(`Rate limited. Waiting ${delay/1000} seconds before retry (attempt ${attempt}/${maxRetries})...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 continue;
             }
             
-            // If it's not a rate limit error, throw immediately
-            throw error;
+            // For other errors, use exponential backoff
+            if (attempt === maxRetries) {
+                throw error; // Last attempt, give up
+            }
+            
+            const delay = baseDelay * Math.pow(2, attempt - 1);
+            console.log(`Retrying in ${delay}ms (attempt ${attempt}/${maxRetries})...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
         }
     }
 }
@@ -122,13 +130,19 @@ app.post('/api/airtable/submit', async (req, res) => {
         
         const searchResult = await withRetry(async () => {
             return new Promise((resolve, reject) => {
-                // Escape quotes and special characters in email for safe formula usage
-                const escapedEmail = email.replace(/"/g, '""').replace(/'/g, "''");
+                // Use the exact pattern from Airtable documentation
+                const escapedEmail = email.replace(/"/g, '""');
                 base(tableName).select({
-                    filterByFormula: `LOWER({email}) = "${escapedEmail}"`
+                    filterByFormula: `{email} = "${escapedEmail}"`,
+                    maxRecords: 1
                 }).firstPage((err, records) => {
-                    if (err) reject(err);
-                    else resolve(records);
+                    if (err) {
+                        console.error('Airtable search error:', err);
+                        reject(err);
+                    } else {
+                        console.log(`Found ${records.length} existing records for ${email}`);
+                        resolve(records);
+                    }
                 });
             });
         });
@@ -164,6 +178,7 @@ app.post('/api/airtable/submit', async (req, res) => {
         }
 
         // Email doesn't exist, create new record with retry logic
+        console.log(`Creating new record for ${email}`);
         const newRecords = await withRetry(async () => {
             return new Promise((resolve, reject) => {
                 base(tableName).create([
@@ -171,14 +186,19 @@ app.post('/api/airtable/submit', async (req, res) => {
                         "fields": {
                             "email": fields.email,
                             "lastname": fields.lastname,
-                            "key1 status": fields['key1 status'] || 'not_scanned',
-                            "key2 status": fields['key2 status'] || 'not_scanned',
-                            "key3 status": fields['key3 status'] || 'not_scanned'
+                            "key1 status": "not_scanned",
+                            "key2 status": "not_scanned",
+                            "key3 status": "not_scanned"
                         }
                     }
                 ], function(err, records) {
-                    if (err) reject(err);
-                    else resolve(records);
+                    if (err) {
+                        console.error('Airtable create error:', err);
+                        reject(err);
+                    } else {
+                        console.log('Created record:', records[0].getId());
+                        resolve(records);
+                    }
                 });
             });
         });
@@ -198,10 +218,48 @@ app.post('/api/airtable/submit', async (req, res) => {
         }); // End of withEmailLock
 
     } catch (error) {
-        console.error('Server error:', error);
+        console.error('Server error in /api/airtable/submit:', error);
+        
+        // Handle specific error types
+        if (error.statusCode === 401) {
+            return res.status(401).json({ 
+                success: false, 
+                error: 'Authentication failed - check Airtable API key',
+                message: 'Invalid API credentials'
+            });
+        }
+        
+        if (error.statusCode === 429) {
+            return res.status(429).json({ 
+                success: false, 
+                error: 'Rate limit exceeded',
+                message: 'Too many requests. Please wait 30 seconds and try again.'
+            });
+        }
+        
+        if (error.statusCode === 422) {
+            return res.status(422).json({ 
+                success: false, 
+                error: 'Invalid request data',
+                message: 'The data provided is invalid. Please check your input.'
+            });
+        }
+        
+        // For network/timeout errors
+        if (error.code === 'ETIMEDOUT' || error.code === 'ENOTFOUND') {
+            return res.status(503).json({ 
+                success: false, 
+                error: 'Network error',
+                message: 'Unable to connect to Airtable. Please check your internet connection.'
+            });
+        }
+        
+        // Generic server error
         res.status(500).json({ 
             success: false, 
-            error: 'Internal server error' 
+            error: 'Internal server error',
+            message: 'An unexpected error occurred. Please try again later.',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 });

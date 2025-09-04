@@ -1691,10 +1691,25 @@
                         }
                     }
                     
-                    const errorText = await response.text();
-                    addDebugLog(`Server error: ${response.status}`, 'error');
-                    console.error('Server error:', errorText);
-                    // Don't throw error - allow AR experience to continue
+                    if (response.status === 429) {
+                        // Rate limit error
+                        const errorData = await response.json();
+                        addDebugLog(`Rate limit error: ${errorData.message}`, 'error');
+                        throw new Error(errorData.message || 'Too many requests. Please wait a moment and try again.');
+                    }
+                    
+                    // Try to get JSON error response, fall back to text
+                    let errorInfo;
+                    try {
+                        errorInfo = await response.json();
+                    } catch {
+                        errorInfo = { error: await response.text() };
+                    }
+                    
+                    addDebugLog(`Server error: ${response.status} - ${errorInfo.message || errorInfo.error}`, 'error');
+                    console.error('Server error:', errorInfo);
+                    
+                    // Don't throw error - allow AR experience to continue with local session
                     return { id: 'local_session', fields: { email, lastname: lastName } };
                 }
             } catch (error) {
