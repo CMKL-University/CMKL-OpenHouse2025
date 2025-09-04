@@ -1,20 +1,76 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const Airtable = require('airtable');
+const https = require('https');
+const { URL } = require('url');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configure Airtable
-let base = null;
-if (process.env.AIRTABLE_API_KEY && process.env.AIRTABLE_BASE_ID) {
-    Airtable.configure({
-        endpointUrl: 'https://api.airtable.com',
-        apiKey: process.env.AIRTABLE_API_KEY
+// Configure Airtable direct API access
+const AIRTABLE_CONFIG = {
+    apiKey: process.env.AIRTABLE_API_KEY,
+    baseId: process.env.AIRTABLE_BASE_ID,
+    tableName: process.env.AIRTABLE_TABLE_NAME || 'Table 1',
+    baseUrl: 'https://api.airtable.com/v0'
+};
+
+// Helper function for Airtable API calls with proper timeout handling using Node.js https
+async function airtableRequest(url, options = {}) {
+    return new Promise((resolve, reject) => {
+        const urlObj = new URL(url);
+        const requestOptions = {
+            hostname: urlObj.hostname,
+            port: urlObj.port || 443,
+            path: urlObj.pathname + urlObj.search,
+            method: options.method || 'GET',
+            headers: {
+                'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
+                'Content-Type': 'application/json',
+                'User-Agent': 'CMKL-OpenHouse-API/1.0',
+                ...options.headers
+            },
+            timeout: 15000 // 15 second timeout
+        };
+
+        const req = https.request(requestOptions, (res) => {
+            let data = '';
+            
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
+            
+            res.on('end', () => {
+                try {
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        const jsonData = JSON.parse(data);
+                        resolve(jsonData);
+                    } else {
+                        reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`));
+                    }
+                } catch (error) {
+                    reject(new Error(`Invalid JSON response: ${error.message}`));
+                }
+            });
+        });
+
+        req.on('error', (error) => {
+            reject(error);
+        });
+
+        req.on('timeout', () => {
+            req.destroy();
+            reject(new Error('Request timeout'));
+        });
+
+        // Write request body if provided
+        if (options.body) {
+            req.write(options.body);
+        }
+
+        req.end();
     });
-    base = Airtable.base(process.env.AIRTABLE_BASE_ID || 'appBWW2jchcr1OW3Q');
 }
 
 // Rate limit helper function - following Airtable documentation
@@ -82,11 +138,14 @@ app.use(express.static(path.join(__dirname, '..')));
 // API Routes
 app.get('/api/config', (req, res) => {
     try {
+        // Ensure Airtable is properly configured before enabling data submission
+        const airtableConfigured = !!(AIRTABLE_CONFIG.apiKey && AIRTABLE_CONFIG.baseId);
+        
         // Send only non-sensitive configuration to frontend
         const config = {
             mission: process.env.MISSION || 'ENABLE',
             features: {
-                dataSubmission: !!(process.env.AIRTABLE_API_KEY && process.env.AIRTABLE_BASE_ID && process.env.AIRTABLE_TABLE_NAME)
+                dataSubmission: airtableConfigured
             },
             ui: {
                 targetTimeout: 60000,
@@ -94,6 +153,7 @@ app.get('/api/config', (req, res) => {
             }
         };
         
+        console.log(`Config requested - Airtable integration: ${airtableConfigured ? 'ENABLED' : 'DISABLED'}`);
         res.json(config);
     } catch (error) {
         console.error('Error loading config:', error);
@@ -104,11 +164,12 @@ app.get('/api/config', (req, res) => {
 // Secure Airtable submission endpoint
 app.post('/api/airtable/submit', async (req, res) => {
     try {
-        // Check if Airtable integration is configured
-        if (!base || !process.env.AIRTABLE_API_KEY || !process.env.AIRTABLE_BASE_ID) {
-            return res.json({ 
+        // Check if Airtable integration is configured - REQUIRED
+        if (!AIRTABLE_CONFIG.apiKey || !AIRTABLE_CONFIG.baseId) {
+            return res.status(503).json({ 
                 success: false, 
-                message: 'Airtable integration not configured - running in demo mode' 
+                error: 'Configuration error',
+                message: 'Airtable integration is required but not configured. Please contact administrator.' 
             });
         }
 
@@ -121,35 +182,24 @@ app.post('/api/airtable/submit', async (req, res) => {
             });
         }
 
-        const tableName = process.env.AIRTABLE_TABLE_NAME || 'Table 1';
         const email = fields.email.toLowerCase(); // Normalize email to lowercase
         const lastname = fields.lastname;
         
         // Use email lock to prevent race conditions
         return await withEmailLock(email, async () => {
         
+        // Search for existing record using direct API
+        const escapedEmail = email.replace(/"/g, '""');
+        const searchUrl = `${AIRTABLE_CONFIG.baseUrl}/${AIRTABLE_CONFIG.baseId}/${encodeURIComponent(AIRTABLE_CONFIG.tableName)}?filterByFormula={email}="${escapedEmail}"&maxRecords=1`;
+        
         const searchResult = await withRetry(async () => {
-            return new Promise((resolve, reject) => {
-                // Use the exact pattern from Airtable documentation
-                const escapedEmail = email.replace(/"/g, '""');
-                base(tableName).select({
-                    filterByFormula: `{email} = "${escapedEmail}"`,
-                    maxRecords: 1
-                }).firstPage((err, records) => {
-                    if (err) {
-                        console.error('Airtable search error:', err);
-                        reject(err);
-                    } else {
-                        console.log(`Found ${records.length} existing records for ${email}`);
-                        resolve(records);
-                    }
-                });
-            });
+            console.log(`Searching for existing records for ${email}`);
+            return await airtableRequest(searchUrl);
         });
         
-        if (searchResult && searchResult.length > 0) {
-            const existingRecord = searchResult[0];
-            const existingLastname = existingRecord.get('lastname');
+        if (searchResult && searchResult.records && searchResult.records.length > 0) {
+            const existingRecord = searchResult.records[0];
+            const existingLastname = existingRecord.fields.lastname;
             
             // Check if the lastname matches
             if (existingLastname && existingLastname.toLowerCase() !== lastname.toLowerCase()) {
@@ -161,58 +211,57 @@ app.post('/api/airtable/submit', async (req, res) => {
                 });
             } else {
                 // Email exists with same lastname - return existing record with fields
+                console.log(`Found existing record for ${email}`);
                 return res.json({ 
                     success: true, 
-                    recordId: existingRecord.getId(), 
+                    recordId: existingRecord.id, 
                     existing: true,
                     message: 'Welcome back! Using your existing account.',
                     fields: {
-                        email: existingRecord.get('email') || fields.email,
-                        lastname: existingRecord.get('lastname') || fields.lastname,
-                        'key1 status': existingRecord.get('key1 status') || 'not_scanned',
-                        'key2 status': existingRecord.get('key2 status') || 'not_scanned',
-                        'key3 status': existingRecord.get('key3 status') || 'not_scanned'
+                        email: existingRecord.fields.email || fields.email,
+                        lastname: existingRecord.fields.lastname || fields.lastname,
+                        'key1 status': existingRecord.fields['key1 status'] || 'not_scanned',
+                        'key2 status': existingRecord.fields['key2 status'] || 'not_scanned',
+                        'key3 status': existingRecord.fields['key3 status'] || 'not_scanned'
                     }
                 });
             }
         }
 
-        // Email doesn't exist, create new record with retry logic
+        // Email doesn't exist, create new record with direct API
         console.log(`Creating new record for ${email}`);
-        const newRecords = await withRetry(async () => {
-            return new Promise((resolve, reject) => {
-                base(tableName).create([
-                    {
-                        "fields": {
-                            "email": fields.email,
-                            "lastname": fields.lastname,
-                            "key1 status": "not_scanned",
-                            "key2 status": "not_scanned",
-                            "key3 status": "not_scanned"
+        const createUrl = `${AIRTABLE_CONFIG.baseUrl}/${AIRTABLE_CONFIG.baseId}/${encodeURIComponent(AIRTABLE_CONFIG.tableName)}`;
+        
+        const createResult = await withRetry(async () => {
+            return await airtableRequest(createUrl, {
+                method: 'POST',
+                body: JSON.stringify({
+                    records: [{
+                        fields: {
+                            email: fields.email,
+                            lastname: fields.lastname,
+                            'key1 status': 'not_scanned',
+                            'key2 status': 'not_scanned',
+                            'key3 status': 'not_scanned'
                         }
-                    }
-                ], function(err, records) {
-                    if (err) {
-                        console.error('Airtable create error:', err);
-                        reject(err);
-                    } else {
-                        console.log('Created record:', records[0].getId());
-                        resolve(records);
-                    }
-                });
+                    }]
+                })
             });
         });
         
+        const newRecord = createResult.records[0];
+        console.log('Created record:', newRecord.id);
+        
         res.json({ 
             success: true, 
-            recordId: newRecords[0].getId(),
+            recordId: newRecord.id,
             message: 'User record created successfully',
             fields: {
-                email: newRecords[0].get('email'),
-                lastname: newRecords[0].get('lastname'),
-                'key1 status': newRecords[0].get('key1 status') || 'not_scanned',
-                'key2 status': newRecords[0].get('key2 status') || 'not_scanned',
-                'key3 status': newRecords[0].get('key3 status') || 'not_scanned'
+                email: newRecord.fields.email,
+                lastname: newRecord.fields.lastname,
+                'key1 status': newRecord.fields['key1 status'] || 'not_scanned',
+                'key2 status': newRecord.fields['key2 status'] || 'not_scanned',
+                'key3 status': newRecord.fields['key3 status'] || 'not_scanned'
             }
         });
         }); // End of withEmailLock
@@ -246,11 +295,13 @@ app.post('/api/airtable/submit', async (req, res) => {
         }
         
         // For network/timeout errors
-        if (error.code === 'ETIMEDOUT' || error.code === 'ENOTFOUND') {
+        if (error.code === 'ETIMEDOUT' || error.code === 'ENOTFOUND' || 
+            error.type === 'system' || error.message === 'Request timeout') {
+            console.error('Network/timeout error details:', error);
             return res.status(503).json({ 
                 success: false, 
                 error: 'Network error',
-                message: 'Unable to connect to Airtable. Please check your internet connection.'
+                message: 'Connection to Airtable timed out. Please try again in a few moments.'
             });
         }
         
@@ -267,10 +318,11 @@ app.post('/api/airtable/submit', async (req, res) => {
 // Update key status endpoint
 app.post('/api/airtable/update-key', async (req, res) => {
     try {
-        if (!base || !process.env.AIRTABLE_API_KEY || !process.env.AIRTABLE_BASE_ID) {
-            return res.json({ 
+        if (!AIRTABLE_CONFIG.apiKey || !AIRTABLE_CONFIG.baseId) {
+            return res.status(503).json({ 
                 success: false, 
-                message: 'Airtable integration not configured' 
+                error: 'Configuration error',
+                message: 'Airtable integration is required but not configured. Please contact administrator.' 
             });
         }
 
@@ -283,28 +335,26 @@ app.post('/api/airtable/update-key', async (req, res) => {
             });
         }
 
-        const tableName = process.env.AIRTABLE_TABLE_NAME || 'Table 1';
+        const updateUrl = `${AIRTABLE_CONFIG.baseUrl}/${AIRTABLE_CONFIG.baseId}/${encodeURIComponent(AIRTABLE_CONFIG.tableName)}`;
         
-        const updatedRecords = await withRetry(async () => {
-            return new Promise((resolve, reject) => {
-                base(tableName).update([
-                    {
-                        "id": recordId,
-                        "fields": {
+        const updateResult = await withRetry(async () => {
+            return await airtableRequest(updateUrl, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    records: [{
+                        id: recordId,
+                        fields: {
                             [keyField]: status
                         }
-                    }
-                ], function(err, records) {
-                    if (err) reject(err);
-                    else resolve(records);
-                });
+                    }]
+                })
             });
         });
         
         res.json({ 
             success: true, 
             message: 'Key status updated successfully',
-            data: updatedRecords[0].fields
+            data: updateResult.records[0].fields
         });
 
     } catch (error) {
@@ -330,9 +380,22 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
+// Validate Airtable configuration at startup
+if (!AIRTABLE_CONFIG.apiKey || !AIRTABLE_CONFIG.baseId) {
+    console.error('❌ FATAL ERROR: Airtable integration is required but not configured!');
+    console.error('   Missing environment variables:');
+    if (!AIRTABLE_CONFIG.apiKey) console.error('   - AIRTABLE_API_KEY');
+    if (!AIRTABLE_CONFIG.baseId) console.error('   - AIRTABLE_BASE_ID');
+    console.error('   Please configure these in your .env file before starting the server.');
+    process.exit(1);
+}
+
 app.listen(PORT, () => {
     console.log(`🚀 CMKL OpenHouse API server running on port ${PORT}`);
     console.log(`📱 Frontend available at: http://localhost:${PORT}`);
     console.log(`🔧 API endpoints available at: http://localhost:${PORT}/api/`);
     console.log(`🔒 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`✅ Airtable integration: ENABLED`);
+    console.log(`📊 Base ID: ${AIRTABLE_CONFIG.baseId}`);
+    console.log(`📋 Table: ${AIRTABLE_CONFIG.tableName}`);
 });
