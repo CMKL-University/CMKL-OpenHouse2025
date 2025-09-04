@@ -1759,9 +1759,26 @@
         }
 
         /* Adjust action buttons for smaller viewport heights */
-        @media (max-height: 790px) {
+        @media (max-height: 820px) {
             .action-buttons-container {
-                bottom: 150px;
+                bottom: 130px;
+            }
+        }
+
+        @media (max-height: 750px) {
+            .header-section {
+                top: 40px;
+            }
+            
+            .nav-cards-container {
+                top: 110px;
+            }
+            
+            .action-buttons-container {
+                bottom: 140px;
+                width: 75vw;
+                max-width: 200px;
+                gap: 10px;
             }
         }
     </style>
