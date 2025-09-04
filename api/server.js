@@ -143,7 +143,7 @@ app.get('/api/config', (req, res) => {
         
         // Send only non-sensitive configuration to frontend
         const config = {
-            mission: process.env.MISSION || 'ENABLE',
+            mission: process.env.MISSION,
             features: {
                 dataSubmission: airtableConfigured
             },

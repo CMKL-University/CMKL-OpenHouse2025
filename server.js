@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 // Secure server-side configuration - loaded from environment variables
 const SERVER_CONFIG = {
-    MISSION: process.env.MISSION || 'ENABLE',
+    MISSION: process.env.MISSION,
     AIRTABLE_API_KEY: process.env.AIRTABLE_API_KEY,
     AIRTABLE_BASE_ID: process.env.AIRTABLE_BASE_ID,
     AIRTABLE_TABLE_NAME: process.env.AIRTABLE_TABLE_NAME || 'Table 1'

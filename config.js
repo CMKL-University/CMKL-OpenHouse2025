@@ -30,9 +30,7 @@ async function loadSecureConfig() {
         }
     } catch (error) {
         console.warn('Failed to load server configuration:', error);
-        // Fallback to paused mode
-        config.mission = 'DISABLE';
-        config.MISSION = 'DISABLE';
+        // No fallback - rely on server configuration only
     }
 }
 
