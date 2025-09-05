@@ -18,8 +18,8 @@
         left: 50%;
         transform: translateX(-50%);
         background: rgba(0, 6, 22, 0.9);
-        border: 2px solid #00ff41;
-        border-radius: 12px;
+        /* border: 2px solid #00ff41; */
+        border-radius: 8px;
         padding: 10px 15px;
         color: #00ff41;
         font-size: 12px;
@@ -361,7 +361,7 @@
         if (isProcessing) return;
         
         const keyNumber = targetIndex + 1;
-        console.log(`Target ${targetIndex} found - Key #${keyNumber}`);
+        console.log(`Target ${targetIndex} found - Key #${keyNumber} (Bear=Key#1, Raccoon=Key#2)`);
         
         // Check if already scanned
         if (checkIfAlreadyScanned(targetIndex)) {
@@ -407,37 +407,61 @@
           console.log('Auto-collect AR scanner ready');
           showStatus('SCANNING FOR KEYS...');
           
-          // Listen for target found events
+          // Scene listener with target ID mapping
           sceneEl.addEventListener('targetFound', (event) => {
+            console.log('Scene targetFound event detected:', event);
             try {
               let targetIndex = 0;
+              
+              // Try to get the correct targetIndex from event
               if (event.detail) {
                 targetIndex = event.detail.targetIndex ?? 
                              event.detail.target?.targetIndex ?? 
                              event.detail.index ?? 0;
               }
-              console.log('Scene targetFound event:', targetIndex);
+              
+              // Map based on which target element triggered (if available)
+              const targetElement = event.target;
+              if (targetElement && targetElement.id === 'target2') {
+                targetIndex = 1;
+                console.log('Detected target2 element, forcing Key #2');
+              } else if (targetElement && targetElement.id === 'target1') {
+                targetIndex = 0;
+                console.log('Detected target1 element, forcing Key #1');
+              }
+              
+              console.log('Final processing targetIndex:', targetIndex, 'as Key #' + (targetIndex + 1));
               handleTargetFound(targetIndex);
             } catch (error) {
               console.error('Error in targetFound handler:', error);
             }
           });
           
-          // Also listen on individual targets as backup
+          // Keep individual listeners as backup with more debugging
           const target1 = document.getElementById('target1');
           const target2 = document.getElementById('target2');
           
+          console.log('Target elements found:', { target1: !!target1, target2: !!target2 });
+          
           if (target1) {
             target1.addEventListener('targetfound', (event) => {
-              console.log('Target 1 found (individual listener)');
-              handleTargetFound(0);
+              console.log('Individual Target 1 listener fired - Bear Model - FORCING Key #1');
+              event.stopPropagation(); // Prevent scene listener from firing
+              handleTargetFound(0); // Always Key #1
+            });
+            target1.addEventListener('targetlost', (event) => {
+              console.log('Target 1 lost');
             });
           }
           
           if (target2) {
             target2.addEventListener('targetfound', (event) => {
-              console.log('Target 2 found (individual listener)');
-              handleTargetFound(1);
+              console.log('Individual Target 2 listener fired - Raccoon Model - FORCING Key #2');
+              event.stopPropagation(); // Prevent scene listener from firing
+              handleTargetFound(1); // Always Key #2
+            });
+            target2.addEventListener('targetlost', (event) => {
+              console.log('Target 2 lost');
             });
           }
         });
