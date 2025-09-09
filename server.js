@@ -841,7 +841,7 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                 success: false, 
                 error: 'USER_NOT_REGISTERED',
                 message: 'Please register first before accessing the portal.',
-                registrationUrl: 'https://example.com/register',
+                registrationUrl: 'https://airtable.com/appE4SeDTpEI6XTRX/pagOUHvMAlLgJS2Pf/form',
                 showModal: true
             });
         }
