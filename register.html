@@ -1648,7 +1648,7 @@
                 addDebugLog('Sending user data to server...', 'info');
                 
                 // Submit user data to Airtable via server (simplified - no session creation needed)
-                const response = await fetch(`${window.APP_CONFIG.API_BASE}/airtable/submit`, {
+                const response = await fetch(`${window.APP_CONFIG.API_BASE}/harty/submit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1687,6 +1687,15 @@
                         const errorData = await response.json();
                         if (errorData.error === 'EMAIL_ALREADY_USED') {
                             addDebugLog(`Email validation error: ${errorData.message}`, 'error');
+                            throw new Error(errorData.message);
+                        }
+                    }
+                    
+                    if (response.status === 403) {
+                        // Forbidden - user not pre-registered
+                        const errorData = await response.json();
+                        if (errorData.error === 'USER_NOT_REGISTERED') {
+                            addDebugLog(`Registration blocked: ${errorData.message}`, 'error');
                             throw new Error(errorData.message);
                         }
                     }
@@ -2228,6 +2237,139 @@
             });
         }
         
+        // Real-time SQL injection detection gimmick for input fields
+        const GIMMICK_ATTACK_PATTERNS = [
+            // SQL injection patterns (more specific)
+            /(\b(select|insert|update|delete|drop|create|alter)\s+(from|into|table|database|schema)\b)/i,
+            /(\bunion\s+select\b)/i,
+            /(or\s+1\s*=\s*1|and\s+1\s*=\s*1|or\s+'1'\s*=\s*'1')/i,
+            
+            // XSS patterns (HTML tags with suspicious attributes)
+            /(<script[^>]*>|<\/script>)/i,
+            /(<iframe[^>]*>|<\/iframe>)/i,
+            /(<object[^>]*>|<\/object>)/i,
+            /(javascript\s*:|vbscript\s*:|data\s*:)/i,
+            /(onload\s*=|onerror\s*=|onclick\s*=|onmouseover\s*=)/i,
+            
+            // Google Sheets/Excel formula injection
+            /^[\s]*[=@\+\-].*[A-Z]+\d+/i, // Formulas starting with = @ + - followed by cell references
+            /(\b(SUM|AVERAGE|COUNT|MAX|MIN|IF|VLOOKUP|INDEX|MATCH)\s*\()/i,
+            /(IMPORTXML|IMPORTHTML|IMPORTDATA|IMPORTRANGE|HYPERLINK)\s*\(/i,
+            
+            // SQL comments (but not email dashes)
+            /(\/\*.*\*\/|--\s+|#\s+)/,
+            
+            // Dangerous characters in suspicious context
+            /['"]\s*(or|and|union|select)\s+/i,
+            /;\s*(drop|delete|update|insert)\s+/i,
+            
+            // Encoded attempts
+            /(%27|%22|%3c|%3e|%3d|%40)/i
+        ];
+
+        function detectMaliciousInput(input) {
+            if (!input || typeof input !== 'string') return false;
+            
+            const normalizedInput = input.toLowerCase().trim();
+            
+            for (const pattern of GIMMICK_ATTACK_PATTERNS) {
+                if (pattern.test(normalizedInput)) {
+                    console.warn(`🚨 GIMMICK: Malicious pattern detected - ${pattern}`);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function triggerHackerDetection(fieldName, value) {
+            console.error(`🚨 GIMMICK TRIGGERED: Field '${fieldName}' contains: ${value}`);
+            
+            // Add dramatic effect before redirect
+            document.body.style.filter = 'hue-rotate(180deg) invert(1)';
+            document.body.style.animation = 'shake 0.1s infinite';
+            
+            // Add shake animation
+            const style = document.createElement('style');
+            style.textContent = '@keyframes shake { 0% { transform: translateX(-2px); } 100% { transform: translateX(2px); } }';
+            document.head.appendChild(style);
+            
+            // Dramatic countdown
+            let countdown = 3;
+            const countdownEl = document.createElement('div');
+            countdownEl.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                font-size: 5rem; color: #ff0000; z-index: 9999;
+                text-shadow: 0 0 20px #ff0000; font-family: monospace;
+                animation: pulse 0.5s infinite;
+            `;
+            document.body.appendChild(countdownEl);
+            
+            const countdownTimer = setInterval(() => {
+                countdownEl.textContent = `DETECTED! ${countdown}`;
+                countdown--;
+                
+                if (countdown < 0) {
+                    clearInterval(countdownTimer);
+                    window.location.href = 'hacker-detected.html';
+                }
+            }, 1000);
+            
+            // Immediate redirect after 3 seconds
+            setTimeout(() => {
+                window.location.href = 'hacker-detected.html';
+            }, 3200);
+        }
+
+        // Add real-time listeners to input fields
+        document.addEventListener('DOMContentLoaded', function() {
+            // Email field listener
+            const emailField = document.getElementById('userEmail');
+            const lastNameField = document.getElementById('userLastName');
+            
+            if (emailField) {
+                emailField.addEventListener('input', function(e) {
+                    const value = e.target.value;
+                    if (detectMaliciousInput(value)) {
+                        addDebugLog(`🚨 GIMMICK: Malicious email pattern detected!`, 'error');
+                        triggerHackerDetection('email', value);
+                    }
+                });
+                
+                // Also check on paste
+                emailField.addEventListener('paste', function(e) {
+                    setTimeout(() => {
+                        const value = e.target.value;
+                        if (detectMaliciousInput(value)) {
+                            addDebugLog(`🚨 GIMMICK: Malicious email paste detected!`, 'error');
+                            triggerHackerDetection('email', value);
+                        }
+                    }, 10);
+                });
+            }
+            
+            if (lastNameField) {
+                lastNameField.addEventListener('input', function(e) {
+                    const value = e.target.value;
+                    if (detectMaliciousInput(value)) {
+                        addDebugLog(`🚨 GIMMICK: Malicious lastname pattern detected!`, 'error');
+                        triggerHackerDetection('lastname', value);
+                    }
+                });
+                
+                // Also check on paste
+                lastNameField.addEventListener('paste', function(e) {
+                    setTimeout(() => {
+                        const value = e.target.value;
+                        if (detectMaliciousInput(value)) {
+                            addDebugLog(`🚨 GIMMICK: Malicious lastname paste detected!`, 'error');
+                            triggerHackerDetection('lastname', value);
+                        }
+                    }, 10);
+                });
+            }
+            
+        });
+
         // Add hover effects for navigation cards
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.nav-card').forEach(card => {

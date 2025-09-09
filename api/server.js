@@ -59,9 +59,7 @@ try {
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Serve static files from the root directory (frontend)
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(path.join(__dirname)));
 
 // In-memory storage (replace with database in production)
 const sessions = new Map();
@@ -70,6 +68,131 @@ const userInteractions = new Map();
 // Generate secure session ID
 function generateSecureSessionId() {
     return crypto.randomBytes(32).toString('hex');
+}
+
+// SQL Injection Detection Patterns
+const SQL_INJECTION_PATTERNS = [
+    // Basic SQL injection patterns
+    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE|UNION|SCRIPT)\b)/i,
+    // Common SQL injection techniques
+    /(\'|\"|;|--|\/\*|\*\/)/,
+    // XSS patterns
+    /(<script|<iframe|<object|<embed|javascript:|vbscript:|onload=|onerror=)/i,
+    // SQL functions and operators
+    /(OR\s+1=1|AND\s+1=1|OR\s+\'1\'=\'1\'|AND\s+\'1\'=\'1\')/i,
+    // Union-based injection
+    /(UNION\s+(ALL\s+)?SELECT)/i,
+    // Comment-based injection
+    /(\/\*.*\*\/|--.*|#.*)/i,
+    // Time-based injection
+    /(SLEEP\(|WAITFOR\s+DELAY|BENCHMARK\()/i,
+    // Information gathering
+    /(INFORMATION_SCHEMA|SYSOBJECTS|SYSTABLES)/i,
+    // Advanced patterns
+    /(CONCAT\(|CHAR\(|ASCII\(|SUBSTRING\()/i,
+    // Encoded attempts
+    /(%27|%22|%3B|%2D%2D)/i,
+];
+
+// Advanced threat detection
+const ADVANCED_PATTERNS = [
+    // SQL injection with encoding
+    /(%3C%73%63%72%69%70%74|%3Cscript)/i,
+    // NoSQL injection
+    /(\$where|\$ne|\$gt|\$lt|\$regex)/i,
+    // Command injection
+    /(;|\||\&\&|ls\s|cat\s|pwd|whoami|id\s)/,
+    // Path traversal
+    /(\.\.\/|\.\.\\|%2e%2e%2f)/i,
+    // LDAP injection
+    /(\*\)\(|\)\(|\*\()/,
+];
+
+// Check for malicious patterns in input
+function detectSQLInjection(input) {
+    if (!input || typeof input !== 'string') return false;
+    
+    const normalizedInput = input.toLowerCase().trim();
+    
+    // Check against SQL injection patterns
+    for (const pattern of SQL_INJECTION_PATTERNS) {
+        if (pattern.test(normalizedInput)) {
+            console.warn(`🚨 SQL Injection attempt detected: Pattern matched - ${pattern}`);
+            return true;
+        }
+    }
+    
+    // Check against advanced patterns
+    for (const pattern of ADVANCED_PATTERNS) {
+        if (pattern.test(normalizedInput)) {
+            console.warn(`🚨 Advanced attack detected: Pattern matched - ${pattern}`);
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+// Validate all fields in an object
+function validateInputSecurity(fields) {
+    for (const [key, value] of Object.entries(fields)) {
+        if (typeof value === 'string' && detectSQLInjection(value)) {
+            console.error(`🚨 SECURITY ALERT: Malicious input detected in field '${key}': ${value}`);
+            return {
+                isMalicious: true,
+                field: key,
+                value: value
+            };
+        }
+    }
+    return { isMalicious: false };
+}
+
+// Security middleware for protecting endpoints
+function securityMiddleware(req, res, next) {
+    const clientIP = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
+    
+    // Check URL parameters
+    if (req.params) {
+        const urlCheck = validateInputSecurity(req.params);
+        if (urlCheck.isMalicious) {
+            console.error(`🚨 SECURITY BREACH: URL parameter attack from IP ${clientIP}`);
+            console.error(`🚨 Field: ${urlCheck.field}, Value: ${urlCheck.value}`);
+            return res.redirect('/hacker-detected.html');
+        }
+    }
+    
+    // Check query parameters
+    if (req.query) {
+        const queryCheck = validateInputSecurity(req.query);
+        if (queryCheck.isMalicious) {
+            console.error(`🚨 SECURITY BREACH: Query parameter attack from IP ${clientIP}`);
+            console.error(`🚨 Field: ${queryCheck.field}, Value: ${queryCheck.value}`);
+            return res.redirect('/hacker-detected.html');
+        }
+    }
+    
+    // Check request body
+    if (req.body) {
+        const bodyCheck = validateInputSecurity(req.body);
+        if (bodyCheck.isMalicious) {
+            console.error(`🚨 SECURITY BREACH: Request body attack from IP ${clientIP}`);
+            console.error(`🚨 Field: ${bodyCheck.field}, Value: ${bodyCheck.value}`);
+            return res.redirect('/hacker-detected.html');
+        }
+        
+        // Deep check nested objects (like fields.email, fields.lastname)
+        if (req.body.fields) {
+            const fieldsCheck = validateInputSecurity(req.body.fields);
+            if (fieldsCheck.isMalicious) {
+                console.error(`🚨 SECURITY BREACH: Form fields attack from IP ${clientIP}`);
+                console.error(`🚨 Field: ${fieldsCheck.field}, Value: ${fieldsCheck.value}`);
+                return res.redirect('/hacker-detected.html');
+            }
+        }
+    }
+    
+    next();
 }
 
 // Create new session
@@ -263,7 +386,7 @@ async function findUserByEmail(email) {
             // Get all data from the sheet
             const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:C', // A=First Name, B=Last Name, C=Email
+                range: 'A:G', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key
             });
             
             const rows = response.data.values;
@@ -279,7 +402,11 @@ async function findUserByEmail(email) {
                         rowIndex: i + 1, // 1-based for Sheets API
                         firstName: row[0] || '',
                         lastName: row[1] || '',
-                        email: row[2] || ''
+                        email: row[2] || '',
+                        checkin: row[3] || '',
+                        registerKey: row[4] || '',
+                        projectShowcaseKey: row[5] || '',
+                        afternoonSessionKey: row[6] || ''
                     }];
                 }
             }
@@ -303,7 +430,7 @@ async function createUserRecord(fields) {
             // Find the next empty row
             const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:C',
+                range: 'A:G',
             });
             
             const rows = response.data.values || [];
@@ -312,11 +439,11 @@ async function createUserRecord(fields) {
             // Append new row with first name, last name, email
             await sheets.spreadsheets.values.append({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:C',
+                range: 'A:G',
                 valueInputOption: 'USER_ENTERED',
                 resource: {
                     values: [
-                        [fields.firstname || '', fields.lastname || '', fields.email]
+                        [fields.firstname || '', fields.lastname || '', fields.email, 'checked-in', '', '', '']
                     ]
                 }
             });
@@ -325,7 +452,11 @@ async function createUserRecord(fields) {
                 rowIndex: nextRow,
                 firstName: fields.firstname || '',
                 lastName: fields.lastname || '',
-                email: fields.email
+                email: fields.email,
+                checkin: 'checked-in',
+                registerKey: '',
+                projectShowcaseKey: '',
+                afternoonSessionKey: ''
             };
         } catch (error) {
             console.error('Error creating user record:', error);
@@ -343,14 +474,14 @@ async function updateUserRecord(rowIndex, fields) {
     return await withRetry(async () => {
         try {
             // Update specific row
-            const range = `A${rowIndex}:C${rowIndex}`;
+            const range = `A${rowIndex}:G${rowIndex}`;
             await sheets.spreadsheets.values.update({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
                 range: range,
                 valueInputOption: 'USER_ENTERED',
                 resource: {
                     values: [
-                        [fields.firstname || '', fields.lastname || '', fields.email || '']
+                        [fields.firstname || '', fields.lastname || '', fields.email || '', fields.checkin || '', fields.registerKey || '', fields.projectShowcaseKey || '', fields.afternoonSessionKey || '']
                     ]
                 }
             });
@@ -369,7 +500,7 @@ async function updateUserRecord(rowIndex, fields) {
 }
 
 // Submit data to Google Sheets (secure endpoint)
-app.post('/api/airtable/submit', async (req, res) => {
+app.post('/api/harty/submit', securityMiddleware, async (req, res) => {
     // Check if mission is enabled
     if (SERVER_CONFIG.MISSION !== 'ENABLE') {
         return res.json({ success: false, message: 'Data submission disabled' });
@@ -403,26 +534,48 @@ app.post('/api/airtable/submit', async (req, res) => {
                 });
             }
             
-            // User exists with same name, return existing record
+            // User exists with same name - auto check-in and initialize fields if needed
             console.log('Existing user found at row:', existingUser.rowIndex);
+            
+            // Check if user needs check-in or field initialization
+            const needsUpdate = !existingUser.checkin || existingUser.checkin !== 'checked-in';
+            
+            if (needsUpdate) {
+                console.log('Auto-checking in existing user and initializing fields...');
+                
+                // Update user with check-in status
+                const updateFields = {
+                    firstname: existingUser.firstName,
+                    lastname: existingUser.lastName,
+                    email: existingUser.email,
+                    checkin: 'checked-in', // Mark as checked in
+                    registerKey: existingUser.registerKey || '', // Keep existing or empty
+                    projectShowcaseKey: existingUser.projectShowcaseKey || '', // Keep existing or empty
+                    afternoonSessionKey: existingUser.afternoonSessionKey || '' // Keep existing or empty
+                };
+                
+                await updateUserRecord(existingUser.rowIndex, updateFields);
+                console.log('Existing user auto-checked in successfully');
+            }
+            
             return res.json({ 
                 success: true, 
                 recordId: existingUser.rowIndex.toString(), 
                 existing: true,
-                message: 'Welcome back!' 
+                checkedIn: true,
+                message: needsUpdate ? 'Welcome back! You have been checked in.' : 'Welcome back!' 
+            });
+        } else {
+            // User not found - only pre-existing users are allowed
+            console.log('New user registration blocked:', fields.email);
+            return res.status(403).json({
+                success: false,
+                error: 'USER_NOT_REGISTERED',
+                message: 'Only pre-registered users can access this portal. Please contact the administrator.',
+                registrationUrl: 'https://example.com/contact',
+                showModal: true
             });
         }
-        
-        // Create new user record
-        const newRecord = await createUserRecord(fields);
-        
-        console.log('New user created successfully at row:', newRecord.rowIndex);
-        res.json({ 
-            success: true, 
-            recordId: newRecord.rowIndex.toString(),
-            existing: false,
-            message: 'Registration successful!' 
-        });
         
     } catch (error) {
         console.error('Failed to submit to Google Sheets:', error);
@@ -448,7 +601,7 @@ app.post('/api/airtable/submit', async (req, res) => {
 });
 
 // Update existing Google Sheets record (secure endpoint)
-app.post('/api/airtable/update', async (req, res) => {
+app.post('/api/harty/update', securityMiddleware, async (req, res) => {
     // Check if mission is enabled
     if (SERVER_CONFIG.MISSION !== 'ENABLE') {
         return res.json({ success: false, message: 'Data updates disabled' });
@@ -506,8 +659,99 @@ app.post('/api/airtable/update', async (req, res) => {
     }
 });
 
+// Update specific key for a user
+app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
+    // Check if mission is enabled
+    if (SERVER_CONFIG.MISSION !== 'ENABLE') {
+        return res.json({ success: false, message: 'Key updates disabled' });
+    }
+    
+    const { recordId, keyField, status } = req.body;
+    
+    if (!recordId || !keyField || !status) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Missing recordId, keyField, or status' 
+        });
+    }
+    
+    try {
+        console.log(`Updating key ${keyField} to ${status} for row ${recordId}`);
+        
+        const rowIndex = parseInt(recordId);
+        
+        // Map key fields to spreadsheet columns
+        let columnLetter = '';
+        let columnIndex = -1;
+        
+        switch(keyField) {
+            case 'key1 status':
+                columnLetter = 'E'; // Register Key
+                columnIndex = 4;
+                break;
+            case 'key2 status':
+                columnLetter = 'F'; // Project showcase Key
+                columnIndex = 5;
+                break;
+            case 'key3 status':
+                columnLetter = 'G'; // Afternoon session Key
+                columnIndex = 6;
+                break;
+            case 'key4 status':
+                columnLetter = 'D'; // Check-in (if needed)
+                columnIndex = 3;
+                break;
+            default:
+                return res.status(400).json({ 
+                    success: false, 
+                    error: 'Invalid keyField: ' + keyField 
+                });
+        }
+        
+        // Update specific cell
+        const range = `${columnLetter}${rowIndex}`;
+        await sheets.spreadsheets.values.update({
+            spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+            range: range,
+            valueInputOption: 'USER_ENTERED',
+            resource: {
+                values: [[status]]
+            }
+        });
+        
+        console.log(`Key ${keyField} updated successfully to ${status}`);
+        res.json({ 
+            success: true, 
+            message: `Key ${keyField} updated to ${status}`,
+            keyField,
+            status
+        });
+        
+    } catch (error) {
+        console.error('Failed to update key in Google Sheets:', error);
+        
+        // Check if it's a rate limit error
+        if (error.code === 429 || error.status === 429) {
+            return res.status(429).json({
+                success: false,
+                error: 'Rate limit exceeded. Please try again in a few seconds.',
+                message: 'Too many requests - please wait a moment and try again.'
+            });
+        }
+        
+        // For other errors, return 500 but allow fallback
+        console.log('Falling back to offline mode for key update');
+        res.status(500).json({ 
+            success: false,
+            error: 'Internal server error',
+            message: 'Unable to update key at this time. Please try again later.',
+            offline: true
+        });
+    }
+});
+
 // Get user data endpoint
-app.get('/api/airtable/user/:email', async (req, res) => {
+app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
     try {
         if (!sheets) {
             return res.status(503).json({ 
@@ -534,13 +778,12 @@ app.get('/api/airtable/user/:email', async (req, res) => {
         if (existingUsers && existingUsers.length > 0) {
             const userRecord = existingUsers[0];
             
-            // For Google Sheets, we only have basic user data (no key status columns yet)
-            // Return basic user data structure expected by frontend
+            // Map spreadsheet columns to key statuses
             const keyStatuses = {
-                key1: 'not_scanned',
-                key2: 'not_scanned', 
-                key3: 'not_scanned',
-                key4: 'not_scanned'
+                key1: userRecord.registerKey === 'scanned' ? 'scanned' : 'not_scanned', // Column E
+                key2: userRecord.projectShowcaseKey === 'scanned' ? 'scanned' : 'not_scanned', // Column F
+                key3: userRecord.afternoonSessionKey === 'scanned' ? 'scanned' : 'not_scanned', // Column G
+                key4: userRecord.checkin === 'scanned' ? 'scanned' : 'not_scanned' // Column D
             };
 
             res.json({ 
@@ -556,8 +799,10 @@ app.get('/api/airtable/user/:email', async (req, res) => {
         } else {
             res.status(404).json({ 
                 success: false, 
-                error: 'User not found',
-                message: 'No user found with the provided email address'
+                error: 'USER_NOT_REGISTERED',
+                message: 'Please register first before accessing the portal.',
+                registrationUrl: 'https://example.com/register',
+                showModal: true
             });
         }
 
@@ -593,10 +838,18 @@ app.get('/api/admin/analytics', (req, res) => {
     res.json(analytics);
 });
 
-// Serve frontend for all other routes (SPA support)
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'index.html'));
+// Serve main page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Export the app for Vercel
+// For Vercel deployment
 module.exports = app;
+
+// For local development
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`🚀 CMKL OpenHouse secure server running on port ${PORT}`);
+        console.log(`📱 Visit: http://localhost:${PORT}`);
+    });
+}

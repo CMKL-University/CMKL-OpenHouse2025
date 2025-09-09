@@ -2202,6 +2202,114 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Registration Required Modal */
+        .registration-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 6, 22, 0.95);
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+
+        .registration-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0a1a2e 0%, #16213e 100%);
+            border: 2px solid #6be4f0;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #6be4f0;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(107, 228, 240, 0.1);
+        }
+
+        .modal-icon {
+            font-size: 48px;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            color: #6be4f0;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-family: 'Darker Grotesque', sans-serif;
+        }
+
+        .modal-message {
+            color: #a0a0a0;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            font-family: 'Darker Grotesque', sans-serif;
+        }
+
+        .modal-button {
+            background: linear-gradient(135deg, #6be4f0 0%, #4ecdc4 100%);
+            color: #000616;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-family: 'Darker Grotesque', sans-serif;
+        }
+
+        .modal-button:hover {
+            background: linear-gradient(135deg, #4ecdc4 0%, #6be4f0 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(107, 228, 240, 0.3);
+        }
+
     </style>
 </head>
 <body>
@@ -2225,6 +2333,17 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Registration Required Modal -->
+    <div id="registrationModal" class="registration-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeRegistrationModal()">&times;</button>
+            <div class="modal-icon">⚠️</div>
+            <h2 class="modal-title">Registration Required</h2>
+            <p class="modal-message">Please register first before accessing the portal.</p>
+            <a id="registerButton" href="#" class="modal-button" target="_blank">Register Now</a>
         </div>
     </div>
     
@@ -2604,7 +2723,7 @@
                 showLoadingScreen();
                 console.log(`Fetching fresh user data for: ${email}`);
                 
-                const response = await fetch(`/api/airtable/user/${encodeURIComponent(email)}`);
+                const response = await fetch(`/api/harty/user/${encodeURIComponent(email)}`);
                 const data = await response.json();
                 
                 if (data.success) {
@@ -2623,6 +2742,12 @@
                 } else {
                     console.error('Failed to fetch user data:', data.error);
                     hideLoadingScreen();
+                    
+                    // Handle USER_NOT_REGISTERED error with persistent modal
+                    if (data.error === 'USER_NOT_REGISTERED' && data.showModal) {
+                        showRegistrationModal(data.registrationUrl, data.message);
+                    }
+                    
                     return null;
                 }
             } catch (error) {
@@ -3282,6 +3407,49 @@
         }
 
         // Initialize orientation detection when page loads
+        // Registration Modal Functions
+        function showRegistrationModal(registrationUrl, message) {
+            const modal = document.getElementById('registrationModal');
+            const messageEl = modal.querySelector('.modal-message');
+            const registerButton = document.getElementById('registerButton');
+            
+            // Update modal content
+            if (message) {
+                messageEl.textContent = message;
+            }
+            
+            if (registrationUrl) {
+                registerButton.href = registrationUrl;
+            }
+            
+            // Show modal
+            modal.classList.add('show');
+            
+            // Prevent body scrolling
+            document.body.style.overflow = 'hidden';
+            
+            // Focus trap - prevent clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    // Don't close on outside click - force user to use close button
+                    return;
+                }
+            });
+        }
+
+        function closeRegistrationModal() {
+            const modal = document.getElementById('registrationModal');
+            modal.classList.remove('show');
+            
+            // Restore body scrolling
+            document.body.style.overflow = '';
+            
+            // Redirect to registration page or home
+            setTimeout(() => {
+                window.location.href = 'register.html';
+            }, 300);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             initOrientationCheck();
         });

@@ -318,7 +318,7 @@
         try {
           console.log(`Auto-collecting Key #${keyNumber}...`);
           
-          const response = await fetch('/api/airtable/update-key', {
+          const response = await fetch('/api/harty/update-key', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
