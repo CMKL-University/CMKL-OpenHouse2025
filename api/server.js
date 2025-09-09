@@ -1,131 +1,59 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const https = require('https');
-const { URL } = require('url');
+const crypto = require('crypto');
+const { google } = require('googleapis');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configure Airtable direct API access
-const AIRTABLE_CONFIG = {
-    apiKey: process.env.AIRTABLE_API_KEY,
-    baseId: process.env.AIRTABLE_BASE_ID,
-    tableName: process.env.AIRTABLE_TABLE_NAME || 'Table 1',
-    baseUrl: 'https://api.airtable.com/v0'
+// Secure server-side configuration - loaded from environment variables
+const SERVER_CONFIG = {
+    MISSION: process.env.MISSION,
+    GOOGLE_SHEETS_ID: process.env.GOOGLE_SHEETS_ID,
+    GOOGLE_PROJECT_ID: process.env.GOOGLE_PROJECT_ID,
+    GOOGLE_PRIVATE_KEY: process.env.GOOGLE_PRIVATE_KEY,
+    GOOGLE_CLIENT_EMAIL: process.env.GOOGLE_CLIENT_EMAIL,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID
 };
 
-// Helper function for Airtable API calls with proper timeout handling using Node.js https
-async function airtableRequest(url, options = {}) {
-    return new Promise((resolve, reject) => {
-        const urlObj = new URL(url);
-        const requestOptions = {
-            hostname: urlObj.hostname,
-            port: urlObj.port || 443,
-            path: urlObj.pathname + urlObj.search,
-            method: options.method || 'GET',
-            headers: {
-                'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
-                'Content-Type': 'application/json',
-                'User-Agent': 'CMKL-OpenHouse-API/1.0',
-                ...options.headers
-            },
-            timeout: 15000 // 15 second timeout
-        };
+// Validate required configuration
+const requiredEnvVars = [
+    'GOOGLE_SHEETS_ID',
+    'GOOGLE_PROJECT_ID', 
+    'GOOGLE_PRIVATE_KEY',
+    'GOOGLE_CLIENT_EMAIL'
+];
 
-        const req = https.request(requestOptions, (res) => {
-            let data = '';
-            
-            res.on('data', (chunk) => {
-                data += chunk;
-            });
-            
-            res.on('end', () => {
-                try {
-                    if (res.statusCode >= 200 && res.statusCode < 300) {
-                        const jsonData = JSON.parse(data);
-                        resolve(jsonData);
-                    } else {
-                        reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`));
-                    }
-                } catch (error) {
-                    reject(new Error(`Invalid JSON response: ${error.message}`));
-                }
-            });
-        });
+const missingVars = requiredEnvVars.filter(varName => !SERVER_CONFIG[varName]);
+if (missingVars.length > 0) {
+    console.error('❌ Missing required environment variables:');
+    missingVars.forEach(varName => console.error(`   - ${varName}`));
+    console.error('Please check your .env file configuration.');
+    process.exit(1);
+}
 
-        req.on('error', (error) => {
-            reject(error);
-        });
+// Configure Google Sheets API with Service Account from environment variables
+let sheets = null;
+try {
+    const serviceAccountCredentials = {
+        type: "service_account",
+        project_id: SERVER_CONFIG.GOOGLE_PROJECT_ID,
+        private_key: SERVER_CONFIG.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        client_email: SERVER_CONFIG.GOOGLE_CLIENT_EMAIL,
+        client_id: SERVER_CONFIG.GOOGLE_CLIENT_ID
+    };
 
-        req.on('timeout', () => {
-            req.destroy();
-            reject(new Error('Request timeout'));
-        });
-
-        // Write request body if provided
-        if (options.body) {
-            req.write(options.body);
-        }
-
-        req.end();
+    const auth = new google.auth.GoogleAuth({
+        credentials: serviceAccountCredentials,
+        scopes: ['https://www.googleapis.com/auth/spreadsheets']
     });
-}
-
-// Rate limit helper function - following Airtable documentation
-async function withRetry(fn, maxRetries = 3, baseDelay = 1000) {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            return await fn();
-        } catch (error) {
-            console.log(`Attempt ${attempt}/${maxRetries} failed:`, error.message);
-            
-            // Check if it's a rate limit error (429)
-            if (error.statusCode === 429 || (error.error && error.error.indexOf('Rate limit') !== -1)) {
-                if (attempt === maxRetries) {
-                    throw new Error('Rate limit exceeded after maximum retries');
-                }
-                
-                // Airtable documentation says wait 30 seconds for rate limits
-                const delay = 30000; // 30 seconds
-                console.log(`Rate limited. Waiting ${delay/1000} seconds before retry (attempt ${attempt}/${maxRetries})...`);
-                await new Promise(resolve => setTimeout(resolve, delay));
-                continue;
-            }
-            
-            // For other errors, use exponential backoff
-            if (attempt === maxRetries) {
-                throw error; // Last attempt, give up
-            }
-            
-            const delay = baseDelay * Math.pow(2, attempt - 1);
-            console.log(`Retrying in ${delay}ms (attempt ${attempt}/${maxRetries})...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-    }
-}
-
-// In-memory lock to prevent race conditions for email registration
-const emailLocks = new Map();
-
-async function withEmailLock(email, fn) {
-    const normalizedEmail = email.toLowerCase();
-    
-    // Wait for any existing lock to release
-    while (emailLocks.has(normalizedEmail)) {
-        await new Promise(resolve => setTimeout(resolve, 10));
-    }
-    
-    // Acquire lock
-    emailLocks.set(normalizedEmail, true);
-    
-    try {
-        return await fn();
-    } finally {
-        // Always release lock
-        emailLocks.delete(normalizedEmail);
-    }
+    sheets = google.sheets({ version: 'v4', auth });
+    console.log('✅ Google Sheets configured successfully with service account from environment variables');
+} catch (error) {
+    console.error('❌ Failed to configure Google Sheets:', error.message);
+    console.warn('⚠️ Google Sheets not configured - running in offline mode');
 }
 
 // Middleware
@@ -135,233 +63,445 @@ app.use(express.json());
 // Serve static files from the root directory (frontend)
 app.use(express.static(path.join(__dirname, '..')));
 
-// API Routes
-app.get('/api/config', (req, res) => {
-    try {
-        // Ensure Airtable is properly configured before enabling data submission
-        const airtableConfigured = !!(AIRTABLE_CONFIG.apiKey && AIRTABLE_CONFIG.baseId);
-        
-        // Send only non-sensitive configuration to frontend
-        const config = {
-            mission: process.env.MISSION,
-            features: {
-                dataSubmission: airtableConfigured
-            },
-            ui: {
-                targetTimeout: 60000,
-                messageDisplayTime: 3000
-            }
-        };
-        
-        console.log(`Config requested - Airtable integration: ${airtableConfigured ? 'ENABLED' : 'DISABLED'}`);
-        res.json(config);
-    } catch (error) {
-        console.error('Error loading config:', error);
-        res.status(500).json({ error: 'Failed to load configuration' });
-    }
+// In-memory storage (replace with database in production)
+const sessions = new Map();
+const userInteractions = new Map();
+
+// Generate secure session ID
+function generateSecureSessionId() {
+    return crypto.randomBytes(32).toString('hex');
+}
+
+// Create new session
+app.post('/api/session/create', (req, res) => {
+    const sessionId = generateSecureSessionId();
+    const sessionData = {
+        sessionId,
+        startTime: new Date().toISOString(),
+        collectedKeys: [],
+        targetsFound: [],
+        interactions: [],
+        requiredKeys: ['Engineering Access Key', 'Science Lab Key'],
+        isCompleted: false,
+        createdAt: new Date().toISOString()
+    };
+    
+    sessions.set(sessionId, sessionData);
+    
+    // Only return minimal data to frontend
+    res.json({
+        sessionId,
+        requiredKeys: sessionData.requiredKeys,
+        status: 'created'
+    });
 });
 
-// Secure Airtable submission endpoint
-app.post('/api/airtable/submit', async (req, res) => {
-    try {
-        // Check if Airtable integration is configured - REQUIRED
-        if (!AIRTABLE_CONFIG.apiKey || !AIRTABLE_CONFIG.baseId) {
-            return res.status(503).json({ 
-                success: false, 
-                error: 'Configuration error',
-                message: 'Airtable integration is required but not configured. Please contact administrator.' 
-            });
-        }
+// Validate session
+app.get('/api/session/:sessionId/validate', (req, res) => {
+    const { sessionId } = req.params;
+    
+    if (!sessions.has(sessionId)) {
+        return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    const session = sessions.get(sessionId);
+    res.json({
+        valid: true,
+        collectedKeysCount: session.collectedKeys.length,
+        totalKeys: session.requiredKeys.length,
+        isCompleted: session.isCompleted
+    });
+});
 
-        const { fields } = req.body;
+// Collect key (secure endpoint)
+app.post('/api/session/:sessionId/collect-key', (req, res) => {
+    const { sessionId } = req.params;
+    const { keyName, targetType, method } = req.body;
+    
+    if (!sessions.has(sessionId)) {
+        return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    const session = sessions.get(sessionId);
+    
+    // Validate key name
+    if (!session.requiredKeys.includes(keyName)) {
+        return res.status(400).json({ error: 'Invalid key name' });
+    }
+    
+    // Check if already collected
+    if (session.collectedKeys.includes(keyName)) {
+        return res.status(400).json({ error: 'Key already collected' });
+    }
+    
+    // Add key to collection
+    session.collectedKeys.push(keyName);
+    
+    // Track target found
+    if (!session.targetsFound.includes(targetType)) {
+        session.targetsFound.push(targetType);
+    }
+    
+    // Record interaction (server-side only)
+    const interaction = {
+        type: 'key_collected',
+        keyName,
+        targetType,
+        method,
+        timestamp: new Date().toISOString(),
+        sessionId // Server tracks this, not exposed to frontend
+    };
+    
+    session.interactions.push(interaction);
+    
+    // Check completion
+    const isCompleted = session.requiredKeys.every(key => session.collectedKeys.includes(key));
+    if (isCompleted && !session.isCompleted) {
+        session.isCompleted = true;
+        session.completionTime = new Date().toISOString();
         
-        if (!fields || !fields.email || !fields.lastname) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Missing required fields: email and lastname' 
-            });
-        }
-
-        const email = fields.email.toLowerCase(); // Normalize email to lowercase
-        const lastname = fields.lastname;
-        
-        // Use email lock to prevent race conditions
-        return await withEmailLock(email, async () => {
-        
-        // Search for existing record using direct API
-        const escapedEmail = email.replace(/"/g, '""');
-        const searchUrl = `${AIRTABLE_CONFIG.baseUrl}/${AIRTABLE_CONFIG.baseId}/${encodeURIComponent(AIRTABLE_CONFIG.tableName)}?filterByFormula={email}="${escapedEmail}"&maxRecords=1`;
-        
-        const searchResult = await withRetry(async () => {
-            console.log(`Searching for existing records for ${email}`);
-            return await airtableRequest(searchUrl);
+        session.interactions.push({
+            type: 'game_completed',
+            completionTime: session.completionTime,
+            timeTaken: new Date() - new Date(session.startTime),
+            timestamp: new Date().toISOString(),
+            sessionId
         });
-        
-        if (searchResult && searchResult.records && searchResult.records.length > 0) {
-            const existingRecord = searchResult.records[0];
-            const existingLastname = existingRecord.fields.lastname;
+    }
+    
+    // Update session
+    sessions.set(sessionId, session);
+    
+    // Return minimal response
+    res.json({
+        success: true,
+        keyCollected: keyName,
+        totalCollected: session.collectedKeys.length,
+        totalRequired: session.requiredKeys.length,
+        isCompleted,
+        message: isCompleted ? 'Congratulations! All keys collected!' : `Key ${keyName} collected successfully!`
+    });
+});
+
+// Record interaction (secure endpoint)
+app.post('/api/session/:sessionId/interaction', (req, res) => {
+    const { sessionId } = req.params;
+    const { type, data } = req.body;
+    
+    if (!sessions.has(sessionId)) {
+        return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    const session = sessions.get(sessionId);
+    
+    const interaction = {
+        type,
+        ...data,
+        timestamp: new Date().toISOString(),
+        sessionId // Server-side only
+    };
+    
+    session.interactions.push(interaction);
+    sessions.set(sessionId, session);
+    
+    res.json({ success: true });
+});
+
+// Get session progress (minimal data)
+app.get('/api/session/:sessionId/progress', (req, res) => {
+    const { sessionId } = req.params;
+    
+    if (!sessions.has(sessionId)) {
+        return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    const session = sessions.get(sessionId);
+    
+    // Only return non-sensitive progress data
+    res.json({
+        collectedKeysCount: session.collectedKeys.length,
+        totalKeys: session.requiredKeys.length,
+        targetsFoundCount: session.targetsFound.length,
+        isCompleted: session.isCompleted,
+        progress: Math.round((session.collectedKeys.length / session.requiredKeys.length) * 100)
+    });
+});
+
+// Google Sheets helper functions
+async function withRetry(fn, maxRetries = 3, baseDelay = 1000) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            return await fn();
+        } catch (error) {
+            // Check if it's a rate limit error
+            if (error.code === 429 || error.status === 429) {
+                if (attempt === maxRetries) {
+                    throw error; // Last attempt, give up
+                }
+                
+                // Exponential backoff: wait longer each time
+                const delay = baseDelay * Math.pow(2, attempt - 1);
+                console.log(`Rate limited (attempt ${attempt}/${maxRetries}). Waiting ${delay}ms before retry...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
             
-            // Check if the lastname matches
-            if (existingLastname && existingLastname.toLowerCase() !== lastname.toLowerCase()) {
-                // Email exists but with different lastname - return error
-                return res.status(409).json({ 
-                    success: false, 
+            // If it's not a rate limit error, throw immediately
+            throw error;
+        }
+    }
+}
+
+// Search for existing user by email
+async function findUserByEmail(email) {
+    if (!sheets) {
+        throw new Error('Google Sheets not configured');
+    }
+    
+    return await withRetry(async () => {
+        try {
+            // Get all data from the sheet
+            const response = await sheets.spreadsheets.values.get({
+                spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+                range: 'A:C', // A=First Name, B=Last Name, C=Email
+            });
+            
+            const rows = response.data.values;
+            if (!rows || rows.length <= 1) {
+                return []; // No data rows (only header or no data)
+            }
+            
+            // Find matching email (skip header row)
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (row[2] && row[2].toLowerCase() === email.toLowerCase()) {
+                    return [{
+                        rowIndex: i + 1, // 1-based for Sheets API
+                        firstName: row[0] || '',
+                        lastName: row[1] || '',
+                        email: row[2] || ''
+                    }];
+                }
+            }
+            
+            return []; // No match found
+        } catch (error) {
+            console.error('Error searching for user:', error);
+            throw error;
+        }
+    });
+}
+
+// Create new user record
+async function createUserRecord(fields) {
+    if (!sheets) {
+        throw new Error('Google Sheets not configured');
+    }
+    
+    return await withRetry(async () => {
+        try {
+            // Find the next empty row
+            const response = await sheets.spreadsheets.values.get({
+                spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+                range: 'A:C',
+            });
+            
+            const rows = response.data.values || [];
+            const nextRow = rows.length + 1; // Next empty row
+            
+            // Append new row with first name, last name, email
+            await sheets.spreadsheets.values.append({
+                spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+                range: 'A:C',
+                valueInputOption: 'USER_ENTERED',
+                resource: {
+                    values: [
+                        [fields.firstname || '', fields.lastname || '', fields.email]
+                    ]
+                }
+            });
+            
+            return {
+                rowIndex: nextRow,
+                firstName: fields.firstname || '',
+                lastName: fields.lastname || '',
+                email: fields.email
+            };
+        } catch (error) {
+            console.error('Error creating user record:', error);
+            throw error;
+        }
+    });
+}
+
+// Update existing user record (Google Sheets doesn't have record IDs, so we use row index)
+async function updateUserRecord(rowIndex, fields) {
+    if (!sheets) {
+        throw new Error('Google Sheets not configured');
+    }
+    
+    return await withRetry(async () => {
+        try {
+            // Update specific row
+            const range = `A${rowIndex}:C${rowIndex}`;
+            await sheets.spreadsheets.values.update({
+                spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+                range: range,
+                valueInputOption: 'USER_ENTERED',
+                resource: {
+                    values: [
+                        [fields.firstname || '', fields.lastname || '', fields.email || '']
+                    ]
+                }
+            });
+            
+            return {
+                rowIndex: rowIndex,
+                firstName: fields.firstname || '',
+                lastName: fields.lastname || '',
+                email: fields.email || ''
+            };
+        } catch (error) {
+            console.error('Error updating user record:', error);
+            throw error;
+        }
+    });
+}
+
+// Submit data to Google Sheets (secure endpoint)
+app.post('/api/airtable/submit', async (req, res) => {
+    // Check if mission is enabled
+    if (SERVER_CONFIG.MISSION !== 'ENABLE') {
+        return res.json({ success: false, message: 'Data submission disabled' });
+    }
+    
+    const { fields } = req.body;
+    
+    if (!fields || !fields.email || !fields.lastname) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Missing required fields: email and lastname are required' 
+        });
+    }
+    
+    try {
+        console.log('Processing submission for:', fields.email);
+        
+        // Check if user already exists
+        const existingUsers = await findUserByEmail(fields.email);
+        
+        if (existingUsers && existingUsers.length > 0) {
+            const existingUser = existingUsers[0];
+            const existingLastname = existingUser.lastName;
+            
+            // Check if lastname matches
+            if (existingLastname && existingLastname.toLowerCase() !== fields.lastname.toLowerCase()) {
+                return res.status(409).json({
+                    success: false,
                     error: 'EMAIL_ALREADY_USED',
-                    message: `This email is already registered with a different name. Please use a different email.`
-                });
-            } else {
-                // Email exists with same lastname - return existing record with fields
-                console.log(`Found existing record for ${email}`);
-                return res.json({ 
-                    success: true, 
-                    recordId: existingRecord.id, 
-                    existing: true,
-                    message: 'Welcome back! Using your existing account.',
-                    fields: {
-                        email: existingRecord.fields.email || fields.email,
-                        lastname: existingRecord.fields.lastname || fields.lastname,
-                        'key1 status': existingRecord.fields['key1 status'] || 'not_scanned',
-                        'key2 status': existingRecord.fields['key2 status'] || 'not_scanned',
-                        'key3 status': existingRecord.fields['key3 status'] || 'not_scanned'
-                    }
+                    message: `This email is already registered with a different name (${existingLastname}). Please use a different email or contact support.`
                 });
             }
-        }
-
-        // Email doesn't exist, create new record with direct API
-        console.log(`Creating new record for ${email}`);
-        const createUrl = `${AIRTABLE_CONFIG.baseUrl}/${AIRTABLE_CONFIG.baseId}/${encodeURIComponent(AIRTABLE_CONFIG.tableName)}`;
-        
-        const createResult = await withRetry(async () => {
-            return await airtableRequest(createUrl, {
-                method: 'POST',
-                body: JSON.stringify({
-                    records: [{
-                        fields: {
-                            email: fields.email,
-                            lastname: fields.lastname,
-                            'key1 status': 'not_scanned',
-                            'key2 status': 'not_scanned',
-                            'key3 status': 'not_scanned'
-                        }
-                    }]
-                })
+            
+            // User exists with same name, return existing record
+            console.log('Existing user found at row:', existingUser.rowIndex);
+            return res.json({ 
+                success: true, 
+                recordId: existingUser.rowIndex.toString(), 
+                existing: true,
+                message: 'Welcome back!' 
             });
-        });
+        }
         
-        const newRecord = createResult.records[0];
-        console.log('Created record:', newRecord.id);
+        // Create new user record
+        const newRecord = await createUserRecord(fields);
         
+        console.log('New user created successfully at row:', newRecord.rowIndex);
         res.json({ 
             success: true, 
-            recordId: newRecord.id,
-            message: 'User record created successfully',
-            fields: {
-                email: newRecord.fields.email,
-                lastname: newRecord.fields.lastname,
-                'key1 status': newRecord.fields['key1 status'] || 'not_scanned',
-                'key2 status': newRecord.fields['key2 status'] || 'not_scanned',
-                'key3 status': newRecord.fields['key3 status'] || 'not_scanned'
-            }
+            recordId: newRecord.rowIndex.toString(),
+            existing: false,
+            message: 'Registration successful!' 
         });
-        }); // End of withEmailLock
-
+        
     } catch (error) {
-        console.error('Server error in /api/airtable/submit:', error);
+        console.error('Failed to submit to Google Sheets:', error);
         
-        // Handle specific error types
-        if (error.statusCode === 401) {
-            return res.status(401).json({ 
-                success: false, 
-                error: 'Authentication failed - check Airtable API key',
-                message: 'Invalid API credentials'
+        // Check if it's a rate limit error
+        if (error.code === 429 || error.status === 429) {
+            return res.status(429).json({
+                success: false,
+                error: 'Rate limit exceeded. Please try again in a few seconds.',
+                message: 'Too many requests - please wait a moment and try again.'
             });
         }
         
-        if (error.statusCode === 429) {
-            return res.status(429).json({ 
-                success: false, 
-                error: 'Rate limit exceeded',
-                message: 'Too many requests. Please wait 30 seconds and try again.'
-            });
-        }
-        
-        if (error.statusCode === 422) {
-            return res.status(422).json({ 
-                success: false, 
-                error: 'Invalid request data',
-                message: 'The data provided is invalid. Please check your input.'
-            });
-        }
-        
-        // For network/timeout errors
-        if (error.code === 'ETIMEDOUT' || error.code === 'ENOTFOUND' || 
-            error.type === 'system' || error.message === 'Request timeout') {
-            console.error('Network/timeout error details:', error);
-            return res.status(503).json({ 
-                success: false, 
-                error: 'Network error',
-                message: 'Connection to Airtable timed out. Please try again in a few moments.'
-            });
-        }
-        
-        // Generic server error
+        // For other errors, return 500 but allow fallback
+        console.log('Falling back to offline mode');
         res.status(500).json({ 
-            success: false, 
+            success: false,
             error: 'Internal server error',
-            message: 'An unexpected error occurred. Please try again later.',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+            message: 'Unable to process registration at this time. Please try again later.',
+            offline: true
         });
     }
 });
 
-// Update key status endpoint
-app.post('/api/airtable/update-key', async (req, res) => {
-    try {
-        if (!AIRTABLE_CONFIG.apiKey || !AIRTABLE_CONFIG.baseId) {
-            return res.status(503).json({ 
-                success: false, 
-                error: 'Configuration error',
-                message: 'Airtable integration is required but not configured. Please contact administrator.' 
-            });
-        }
-
-        const { recordId, keyField, status } = req.body;
-        
-        if (!recordId || !keyField || !status) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Missing required fields: recordId, keyField, and status' 
-            });
-        }
-
-        const updateUrl = `${AIRTABLE_CONFIG.baseUrl}/${AIRTABLE_CONFIG.baseId}/${encodeURIComponent(AIRTABLE_CONFIG.tableName)}`;
-        
-        const updateResult = await withRetry(async () => {
-            return await airtableRequest(updateUrl, {
-                method: 'PATCH',
-                body: JSON.stringify({
-                    records: [{
-                        id: recordId,
-                        fields: {
-                            [keyField]: status
-                        }
-                    }]
-                })
-            });
+// Update existing Google Sheets record (secure endpoint)
+app.post('/api/airtable/update', async (req, res) => {
+    // Check if mission is enabled
+    if (SERVER_CONFIG.MISSION !== 'ENABLE') {
+        return res.json({ success: false, message: 'Data updates disabled' });
+    }
+    
+    const { recordId, fields } = req.body;
+    
+    if (!recordId || !fields) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Missing recordId or fields' 
         });
+    }
+    
+    try {
+        console.log('Updating row:', recordId);
         
+        const rowIndex = parseInt(recordId);
+        const updatedRecord = await updateUserRecord(rowIndex, fields);
+        
+        console.log('Record updated successfully');
         res.json({ 
             success: true, 
-            message: 'Key status updated successfully',
-            data: updateResult.records[0].fields
+            record: {
+                id: updatedRecord.rowIndex.toString(),
+                fields: {
+                    firstName: updatedRecord.firstName,
+                    lastName: updatedRecord.lastName,
+                    email: updatedRecord.email
+                }
+            },
+            message: 'Record updated successfully'
         });
-
+        
     } catch (error) {
-        console.error('Server error:', error);
+        console.error('Failed to update Google Sheets record:', error);
+        
+        // Check if it's a rate limit error
+        if (error.code === 429 || error.status === 429) {
+            return res.status(429).json({
+                success: false,
+                error: 'Rate limit exceeded. Please try again in a few seconds.',
+                message: 'Too many requests - please wait a moment and try again.'
+            });
+        }
+        
+        // For other errors, return 500 but allow fallback
+        console.log('Falling back to offline mode for update');
         res.status(500).json({ 
-            success: false, 
-            error: 'Internal server error' 
+            success: false,
+            error: 'Internal server error',
+            message: 'Unable to update record at this time. Please try again later.',
+            offline: true
         });
     }
 });
@@ -369,11 +509,11 @@ app.post('/api/airtable/update-key', async (req, res) => {
 // Get user data endpoint
 app.get('/api/airtable/user/:email', async (req, res) => {
     try {
-        if (!AIRTABLE_CONFIG.apiKey || !AIRTABLE_CONFIG.baseId) {
+        if (!sheets) {
             return res.status(503).json({ 
                 success: false, 
                 error: 'Configuration error',
-                message: 'Airtable integration is required but not configured. Please contact administrator.' 
+                message: 'Google Sheets integration is required but not configured. Please contact administrator.' 
             });
         }
 
@@ -386,35 +526,30 @@ app.get('/api/airtable/user/:email', async (req, res) => {
             });
         }
 
-        // Search for user by email
-        const escapedEmail = email.replace(/"/g, '""');
-        const searchUrl = `${AIRTABLE_CONFIG.baseUrl}/${AIRTABLE_CONFIG.baseId}/${encodeURIComponent(AIRTABLE_CONFIG.tableName)}?filterByFormula={email}="${escapedEmail}"`;
-        
         console.log(`Searching for user data for ${email}`);
         
-        const searchResult = await withRetry(async () => {
-            return await airtableRequest(searchUrl);
-        });
+        // Search for user by email using our existing function
+        const existingUsers = await findUserByEmail(email);
 
-        if (searchResult.records && searchResult.records.length > 0) {
-            const userRecord = searchResult.records[0];
-            const fields = userRecord.fields;
+        if (existingUsers && existingUsers.length > 0) {
+            const userRecord = existingUsers[0];
             
-            // Extract key statuses
+            // For Google Sheets, we only have basic user data (no key status columns yet)
+            // Return basic user data structure expected by frontend
             const keyStatuses = {
-                key1: fields['key1 status'] || 'not_scanned',
-                key2: fields['key2 status'] || 'not_scanned', 
-                key3: fields['key3 status'] || 'not_scanned',
-                key4: fields['key4 status'] || 'not_scanned'
+                key1: 'not_scanned',
+                key2: 'not_scanned', 
+                key3: 'not_scanned',
+                key4: 'not_scanned'
             };
 
             res.json({ 
                 success: true, 
                 message: 'User data retrieved successfully',
                 data: {
-                    recordId: userRecord.id,
-                    email: fields.email,
-                    lastName: fields.lastname,
+                    recordId: userRecord.rowIndex.toString(),
+                    email: userRecord.email,
+                    lastName: userRecord.lastName,
                     keyStatuses: keyStatuses
                 }
             });
@@ -436,13 +571,26 @@ app.get('/api/airtable/user/:email', async (req, res) => {
     }
 });
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'healthy', 
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development'
+// Get public configuration (safe values only)
+app.get('/api/config', (req, res) => {
+    res.json({
+        mission: SERVER_CONFIG.MISSION,
+        features: {
+            dataSubmission: SERVER_CONFIG.MISSION === 'ENABLE'
+        }
     });
+});
+
+// Admin endpoint to view analytics (add authentication in production)
+app.get('/api/admin/analytics', (req, res) => {
+    // In production, add proper authentication here
+    const analytics = {
+        totalSessions: sessions.size,
+        completedSessions: Array.from(sessions.values()).filter(s => s.isCompleted).length,
+        totalInteractions: Array.from(sessions.values()).reduce((sum, s) => sum + s.interactions.length, 0)
+    };
+    
+    res.json(analytics);
 });
 
 // Serve frontend for all other routes (SPA support)
@@ -450,22 +598,5 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
-// Validate Airtable configuration at startup
-if (!AIRTABLE_CONFIG.apiKey || !AIRTABLE_CONFIG.baseId) {
-    console.error('❌ FATAL ERROR: Airtable integration is required but not configured!');
-    console.error('   Missing environment variables:');
-    if (!AIRTABLE_CONFIG.apiKey) console.error('   - AIRTABLE_API_KEY');
-    if (!AIRTABLE_CONFIG.baseId) console.error('   - AIRTABLE_BASE_ID');
-    console.error('   Please configure these in your .env file before starting the server.');
-    process.exit(1);
-}
-
-app.listen(PORT, () => {
-    console.log(`🚀 CMKL OpenHouse API server running on port ${PORT}`);
-    console.log(`📱 Frontend available at: http://localhost:${PORT}`);
-    console.log(`🔧 API endpoints available at: http://localhost:${PORT}/api/`);
-    console.log(`🔒 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`✅ Airtable integration: ENABLED`);
-    console.log(`📊 Base ID: ${AIRTABLE_CONFIG.baseId}`);
-    console.log(`📋 Table: ${AIRTABLE_CONFIG.tableName}`);
-});
+// Export the app for Vercel
+module.exports = app;
