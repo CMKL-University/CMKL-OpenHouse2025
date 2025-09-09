@@ -368,7 +368,6 @@
           console.log(`Key #${keyNumber} already scanned - showing status only`);
           statusEl.textContent = `✅ KEY #${keyNumber} ALREADY COLLECTED`;
           statusEl.className = 'status-overlay collected-message';
-          
           setTimeout(() => {
             statusEl.textContent = 'SCANNING FOR KEYS...';
             statusEl.className = 'status-overlay';

@@ -1498,6 +1498,303 @@
             background: #22B2B9;
         }
 
+        /* Program Details Modal Styles */
+        .program-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: auto;
+            height: auto;
+            background: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .program-modal-content {
+            background: linear-gradient(135deg, #000616 0%, #001122 100%);
+            border: 2px solid #6be4f0;
+            border-radius: 15px;
+            padding: 0;
+            width: 450px;
+            max-width: 90vw;
+            max-height: 70vh;
+            box-shadow: 0 0 30px #6be4f0, inset 0 0 20px rgba(107, 228, 240, 0.1);
+            overflow: hidden;
+            animation: modalSlideIn 0.3s ease-out;
+            position: relative;
+        }
+
+        .program-modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(107, 228, 240, 0.03) 50%, transparent 70%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .program-header {
+            background: linear-gradient(135deg, #0a1925 0%, #1a2a3a 100%);
+            padding: 20px;
+            border-bottom: 2px solid #6be4f0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .program-header h2 {
+            color: #e3e3e3;
+            font-family: 'Inter', sans-serif;
+            font-size: 28px;
+            font-weight: 400;
+            margin: 0;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(107, 228, 240, 0.7), 0 0 30px rgba(107, 228, 240, 0.4), 0 0 45px rgba(107, 228, 240, 0.2);
+            position: relative;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        .program-header h2::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(107, 228, 240, 0.1), transparent);
+            animation: futuristicScan 3s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        
+        @keyframes futuristicScan {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) scaleX(0.5);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateX(-50%) scaleX(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) scaleX(0.5);
+            }
+        }
+        
+        .program-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #6be4f0, transparent);
+            box-shadow: 0 0 10px #6be4f0;
+        }
+
+        .program-body {
+            padding: 20px 15px;
+            max-height: 50vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .program-section {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .degree-category {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .degree-title-container {
+            position: relative;
+            padding: 8px 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .degree-title-container::before,
+        .degree-title-container::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 60px;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        .degree-title-container::before {
+            left: 10px;
+        }
+
+        .degree-title-container::after {
+            right: 10px;
+        }
+
+        .degree-title-container.bachelor::before,
+        .degree-title-container.bachelor::after {
+            background: linear-gradient(90deg, #6be4f0, transparent);
+        }
+
+        .degree-title-container.master::before,
+        .degree-title-container.master::after {
+            background: linear-gradient(90deg, #00ff88, transparent);
+        }
+
+        .degree-title-container.phd::before,
+        .degree-title-container.phd::after {
+            background: linear-gradient(90deg, #ff9500, transparent);
+        }
+
+        .degree-title {
+            color: #cafaff;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 600;
+            font-size: 24px;
+            text-align: center;
+            text-shadow: 0 0 8px rgba(202, 250, 255, 0.4);
+            background: linear-gradient(135deg, #000616 0%, #001122 100%);
+            padding: 0 15px;
+        }
+
+        .program-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .program-item {
+            background: none;
+            border: none;
+            padding: 0;
+            text-align: center;
+            position: relative;
+            overflow: visible;
+            transition: all 0.3s ease;
+        }
+        
+        .program-svg-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 60px;
+        }
+        
+        .program-frame-svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+        
+        .program-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cafaff;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            text-shadow: 0 0 8px rgba(202, 250, 255, 0.5);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .program-item:hover .program-frame-svg {
+            filter: brightness(1.2) drop-shadow(0 0 10px rgba(107, 228, 240, 0.3));
+            transform: scale(1.05);
+        }
+
+        .program-item:hover .program-text {
+            text-shadow: 0 0 12px rgba(202, 250, 255, 0.8);
+            transform: translate(-50%, -50%) scale(1.02);
+        }
+
+        .bachelor-item:hover .program-frame-svg {
+            filter: brightness(1.2) drop-shadow(0 0 10px rgba(107, 228, 240, 0.4));
+        }
+
+        .master-item:hover .program-frame-svg {
+            filter: brightness(1.2) drop-shadow(0 0 10px rgba(0, 255, 136, 0.4));
+        }
+
+        .phd-item:hover .program-frame-svg {
+            filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 149, 0, 0.4));
+        }
+
+
+        .program-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .program-body::-webkit-scrollbar-track {
+            background: rgba(107, 228, 240, 0.1);
+            border-radius: 4px;
+        }
+
+        .program-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #6be4f0, #22B2B9);
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .program-body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #22B2B9, #6be4f0);
+        }
+
+        /* Responsive adjustments for program modal */
+        @media (max-width: 480px) {
+            .program-modal-content {
+                width: 95vw;
+                max-height: 80vh;
+            }
+            
+            .program-header h2 {
+                font-size: 22px;
+                letter-spacing: 1px;
+            }
+            
+            .degree-title {
+                font-size: 18px;
+            }
+            
+            .program-text {
+                font-size: 14px;
+            }
+            
+            .program-svg-container {
+                height: 50px;
+            }
+            
+            .program-body {
+                padding: 15px 10px;
+            }
+            
+            .program-options {
+                max-width: 300px;
+            }
+        }
+
         /* Orientation Warning Popup */
         .orientation-popup {
             display: none;
@@ -2104,6 +2401,79 @@
         </div>
     </div>
 
+    <!-- Program Details Popup Modal -->
+    <div id="programModal" class="program-modal">
+        <div class="program-modal-content">
+            <div class="program-header">
+                <h2>Program Material</h2>
+                <span class="close-button" onclick="hideProgramDetails()">&times;</span>
+            </div>
+            <div class="program-body">
+                <div class="program-section">
+                    <div class="degree-category">
+                        <div class="degree-title-container bachelor">
+                            <div class="degree-title">Bachelor of Science</div>
+                        </div>
+                        <div class="program-options">
+                            <div class="program-item bachelor-item">
+                                <div class="program-svg-container">
+                                    <img src="svg/Group 9.svg" alt="Bachelor Program Frame" class="program-frame-svg">
+                                    <span class="program-text">B.Eng. in AiCE</span>
+                                </div>
+                            </div>
+                            <div class="program-item bachelor-item">
+                                <div class="program-svg-container">
+                                    <img src="svg/Group 10.svg" alt="Bachelor Program Frame" class="program-frame-svg">
+                                    <span class="program-text">B.A.Sc. in Aii</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="degree-category">
+                        <div class="degree-title-container master">
+                            <div class="degree-title">Master of Science</div>
+                        </div>
+                        <div class="program-options">
+                            <div class="program-item master-item">
+                                <div class="program-svg-container">
+                                    <img src="svg/Group 20.svg" alt="Master Program Frame" class="program-frame-svg">
+                                    <span class="program-text">M.S. in AiCE</span>
+                                </div>
+                            </div>
+                            <div class="program-item master-item">
+                                <div class="program-svg-container">
+                                    <img src="svg/Group 21.svg" alt="Master Program Frame" class="program-frame-svg">
+                                    <span class="program-text">M.S. in ECE</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="degree-category">
+                        <div class="degree-title-container phd">
+                            <div class="degree-title">Doctor of Philosophy</div>
+                        </div>
+                        <div class="program-options">
+                            <div class="program-item phd-item">
+                                <div class="program-svg-container">
+                                    <img src="svg/Group 22.svg" alt="PhD Program Frame" class="program-frame-svg">
+                                    <span class="program-text">Ph.D. in AiCE</span>
+                                </div>
+                            </div>
+                            <div class="program-item phd-item">
+                                <div class="program-svg-container">
+                                    <img src="svg/Group 24.svg" alt="PhD Program Frame" class="program-frame-svg">
+                                    <span class="program-text">Ph.D. in ECE</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Rules Popup Modal -->
     <div id="rulesModal" class="rules-modal">
         <div class="rules-modal-content">
@@ -2605,7 +2975,41 @@
         }
         
         function showProgramDetails() {
-            window.open('https://cmkl.ac.th/programs/', '_blank');
+            const modal = document.getElementById('programModal');
+            modal.style.display = 'block';
+            modal.style.opacity = '1';
+            
+            // Add glitchy entrance animation
+            modal.style.animation = 'modalGlitchIn 0.4s ease-out';
+            
+            // Create backdrop
+            const backdrop = document.createElement('div');
+            backdrop.id = 'programModalBackdrop';
+            backdrop.style.position = 'fixed';
+            backdrop.style.top = '0';
+            backdrop.style.left = '0';
+            backdrop.style.width = '100%';
+            backdrop.style.height = '100%';
+            backdrop.style.background = 'rgba(0, 6, 22, 0.95)';
+            backdrop.style.backdropFilter = 'blur(10px)';
+            backdrop.style.zIndex = '999';
+            backdrop.onclick = hideProgramDetails;
+            document.body.appendChild(backdrop);
+        }
+        
+        function hideProgramDetails() {
+            const modal = document.getElementById('programModal');
+            const backdrop = document.getElementById('programModalBackdrop');
+            
+            modal.style.opacity = '0';
+            
+            // Hide after fade-out animation
+            setTimeout(() => {
+                modal.style.display = 'none';
+                if (backdrop) {
+                    document.body.removeChild(backdrop);
+                }
+            }, 300);
         }
         
         function showAgenda() {
@@ -2651,10 +3055,13 @@
         
         // Close modal when clicking outside of it
         document.addEventListener('click', function(event) {
-            const modal = document.getElementById('rulesModal');
-            if (event.target === modal) {
+            const rulesModal = document.getElementById('rulesModal');
+            
+            if (event.target === rulesModal) {
                 hideRules();
             }
+            
+            // Program modal uses backdrop click handling in showProgramDetails()
         });
         
         // Enhanced VR-style message display
