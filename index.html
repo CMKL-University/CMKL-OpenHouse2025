@@ -975,29 +975,221 @@
         }
         
         function goToEventDetails() {
-            console.log('Navigating to Event Details page');
-            // Add page transition
-            document.body.style.transition = 'opacity 0.5s ease-out';
-            document.body.style.opacity = '0';
+            console.log('Opening Event Details popup');
             
-            setTimeout(() => {
-                // Create or navigate to event details page
-                window.location.href = 'event-details.html';
-            }, 500);
+            const eventUrl = 'https://cmkl.ac.th/news-events/cmkl-open-house-2025-ready-player-ai';
+            
+            // All images from the CMKL Open House event page
+            const eventImages = [
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68a29d4d1bf3f3c2acd221d0_CMKL_Open_house_2025_(1).webp',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68a429dd817f723308622df9_CMKL%20Open%20house%202025%2045%20.png',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68ad88e154b989ffa0a8351e_3.png',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68ba77591eec34f36a16de1d_CMKL%20Open%20house%202025%20%20%20(1920%20x%201280%20px)%20(3).png',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68b93c179d460b0b0d0db0e2_CMKL%20Open%20house%202025%20%20%20(1920%20x%201280%20px)%20(2).png',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68ad891ec0b85a34bc96edd0_6.png',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68ad8928e513691732501327_7.png'
+            ];
+            
+            // Create a custom popup window that shows all the event images
+            const popup = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes');
+            
+            if (popup) {
+                const imageGallery = eventImages.map((url, index) => 
+                    `<div class="image-container">
+                        <img src="${url}" alt="CMKL Open House 2025 Event Image ${index + 1}" />
+                    </div>`
+                ).join('');
+                
+                popup.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>CMKL Open House 2025 - Event Details Gallery</title>
+                        <style>
+                            @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap');
+                            
+                            body { 
+                                font-family: 'Darker Grotesque', sans-serif;
+                                margin: 0;
+                                padding: 20px;
+                                background: #000616 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23001133" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>') repeat;
+                                color: #6be4f0;
+                                text-align: center;
+                                overflow-x: hidden;
+                            }
+                            
+                            body::before {
+                                content: '';
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                background: rgba(0, 0, 0, 0.8);
+                                z-index: -1;
+                                pointer-events: none;
+                            }
+                            
+                            .wifi-info {
+                                background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+                                color: white;
+                                padding: 15px 20px;
+                                margin: 20px 0;
+                                border-radius: 10px;
+                                font-weight: 700;
+                                font-size: 18px;
+                                text-shadow: 0 0 10px rgba(255,255,255,0.5);
+                                box-shadow: 0 0 20px rgba(34, 178, 185, 0.4);
+                                border: 1px solid rgba(107, 228, 240, 0.3);
+                                white-space: pre-line;
+                            }
+                            
+                            .container {
+                                max-width: 900px;
+                                margin: 0 auto;
+                                background: rgba(0, 6, 22, 0.9);
+                                padding: 30px;
+                                border-radius: 15px;
+                                box-shadow: 0 0 30px rgba(107, 228, 240, 0.2);
+                                border: 1px solid rgba(107, 228, 240, 0.3);
+                                backdrop-filter: blur(10px);
+                            }
+                            
+                            .image-container {
+                                margin: 30px 0;
+                                border-radius: 12px;
+                                overflow: hidden;
+                                box-shadow: 0 0 20px rgba(107, 228, 240, 0.3);
+                                border: 1px solid rgba(107, 228, 240, 0.2);
+                                transition: all 0.3s ease;
+                            }
+                            
+                            .image-container:hover {
+                                box-shadow: 0 0 30px rgba(107, 228, 240, 0.5);
+                                transform: translateY(-5px);
+                            }
+                            
+                            img { 
+                                max-width: 100%; 
+                                height: auto; 
+                                display: block;
+                                transition: transform 0.3s ease;
+                                filter: brightness(0.9) contrast(1.1);
+                            }
+                            
+                            img:hover {
+                                transform: scale(1.02);
+                                filter: brightness(1) contrast(1.2);
+                            }
+                            
+                            .link-button {
+                                display: inline-block;
+                                background: linear-gradient(45deg, #22B2B9, #00946D);
+                                color: white;
+                                padding: 15px 30px;
+                                text-decoration: none;
+                                border-radius: 8px;
+                                margin: 20px 10px;
+                                font-weight: 700;
+                                font-size: 16px;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 0 15px rgba(34, 178, 185, 0.4);
+                                border: 1px solid rgba(107, 228, 240, 0.3);
+                            }
+                            
+                            .link-button:hover {
+                                background: linear-gradient(45deg, #00946D, #22B2B9);
+                                transform: translateY(-3px);
+                                box-shadow: 0 0 25px rgba(34, 178, 185, 0.6);
+                                text-shadow: 0 0 10px rgba(255,255,255,0.8);
+                            }
+                            
+                            .close-button {
+                                background: linear-gradient(45deg, #444, #666) !important;
+                                box-shadow: 0 0 15px rgba(68, 68, 68, 0.4) !important;
+                            }
+                            
+                            .close-button:hover {
+                                background: linear-gradient(45deg, #666, #888) !important;
+                                box-shadow: 0 0 25px rgba(68, 68, 68, 0.6) !important;
+                            }
+                            
+                            h1 {
+                                color: #6be4f0;
+                                margin-bottom: 20px;
+                                font-size: 32px;
+                                font-weight: 800;
+                                text-transform: uppercase;
+                                letter-spacing: 2px;
+                                text-shadow: 0 0 20px rgba(107, 228, 240, 0.8);
+                            }
+                            
+                            .subtitle {
+                                color: #59e5ff;
+                                line-height: 1.6;
+                                font-size: 18px;
+                                margin-bottom: 30px;
+                                font-weight: 500;
+                                text-shadow: 0 0 10px rgba(89, 229, 255, 0.5);
+                            }
+                            
+                            .header-section {
+                                border-bottom: 2px solid rgba(107, 228, 240, 0.3);
+                                padding-bottom: 20px;
+                                margin-bottom: 30px;
+                            }
+                            
+                            .footer-section {
+                                border-top: 2px solid rgba(107, 228, 240, 0.3);
+                                padding-top: 30px;
+                                margin-top: 40px;
+                            }
+                            
+                            /* Matrix animation effects */
+                            @keyframes matrixGlow {
+                                0%, 100% { box-shadow: 0 0 20px rgba(107, 228, 240, 0.3); }
+                                50% { box-shadow: 0 0 30px rgba(107, 228, 240, 0.5); }
+                            }
+                            
+                            .container {
+                                animation: matrixGlow 3s ease-in-out infinite;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <div class="header-section">
+                                <h1>🎮 CMKL Open House 2025: Ready Player AI</h1>
+                                <p class="subtitle">Explore all the exciting details about our upcoming Open House event!</p>
+                            </div>
+                            
+                            <div class="wifi-info">
+                                📶 WiFi Information\nNetwork: CMKL-OpenHouse\nPassword: ReadyPlayerAI2025
+                            </div>
+                            
+                            <div class="gallery">
+                                ${imageGallery}
+                            </div>
+                            
+                            <div class="footer-section">
+                                <p class="subtitle">For complete event details, registration, and more information:</p>
+                                <a href="${eventUrl}" class="link-button" target="_blank">📖 View Full Event Page</a>
+                                <a href="javascript:window.close();" class="link-button close-button">✖️ Close Gallery</a>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                popup.document.close();
+            }
         }
         
         function goToAboutCMKL() {
-            console.log('Navigating to About CMKL page');
-            // Add page transition
-            document.body.style.transition = 'opacity 0.5s ease-out';
-            document.body.style.opacity = '0';
-            
-            setTimeout(() => {
-                // Navigate to CMKL website or create about page
-                window.open('https://cmkl.ac.th', '_blank');
-                // Reset opacity in case user comes back
-                document.body.style.opacity = '1';
-            }, 500);
+            console.log('Navigating to About CMKL Linktree page');
+            // Open the CMKL Linktree page
+            window.open('https://linktr.ee/cmkluniversity?fbclid=PAZXh0bgNhZW0CMTEAAacArGsbTVP5jICHcXHon5zfuJ2PzoLNiHODhFuTL6iz4Kd84miEOVMsNPKSBg_aem_0v0FDaM2J43ONNDcEi1AcQ', '_blank');
         }
         
         function scrollToTop() {
