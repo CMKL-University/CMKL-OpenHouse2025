@@ -120,22 +120,18 @@
         .nav-cards-container {
             position: absolute;
             left: 50%;
-            top: 170px;
+            top: 120px;
             transform: translateX(-50%);
-            width: 260px;
+            width: 400px;
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 35px;
         }
         
         /* Navigation card styling */
         .nav-card {
-            width: 260px;
-            height: 82px;
-            background-image: url('svg/Group 14.svg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+            width: 350px;
+            height: 105px;
             cursor: pointer;
             transition: none;
             position: relative;
@@ -170,10 +166,6 @@
             box-shadow: none !important;
             filter: none !important;
             transform: none !important;
-            background-image: url('svg/Group 14.svg') !important;
-            background-size: contain !important;
-            background-repeat: no-repeat !important;
-            background-position: center !important;
         }
         
         .nav-card:active,
@@ -183,8 +175,6 @@
             box-shadow: none !important;
             filter: none !important;
             transform: none !important;
-            background: url('svg/Group 14.svg') no-repeat center !important;
-            background-size: contain !important;
             background-color: transparent !important;
         }
         
@@ -519,6 +509,82 @@
             transform: translateY(-2px);
         }
         
+        /* Program Cards Styling */
+        .program-cards-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 360px;
+            max-width: 90vw;
+        }
+
+        .program-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+
+        .program-card:hover {
+            opacity: 1;
+            transform: translateY(-3px) scale(1.05);
+            filter: drop-shadow(0 0 15px #6be4f0);
+        }
+
+        .program-card-svg {
+            width: 100%;
+            height: auto;
+            max-width: 177px;
+            transition: all 0.3s ease;
+        }
+
+        .program-card:hover .program-card-svg {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+        }
+
+        /* Modal Program Cards Styling */
+        .program-card-svg-modal {
+            width: 100%;
+            height: auto;
+            max-width: 177px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .program-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .program-item:hover {
+            transform: translateY(-3px) scale(1.05);
+            filter: drop-shadow(0 0 15px #6be4f0);
+        }
+
+        .program-item:hover .program-card-svg-modal {
+            filter: brightness(1.1);
+        }
+
+        /* Degree Title SVG Styling */
+        .degree-title-svg {
+            width: 100%;
+            height: auto;
+            max-width: 331px;
+            transition: all 0.3s ease;
+        }
+
+        .degree-title-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
         /* Special Apply Button Styling */
         .apply-button {
             animation: applyPulse 2.5s ease-in-out infinite;
@@ -654,33 +720,161 @@
             }
         }
         
-        /* 3D Cube icon positioning */
+        /* Key icon positioning */
         .card-icon {
             position: absolute;
-            left: 15px;
+            left: 50%;
             top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            background-image: url('svg/Group 6.svg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-icon img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+
+        /* Key Glow Effects - Using actual key colors */
+        .nav-card:nth-child(1).key-available .card-icon img {
+            filter: drop-shadow(0 0 15px #0096D7) brightness(1.1);
+            animation: key1AvailablePulse 2s ease-in-out infinite;
+        }
+
+        .nav-card:nth-child(2).key-available .card-icon img {
+            filter: drop-shadow(0 0 15px #00ff41) brightness(1.1);
+            animation: key2AvailablePulse 2s ease-in-out infinite;
+        }
+
+        .nav-card:nth-child(3).key-available .card-icon img {
+            filter: drop-shadow(0 0 15px #B2A600) brightness(1.1);
+            animation: key3AvailablePulse 2s ease-in-out infinite;
+        }
+
+        .nav-card:nth-child(4).key-available .card-icon img {
+            filter: drop-shadow(0 0 15px #6BE4F0) brightness(1.1);
+            animation: key4AvailablePulse 2s ease-in-out infinite;
+        }
+
+        .nav-card:nth-child(1).key-collected .card-icon img {
+            filter: drop-shadow(0 0 10px #80D8FF) brightness(0.8);
+            animation: key1CollectedGlow 3s ease-in-out infinite;
+        }
+
+        .nav-card:nth-child(2).key-collected .card-icon img {
+            filter: drop-shadow(0 0 10px #00ff41) brightness(0.8);
+            animation: key2CollectedGlow 3s ease-in-out infinite;
+        }
+
+        .nav-card:nth-child(3).key-collected .card-icon img {
+            filter: drop-shadow(0 0 10px #B2A600) brightness(0.8);
+            animation: key3CollectedGlow 3s ease-in-out infinite;
+        }
+
+        .nav-card:nth-child(4).key-collected .card-icon img {
+            filter: drop-shadow(0 0 10px #6BE4F0) brightness(0.8);
+            animation: key4CollectedGlow 3s ease-in-out infinite;
+        }
+
+        .nav-card.key-locked .card-icon img {
+            filter: drop-shadow(0 0 5px #666666) brightness(0.5);
+            animation: keyLockedPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes key1AvailablePulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 15px #0096D7) brightness(1.1);
+                transform: scale(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 25px #0096D7) brightness(1.3);
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes key2AvailablePulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 15px #00ff41) brightness(1.1);
+                transform: scale(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 25px #00ff41) brightness(1.3);
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes key3AvailablePulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 15px #B2A600) brightness(1.1);
+                transform: scale(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 25px #B2A600) brightness(1.3);
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes key4AvailablePulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 15px #6BE4F0) brightness(1.1);
+                transform: scale(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 25px #6BE4F0) brightness(1.3);
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes key1CollectedGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px #80D8FF) brightness(0.8);
+            }
+            50% {
+                filter: drop-shadow(0 0 15px #80D8FF) brightness(0.9);
+            }
+        }
+
+        @keyframes key2CollectedGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px #00ff41) brightness(0.8);
+            }
+            50% {
+                filter: drop-shadow(0 0 15px #00ff41) brightness(0.9);
+            }
+        }
+
+        @keyframes key3CollectedGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px #B2A600) brightness(0.8);
+            }
+            50% {
+                filter: drop-shadow(0 0 15px #B2A600) brightness(0.9);
+            }
+        }
+
+        @keyframes key4CollectedGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px #6BE4F0) brightness(0.8);
+            }
+            50% {
+                filter: drop-shadow(0 0 15px #6BE4F0) brightness(0.9);
+            }
+        }
+
+        @keyframes keyLockedPulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 5px #666666) brightness(0.5);
+            }
+            50% {
+                filter: drop-shadow(0 0 8px #666666) brightness(0.6);
+            }
         }
         
-        /* Card text styling */
-        .card-text {
-            color: #6BE4F0;
-            font-family: 'Darker Grotesque', sans-serif;
-            font-size: 18px;
-            font-weight: 600;
-            letter-spacing: 0.9px;
-            text-align: center;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
         
         .card-subtext {
             color: #6BE4F0;
@@ -1002,7 +1196,29 @@
                 bottom: 5vh;
             }
         }
-        
+
+        /* Tablet size adjustments (iPad and similar devices) */
+        @media (min-width: 700px) and (max-width: 900px) and (min-height: 900px) and (max-height: 1100px) {
+            .bottom-border {
+                bottom: 0;
+                position: fixed;
+            }
+
+            .logos-row {
+                bottom: 7vh;
+                position: fixed;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .action-buttons-container {
+                bottom: 22vh;
+                position: fixed;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
         @media (min-width: 769px) {
             .main-container {
                 max-width: 393px;
@@ -1018,13 +1234,76 @@
                 min-height: 100vh;
             }
         }
-        
+
+        /* Small window height adjustments - enable scrolling */
+        @media (max-height: 740px) {
+            body {
+                overflow: auto;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .main-container {
+                height: auto;
+                min-height: 100vh;
+                overflow-y: visible;
+                padding: 20px 0;
+            }
+        }
+
+        /* Very small window height adjustments - reduce sizes */
+        @media (max-height: 670px) {
+            .nav-cards-container {
+                top: 200px;
+                transform: translateX(-50%) scale(0.8);
+                gap: 25px;
+                left: 55%;
+            }
+
+            .nav-card {
+                width: 220px;
+                height: 65px;
+            }
+
+            .card-icon {
+                width: 260px;
+                height: 80px;
+            }
+
+            .action-buttons-container {
+                transform: translateX(-50%) scale(0.8);
+                width: 300px;
+                bottom: 60px;
+            }
+
+            .action-button {
+                width: 80px;
+                height: 80px;
+            }
+
+            .action-button svg {
+                width: 80px;
+                height: 80px;
+            }
+
+            .button-text {
+                font-size: 11px;
+            }
+        }
+
         /* Landscape orientation adjustments */
         @media (orientation: landscape) and (max-height: 600px) {
+            body {
+                overflow: auto;
+                height: auto;
+                min-height: 100vh;
+            }
+
             .main-container {
-                height: 100vh;
-                max-height: none;
-                overflow-y: auto;
+                height: auto;
+                min-height: 100vh;
+                overflow-y: visible;
+                padding: 20px 0;
             }
             
             .header-section {
@@ -1600,7 +1879,7 @@
         }
 
         .program-body {
-            padding: 20px 15px;
+            padding: 10px 15px;
             max-height: 50vh;
             overflow-y: auto;
             position: relative;
@@ -1787,7 +2066,7 @@
             }
             
             .program-body {
-                padding: 15px 10px;
+                /* padding: 15px 10px; */
             }
             
             .program-options {
@@ -2063,7 +2342,7 @@
             }
         }
 
-        @media (max-height: 750px) {
+        @media (max-height: 755px) {
             .header-section {
                 top: 40px;
             }
@@ -2071,7 +2350,12 @@
             .nav-cards-container {
                 top: 110px;
             }
-            
+
+            .card-icon {
+                width: 280px;
+                height: 80px;
+            }
+
             .action-buttons-container {
                 bottom: 140px;
                 width: 75vw;
@@ -2380,27 +2664,15 @@
         <div class="nav-cards-container">
             <div class="nav-card cyberpunk-element" onclick="selectCard(1)">
                 <div class="card-icon"></div>
-                <div>
-                    <div class="card-text">???</div>
-                </div>
             </div>
             <div class="nav-card cyberpunk-element" onclick="selectCard(2)">
                 <div class="card-icon"></div>
-                <div>
-                    <div class="card-text">???</div>
-                </div>
             </div>
             <div class="nav-card cyberpunk-element" onclick="selectCard(3)">
                 <div class="card-icon"></div>
-                <div>
-                    <div class="card-text">???</div>
-                </div>
             </div>
             <div class="nav-card cyberpunk-element" onclick="selectCard(4)">
                 <div class="card-icon"></div>
-                <div>
-                    <div class="card-text">???</div>
-                </div>
             </div>
         </div>
         
@@ -2523,68 +2795,47 @@
     <!-- Program Details Popup Modal -->
     <div id="programModal" class="program-modal">
         <div class="program-modal-content">
-            <div class="program-header">
-                <h2>Program Material</h2>
-                <span class="close-button" onclick="hideProgramDetails()">&times;</span>
-            </div>
+            <!-- <span class="close-button" onclick="hideProgramDetails()">&times;</span> -->
             <div class="program-body">
                 <div class="program-section">
                     <div class="degree-category">
                         <div class="degree-title-container bachelor">
-                            <div class="degree-title">Bachelor of Science</div>
+                            <img src="svg/Group 25.svg" alt="Bachelor of Science" class="degree-title-svg">
                         </div>
                         <div class="program-options">
-                            <div class="program-item bachelor-item">
-                                <div class="program-svg-container">
-                                    <img src="svg/Group 9.svg" alt="Bachelor Program Frame" class="program-frame-svg">
-                                    <span class="program-text">B.Eng. in AiCE</span>
-                                </div>
+                            <div class="program-item bachelor-item" onclick="openProgramWebsite('beng-aice')">
+                                <img src="svg/Group 29.svg" alt="B.Eng. in AiCE" class="program-card-svg-modal">
                             </div>
-                            <div class="program-item bachelor-item">
-                                <div class="program-svg-container">
-                                    <img src="svg/Group 10.svg" alt="Bachelor Program Frame" class="program-frame-svg">
-                                    <span class="program-text">B.A.Sc. in Aii</span>
-                                </div>
+                            <div class="program-item bachelor-item" onclick="openProgramWebsite('basc-aii')">
+                                <img src="svg/Group 30.svg" alt="B.A.Sc. in Aii" class="program-card-svg-modal">
                             </div>
                         </div>
                     </div>
                     
                     <div class="degree-category">
                         <div class="degree-title-container master">
-                            <div class="degree-title">Master of Science</div>
+                            <img src="svg/Group 26.svg" alt="Master of Science" class="degree-title-svg">
                         </div>
                         <div class="program-options">
-                            <div class="program-item master-item">
-                                <div class="program-svg-container">
-                                    <img src="svg/Group 20.svg" alt="Master Program Frame" class="program-frame-svg">
-                                    <span class="program-text">M.S. in AiCE</span>
-                                </div>
+                            <div class="program-item master-item" onclick="openProgramWebsite('ms-aice')">
+                                <img src="svg/Group 31.svg" alt="M.S. in AiCE" class="program-card-svg-modal">
                             </div>
-                            <div class="program-item master-item">
-                                <div class="program-svg-container">
-                                    <img src="svg/Group 21.svg" alt="Master Program Frame" class="program-frame-svg">
-                                    <span class="program-text">M.S. in ECE</span>
-                                </div>
+                            <div class="program-item master-item" onclick="openProgramWebsite('ms-ece')">
+                                <img src="svg/Group 32.svg" alt="M.S. in ECE" class="program-card-svg-modal">
                             </div>
                         </div>
                     </div>
                     
                     <div class="degree-category">
                         <div class="degree-title-container phd">
-                            <div class="degree-title">Doctor of Philosophy</div>
+                            <img src="svg/Group 27.svg" alt="Doctor of Philosophy" class="degree-title-svg">
                         </div>
                         <div class="program-options">
-                            <div class="program-item phd-item">
-                                <div class="program-svg-container">
-                                    <img src="svg/Group 22.svg" alt="PhD Program Frame" class="program-frame-svg">
-                                    <span class="program-text">Ph.D. in AiCE</span>
-                                </div>
+                            <div class="program-item phd-item" onclick="openProgramWebsite('phd-aice')">
+                                <img src="svg/Group 32_2.svg" alt="Ph.D. in AiCE" class="program-card-svg-modal">
                             </div>
-                            <div class="program-item phd-item">
-                                <div class="program-svg-container">
-                                    <img src="svg/Group 24.svg" alt="PhD Program Frame" class="program-frame-svg">
-                                    <span class="program-text">Ph.D. in ECE</span>
-                                </div>
+                            <div class="program-item phd-item" onclick="openProgramWebsite('phd-ece')">
+                                <img src="svg/Group 33.svg" alt="Ph.D. in ECE" class="program-card-svg-modal">
                             </div>
                         </div>
                     </div>
@@ -2796,7 +3047,7 @@
         function updateKeyStatusDisplay() {
             try {
                 const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
-                
+
                 // Count scanned keys (only first 3 cards for unlock condition)
                 let scannedCount = 0;
                 for (let i = 1; i <= 3; i++) {
@@ -2804,48 +3055,73 @@
                         scannedCount++;
                     }
                 }
-                
+
                 // Update each key card based on status
                 for (let i = 1; i <= 4; i++) {
                     const card = document.querySelector(`.nav-card:nth-child(${i})`);
-                    const cardText = card.querySelector('.card-text');
+                    const cardIcon = card.querySelector('.card-icon');
                     const keyStatus = keyStatuses[`key${i}`] || 'not_scanned';
-                    
+
+                    // Remove all glow classes first
+                    card.classList.remove('key-available', 'key-collected', 'key-locked');
+
                     if (i === 4) {
                         // Special handling for 4th card (locked until 2 keys scanned)
                         if (scannedCount >= 2) {
                             // Unlock the 4th card
                             card.classList.remove('locked');
                             if (keyStatus === 'scanned') {
-                                cardText.textContent = 'SCANNED';
-                                cardText.style.color = '#00ff41';
+                                // Show check-in key SVG when scanned
+                                cardIcon.innerHTML = `<img src="svg/key${i}.svg" alt="Key ${i}" style="width: 100%; height: 100%; object-fit: contain;"/>`;
                                 card.style.opacity = '0.7';
                                 card.style.filter = 'brightness(0.8)';
+                                card.classList.add('key-collected');
                             } else {
-                                cardText.textContent = 'Special key';
-                                cardText.style.color = '#00ff41';
-                                cardText.style.fontWeight = 'bold';
-                                cardText.style.textShadow = '0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 30px #00ff41';
+                                // Show key4 SVG for unlocked 4th card
+                                cardIcon.innerHTML = `<img src="svg/key4.svg" alt="Check-in Key" style="width: 100%; height: 100%; object-fit: contain;"/>`;
                                 card.style.opacity = '1';
-                                card.style.filter = 'drop-shadow(0 0 15px #00ff41)';
-                                card.classList.add('locked'); // Keep glitch effect
+                                card.style.filter = 'none';
+                                card.classList.add('key-available');
                             }
                         } else {
-                            // Keep 4th card locked
-                            card.classList.add('locked');
-                            cardText.textContent = 'LOCKED';
-                            cardText.style.color = '#ff4444';
+                            // Keep 4th card locked with unknown icon
+                            card.classList.add('locked', 'key-locked');
+                            cardIcon.innerHTML = `<img src="svg/unknow.svg" alt="Locked Key" style="width: 100%; height: 100%; object-fit: contain;"/>`;
+                            card.style.opacity = '0.6';
                         }
                     } else {
-                        // Normal cards (1-3)
+                        // Normal cards (1-3) - conditional key display logic
                         if (keyStatus === 'scanned') {
-                            cardText.textContent = 'SCANNED';
-                            cardText.style.color = '#00ff41';
+                            // Show actual key SVG when scanned
+                            cardIcon.innerHTML = `<img src="svg/key${i}.svg" alt="Key ${i}" style="width: 100%; height: 100%; object-fit: contain;"/>`;
                             card.style.opacity = '0.7';
                             card.style.filter = 'brightness(0.8)';
+                            card.classList.add('key-collected');
                         } else {
-                            cardText.textContent = '???';
-                            cardText.style.color = '#6BE4F0';
+                            // Progressive key reveal logic
+                            if (i === 1) {
+                                // Key 1 is always available
+                                cardIcon.innerHTML = `<img src="svg/key1.svg" alt="Registration Key" style="width: 100%; height: 100%; object-fit: contain;"/>`;
+                                card.classList.add('key-available');
+                            } else if (i === 2) {
+                                // Key 2 shows after key 1 is collected
+                                if (keyStatuses['key1'] === 'scanned') {
+                                    cardIcon.innerHTML = `<img src="svg/key2.svg" alt="Project Showcase Key" style="width: 100%; height: 100%; object-fit: contain;"/>`;
+                                    card.classList.add('key-available');
+                                } else {
+                                    cardIcon.innerHTML = `<img src="svg/unknow.svg" alt="Unknown Key" style="width: 100%; height: 100%; object-fit: contain;"/>`;
+                                    card.classList.add('key-locked');
+                                }
+                            } else if (i === 3) {
+                                // Key 3 shows after key 2 is collected
+                                if (keyStatuses['key2'] === 'scanned') {
+                                    cardIcon.innerHTML = `<img src="svg/key3.svg" alt="Afternoon Session Key" style="width: 100%; height: 100%; object-fit: contain;"/>`;
+                                    card.classList.add('key-available');
+                                } else {
+                                    cardIcon.innerHTML = `<img src="svg/unknow.svg" alt="Unknown Key" style="width: 100%; height: 100%; object-fit: contain;"/>`;
+                                    card.classList.add('key-locked');
+                                }
+                            }
                             card.style.opacity = '1';
                             card.style.filter = 'none';
                         }
@@ -2985,20 +3261,25 @@
             
             proceedToScanner(cardNumber, selectedCard);
         }
-        
+
         function proceedToScanner(cardNumber, selectedCard) {
             // Add glitch shatter animation to the card
             selectedCard.classList.add('glitch-shatter');
-            
-            // Navigate to AR scanner after animation
+
+            // Navigate after animation
             setTimeout(() => {
                 selectedCard.classList.remove('glitch-shatter');
-                
+
                 // Store which key is being scanned
                 localStorage.setItem('selectedKey', cardNumber);
-                
-                // Navigate to AR scanner
-                window.location.href = `scanner.html?key=${cardNumber}`;
+
+                // Special handling for key2 - navigate to key2.html first
+                if (cardNumber === 2) {
+                    window.location.href = 'key2.html';
+                } else {
+                    // Navigate to AR scanner for other keys
+                    window.location.href = `scanner.html?key=${cardNumber}`;
+                }
             }, 400);
         }
         
@@ -3098,7 +3379,27 @@
             // window.open('https://www.instagram.com/cmkluniversity/?hl=en', '_blank');
             window.open('https://cmkl.ac.th', '_blank');
         }
-        
+
+        function openProgramWebsite(programType) {
+            // Define dummy website URLs for different programs
+            const programUrls = {
+                'beng-aice': 'https://example.com/beng-aice',
+                'basc-aii': 'https://example.com/basc-aii',
+                'ms-aice': 'https://example.com/ms-aice',
+                'ms-ece': 'https://example.com/ms-ece',
+                'phd-aice': 'https://example.com/phd-aice',
+                'phd-ece': 'https://example.com/phd-ece'
+            };
+
+            const url = programUrls[programType];
+            if (url) {
+                // Open in new tab
+                window.open(url, '_blank');
+            } else {
+                console.log('Program type not found:', programType);
+            }
+        }
+
         function showProgramDetails() {
             const modal = document.getElementById('programModal');
             modal.style.display = 'block';
@@ -3138,11 +3439,205 @@
         }
         
         function showAgenda() {
-            window.open('https://cmkl.ac.th/events/', '_blank');
+            console.log('Opening Agenda Details popup');
+            
+            const eventUrl = 'https://cmkl.ac.th/news-events/cmkl-open-house-2025-ready-player-ai';
+            
+            // All images from the CMKL Open House event page
+            const eventImages = [
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68a29d4d1bf3f3c2acd221d0_CMKL_Open_house_2025_(1).webp',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68a429dd817f723308622df9_CMKL%20Open%20house%202025%2045%20.png',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68ad88e154b989ffa0a8351e_3.png',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68ba77591eec34f36a16de1d_CMKL%20Open%20house%202025%20%20%20(1920%20x%201280%20px)%20(3).png',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68b93c179d460b0b0d0db0e2_CMKL%20Open%20house%202025%20%20%20(1920%20x%201280%20px)%20(2).png',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68ad891ec0b85a34bc96edd0_6.png',
+                'https://cdn.prod.website-files.com/66431ba62d71809abd35a187/68ad8928e513691732501327_7.png'
+            ];
+            
+            // Create a custom popup window that shows all the event images
+            const popup = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes');
+            
+            if (popup) {
+                const imageGallery = eventImages.map((url, index) => 
+                    `<div class="image-container">
+                        <img src="${url}" alt="CMKL Open House 2025 Event Image ${index + 1}" />
+                    </div>`
+                ).join('');
+                
+                popup.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>CMKL Open House 2025 - Event Details Gallery</title>
+                        <style>
+                            @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap');
+                            
+                            body { 
+                                font-family: 'Darker Grotesque', sans-serif;
+                                margin: 0;
+                                padding: 20px;
+                                background: #000616 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23001133" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>') repeat;
+                                color: #6be4f0;
+                                text-align: center;
+                                overflow-x: hidden;
+                            }
+                            
+                            body::before {
+                                content: '';
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                background: radial-gradient(circle at 50% 50%, rgba(107, 228, 240, 0.05) 0%, transparent 50%);
+                                pointer-events: none;
+                                z-index: 1;
+                            }
+                            
+                            .wifi-info {
+                                position: fixed;
+                                top: 20px;
+                                left: 20px;
+                                background: rgba(107, 228, 240, 0.1);
+                                border: 1px solid #6be4f0;
+                                border-radius: 10px;
+                                padding: 15px;
+                                font-size: 14px;
+                                text-align: left;
+                                box-shadow: 0 0 20px rgba(107, 228, 240, 0.3);
+                                z-index: 100;
+                            }
+                            
+                            .wifi-info h3 {
+                                margin: 0 0 10px 0;
+                                color: #6be4f0;
+                                font-weight: 600;
+                                text-shadow: 0 0 10px #6be4f0;
+                            }
+                            
+                            .wifi-info p {
+                                margin: 5px 0;
+                                line-height: 1.4;
+                            }
+                            
+                            h1 { 
+                                color: #6be4f0;
+                                margin-bottom: 30px;
+                                font-weight: 700;
+                                font-size: 2.5em;
+                                text-shadow: 0 0 20px #6be4f0;
+                                animation: glow 2s ease-in-out infinite alternate;
+                            }
+                            
+                            @keyframes glow {
+                                from { text-shadow: 0 0 20px #6be4f0; }
+                                to { text-shadow: 0 0 30px #6be4f0, 0 0 40px #6be4f0; }
+                            }
+                            
+                            .image-container { 
+                                margin: 20px 0;
+                                border: 2px solid #6be4f0;
+                                border-radius: 15px;
+                                overflow: hidden;
+                                box-shadow: 0 0 30px rgba(107, 228, 240, 0.4);
+                                transition: all 0.3s ease;
+                                position: relative;
+                                z-index: 2;
+                            }
+                            
+                            .image-container:hover {
+                                transform: scale(1.02);
+                                box-shadow: 0 0 50px rgba(107, 228, 240, 0.8);
+                                border-color: #00e2a7;
+                            }
+                            
+                            img { 
+                                width: 100%;
+                                height: auto;
+                                display: block;
+                                transition: all 0.3s ease;
+                            }
+                            
+                            img:hover {
+                                filter: brightness(1.1) contrast(1.1);
+                            }
+                            
+                            .close-btn {
+                                position: fixed;
+                                top: 20px;
+                                right: 20px;
+                                background: rgba(255, 64, 64, 0.8);
+                                border: 2px solid #ff4040;
+                                color: white;
+                                padding: 10px 15px;
+                                border-radius: 25px;
+                                cursor: pointer;
+                                font-family: 'Darker Grotesque', sans-serif;
+                                font-weight: 600;
+                                font-size: 14px;
+                                box-shadow: 0 0 20px rgba(255, 64, 64, 0.5);
+                                transition: all 0.3s ease;
+                                z-index: 100;
+                            }
+                            
+                            .close-btn:hover {
+                                background: rgba(255, 64, 64, 1);
+                                box-shadow: 0 0 30px rgba(255, 64, 64, 0.8);
+                                transform: scale(1.05);
+                            }
+                            
+                            /* Scrollbar styling */
+                            ::-webkit-scrollbar {
+                                width: 8px;
+                            }
+                            
+                            ::-webkit-scrollbar-track {
+                                background: rgba(107, 228, 240, 0.1);
+                            }
+                            
+                            ::-webkit-scrollbar-thumb {
+                                background: #6be4f0;
+                                border-radius: 4px;
+                            }
+                            
+                            ::-webkit-scrollbar-thumb:hover {
+                                background: #00e2a7;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="wifi-info">
+                            <h3>WiFi Information</h3>
+                            <p><strong>WiFi Name:</strong> CMKL_Event</p>
+                            <p><strong>Password:</strong> OpenHouse2025</p>
+                        </div>
+                        
+                        <button class="close-btn" onclick="window.close()">✕ Close</button>
+                        
+                        <h1>🎯 CMKL Open House 2025<br>Event Details Gallery</h1>
+                        ${imageGallery}
+                        
+                        <div style="margin-top: 40px; padding: 20px; border-top: 2px solid #6be4f0;">
+                            <p style="color: #6be4f0; font-size: 16px; font-weight: 500;">
+                                🚀 Ready Player AI - Join us for an exciting journey into the future of technology!
+                            </p>
+                            <p style="color: #00e2a7; font-size: 14px; margin-top: 10px;">
+                                Visit: <a href="${eventUrl}" target="_blank" style="color: #00e2a7; text-decoration: underline;">${eventUrl}</a>
+                            </p>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                
+                popup.document.close();
+            } else {
+                // Fallback if popup is blocked
+                alert('Popup blocked! Please allow popups for this site to view the event details gallery.');
+            }
         }
         
         function showApply() {
-            window.open('https://cmkl.ac.th/admissions/', '_blank');
+            window.open('https://apply.cmkl.ac.th/', '_blank');
         }
         
         function showRules() {
