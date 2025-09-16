@@ -908,7 +908,8 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
 
         if (existingUsers && existingUsers.length > 0) {
             const userRecord = existingUsers[0];
-            
+            console.log('DEBUG: Found user record:', JSON.stringify(userRecord, null, 2));
+
             // Map spreadsheet columns to key statuses
             const keyStatuses = {
                 key1: userRecord.registerKey === 'scanned' ? 'scanned' : 'not_scanned', // Column E
