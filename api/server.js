@@ -917,6 +917,30 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                 key4: userRecord.checkin === 'scanned' ? 'scanned' : 'not_scanned' // Column D
             };
 
+            // Check if keys 1, 2, 3 are all scanned but Redeem Key is still FALSE
+            let redeemKeyEnabled = userRecord.redeemKey === 'TRUE';
+            if (!redeemKeyEnabled && keyStatuses.key1 === 'scanned' && keyStatuses.key2 === 'scanned' && keyStatuses.key3 === 'scanned') {
+                try {
+                    console.log(`Auto-updating Redeem Key to TRUE for user ${userRecord.email} - all keys 1,2,3 are scanned`);
+
+                    // Update Redeem Key column (H) to TRUE
+                    await sheets.spreadsheets.values.update({
+                        spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+                        range: `H${userRecord.rowIndex}`,
+                        valueInputOption: 'USER_ENTERED',
+                        resource: {
+                            values: [['TRUE']]
+                        }
+                    });
+
+                    redeemKeyEnabled = true;
+                    console.log(`Redeem Key auto-updated to TRUE for user ${userRecord.email}`);
+                } catch (updateError) {
+                    console.error('Failed to auto-update Redeem Key:', updateError);
+                    // Continue with original value if update fails
+                }
+            }
+
             res.json({
                 success: true,
                 message: 'User data retrieved successfully',
@@ -925,7 +949,7 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                     email: userRecord.email,
                     lastName: userRecord.lastName,
                     keyStatuses: keyStatuses,
-                    redeemKeyEnabled: userRecord.redeemKey === 'TRUE'
+                    redeemKeyEnabled: redeemKeyEnabled
                 }
             });
         } else {
