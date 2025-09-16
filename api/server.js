@@ -390,7 +390,7 @@ async function findUserByEmail(email) {
             // Get all data from the sheet
             const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:G', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key
+                range: 'A:I', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key, H=Redeem Key, I=CODE
             });
             
             const rows = response.data.values;
@@ -410,7 +410,9 @@ async function findUserByEmail(email) {
                         checkin: row[3] || '',
                         registerKey: row[4] || '',
                         projectShowcaseKey: row[5] || '',
-                        afternoonSessionKey: row[6] || ''
+                        afternoonSessionKey: row[6] || '',
+                        redeemKey: row[7] || 'FALSE',
+                        code: row[8] || ''
                     }];
                 }
             }
@@ -460,7 +462,9 @@ async function createUserRecord(fields) {
                 checkin: 'checked-in',
                 registerKey: '',
                 projectShowcaseKey: '',
-                afternoonSessionKey: ''
+                afternoonSessionKey: '',
+                redeemKey: 'FALSE',
+                code: ''
             };
         } catch (error) {
             console.error('Error creating user record:', error);
@@ -485,7 +489,7 @@ async function updateUserRecord(rowIndex, fields) {
                 valueInputOption: 'USER_ENTERED',
                 resource: {
                     values: [
-                        [fields.firstname || '', fields.lastname || '', fields.email || '', fields.checkin || '', fields.registerKey || '', fields.projectShowcaseKey || '', fields.afternoonSessionKey || '']
+                        [fields.firstname || '', fields.lastname || '', fields.email || '', fields.checkin || '', fields.registerKey || '', fields.projectShowcaseKey || '', fields.afternoonSessionKey || '', fields.redeemKey || 'FALSE', fields.code || '']
                     ]
                 }
             });
@@ -555,7 +559,9 @@ app.post('/api/harty/submit', securityMiddleware, async (req, res) => {
                     checkin: 'checked-in', // Mark as checked in
                     registerKey: existingUser.registerKey || '', // Keep existing or empty
                     projectShowcaseKey: existingUser.projectShowcaseKey || '', // Keep existing or empty
-                    afternoonSessionKey: existingUser.afternoonSessionKey || '' // Keep existing or empty
+                    afternoonSessionKey: existingUser.afternoonSessionKey || '', // Keep existing or empty
+                    redeemKey: existingUser.redeemKey || 'FALSE', // Keep existing or default
+                    code: existingUser.code || '' // Keep existing or empty
                 };
                 
                 await updateUserRecord(existingUser.rowIndex, updateFields);
@@ -663,6 +669,51 @@ app.post('/api/harty/update', securityMiddleware, async (req, res) => {
     }
 });
 
+// Helper function to get user email by row index
+async function getUserEmailByRowIndex(rowIndex) {
+    try {
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+            range: `C${rowIndex}`, // Column C contains the email
+        });
+
+        const rows = response.data.values;
+        if (rows && rows.length > 0 && rows[0].length > 0) {
+            return rows[0][0];
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting user email by row index:', error);
+        return null;
+    }
+}
+
+// Helper function to check if keys 1, 2, 3 are collected and update Redeem Key
+async function checkAndUpdateRedeemKey(userRecord) {
+    const key1Collected = userRecord.registerKey === 'scanned';
+    const key2Collected = userRecord.projectShowcaseKey === 'scanned';
+    const key3Collected = userRecord.afternoonSessionKey === 'scanned';
+
+    if (key1Collected && key2Collected && key3Collected && userRecord.redeemKey !== 'TRUE') {
+        console.log(`All keys 1, 2, 3 collected for user ${userRecord.email}. Setting Redeem Key to TRUE.`);
+
+        // Update Redeem Key column (H) to TRUE
+        const range = `H${userRecord.rowIndex}`;
+        await sheets.spreadsheets.values.update({
+            spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+            range: range,
+            valueInputOption: 'USER_ENTERED',
+            resource: {
+                values: [['TRUE']]
+            }
+        });
+
+        return true; // Redeem key was updated
+    }
+
+    return false; // No update needed
+}
+
 // Update specific key for a user
 app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
     // Check if mission is enabled
@@ -724,8 +775,27 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
         });
         
         console.log(`Key ${keyField} updated successfully to ${status}`);
-        res.json({ 
-            success: true, 
+
+        // Check if this update means we should enable redeem key
+        if (status === 'scanned' && (keyField === 'key1 status' || keyField === 'key2 status' || keyField === 'key3 status')) {
+            try {
+                // Get updated user record to check all keys
+                const userEmail = await getUserEmailByRowIndex(rowIndex);
+                if (userEmail) {
+                    const updatedUsers = await findUserByEmail(userEmail);
+                    if (updatedUsers && updatedUsers.length > 0) {
+                        const updatedUser = updatedUsers[0];
+                        await checkAndUpdateRedeemKey(updatedUser);
+                    }
+                }
+            } catch (redeemError) {
+                console.error('Error checking/updating redeem key:', redeemError);
+                // Don't fail the main operation if redeem key check fails
+            }
+        }
+
+        res.json({
+            success: true,
             message: `Key ${keyField} updated to ${status}`,
             keyField,
             status
@@ -750,6 +820,63 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
             error: 'Internal server error',
             message: 'Unable to update key at this time. Please try again later.',
             offline: true
+        });
+    }
+});
+
+// Save redeem code to user record
+app.post('/api/harty/save-redeem-code', securityMiddleware, async (req, res) => {
+    // Check if mission is enabled
+    if (SERVER_CONFIG.MISSION !== 'ENABLE') {
+        return res.json({ success: false, message: 'Code saving disabled' });
+    }
+
+    const { email, redeemCode } = req.body;
+
+    if (!email || !redeemCode) {
+        return res.status(400).json({
+            success: false,
+            error: 'Missing email or redeemCode'
+        });
+    }
+
+    try {
+        console.log(`Saving redeem code for user ${email}: ${redeemCode}`);
+
+        // Find user by email
+        const users = await findUserByEmail(email);
+        if (!users || users.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        const user = users[0];
+
+        // Update CODE column (I) with the redeem code
+        const range = `I${user.rowIndex}`;
+        await sheets.spreadsheets.values.update({
+            spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+            range: range,
+            valueInputOption: 'USER_ENTERED',
+            resource: {
+                values: [[redeemCode]]
+            }
+        });
+
+        console.log(`Redeem code saved successfully for user ${email}`);
+        res.json({
+            success: true,
+            message: 'Redeem code saved successfully'
+        });
+
+    } catch (error) {
+        console.error('Failed to save redeem code:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to save redeem code',
+            message: error.message
         });
     }
 });

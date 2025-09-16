@@ -396,6 +396,31 @@
             return `${hash.substring(0, 4)}-${hash.substring(4, 8)}`;
         }
 
+        // Save redeem code to spreadsheet
+        function saveRedeemCodeToSpreadsheet(userEmail, redeemCode) {
+            fetch('/api/harty/save-redeem-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: userEmail,
+                    redeemCode: redeemCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Redeem code saved to spreadsheet successfully');
+                } else {
+                    console.error('Failed to save redeem code:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving redeem code:', error);
+            });
+        }
+
         // Copy redeem code to clipboard
         function copyRedeemCode() {
             const codeText = document.getElementById('codeText').textContent;
@@ -446,6 +471,9 @@
                         document.getElementById('codeText').textContent = redeemCode;
 
                         console.log('Generated redeem code:', redeemCode, 'for lastname:', lastname);
+
+                        // Save redeem code to spreadsheet
+                        saveRedeemCodeToSpreadsheet(userEmail, redeemCode);
                     } else {
                         console.error('Invalid user data:', data);
                         document.getElementById('nameText').textContent = 'Invalid User';
