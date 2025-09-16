@@ -884,6 +884,7 @@ app.post('/api/harty/save-redeem-code', securityMiddleware, async (req, res) => 
 // Get user data endpoint
 app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
     try {
+        console.log('=== USER DATA ENDPOINT CALLED ===');
         if (!sheets) {
             return res.status(503).json({ 
                 success: false, 
