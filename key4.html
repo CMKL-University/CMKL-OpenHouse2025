@@ -55,10 +55,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             padding: 20px;
             z-index: 3;
-            gap: 30px;
         }
 
         /* Top decorative border */
@@ -115,9 +113,13 @@
             font-weight: 900;
             color: #00D17D;
             text-align: center;
-            margin-bottom: 20px;
             text-shadow: 0 0 20px rgba(0, 209, 125, 0.8);
             animation: glow 2s ease-in-out infinite alternate;
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 6;
         }
 
         @keyframes glow {
@@ -150,7 +152,11 @@
             flex-direction: column;
             align-items: center;
             gap: 25px;
-            margin: 30px 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6;
         }
 
         .name-container, .code-container {
@@ -161,7 +167,7 @@
         }
 
         .namebox-svg, .codebox-svg {
-            filter: drop-shadow(0 0 15px rgba(0, 209, 125, 0.6));
+            filter: drop-shadow(0 0 15px rgba(0, 250, 150, 0.6));
         }
 
         .name-text, .code-text {
@@ -177,7 +183,7 @@
         .name-text {
             font-size: 16px;
             top: 50%;
-            left: 50%;
+            left: 35%;
             transform: translate(-50%, -50%);
         }
 
@@ -241,6 +247,76 @@
             color: #00ff41;
         }
 
+        /* Edit name button */
+        .edit-name-btn {
+            position: absolute;
+            top: 50%;
+            right: 8px;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            z-index: 7;
+        }
+
+        .edit-name-btn:hover {
+            background: rgba(0, 250, 150, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Action buttons container */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        /* Copy and save sections */
+        .copy-section, .save-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-icon-btn.copied {
+            background: rgba(0, 255, 65, 0.3);
+            border-color: #00ff41;
+        }
+
+        .copy-icon-btn.copied svg {
+            stroke: #00ff41;
+        }
+
+        .copy-icon-btn, .save-icon-btn {
+            background: transparent;
+            border: 2px solid #00FA96;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-icon-btn:hover, .save-icon-btn:hover {
+            background: rgba(0, 250, 150, 0.2);
+            transform: scale(1.1);
+        }
+
+        .copy-text, .save-text {
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 14px;
+            color: #00FA96;
+            text-align: center;
+            line-height: 1.2;
+        }
+
         /* Responsive design */
         @media (max-width: 480px) {
             .main-container {
@@ -256,10 +332,12 @@
 
             .congratulations {
                 font-size: 24px;
+                top: 60px;
             }
 
             .name-text {
                 font-size: 14px;
+                left: 50%;
             }
 
             .code-text {
@@ -270,6 +348,10 @@
             .key-image {
                 width: 100px;
                 height: 100px;
+            }
+
+            .action-buttons {
+                gap: 20px;
             }
         }
 
@@ -339,14 +421,25 @@
             <div class="info-section">
                 <!-- Name box -->
                 <div class="name-container">
-                    <svg class="namebox-svg" width="161" height="40" viewBox="0 0 161 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 2.50104V34.5759L6.18881 39H160V6.60915L153.421 1H3.03846L1 2.50104Z" stroke="#00D17D" stroke-width="1.8882" stroke-miterlimit="10"/>
-                        <path opacity="0.3" d="M28.1184 2.49492L26.5449 4.06842V9.10361L33.2323 2.41624L28.1184 2.49492Z" fill="#00D17D"/>
-                        <path d="M10.0986 1L1 10.7348V34.1326V34.4742L5.23005 39H35V1H10.0986Z" fill="#00D17D"/>
-                        <path d="M25.3894 27.5134H10.1265C10.1265 24.3979 12.6755 21.8488 15.7911 21.8488H19.7248C22.8561 21.8488 25.3894 24.3979 25.3894 27.5134Z" fill="white"/>
-                        <path d="M17.8365 20.2753C15.9325 20.2753 14.3748 18.7332 14.3748 16.8136C14.3748 14.9096 15.9325 13.3519 17.8365 13.3519C19.7561 13.3519 21.2981 14.9096 21.2981 16.8136C21.2981 18.7332 19.7561 20.2753 17.8365 20.2753Z" fill="white"/>
+                    <svg class="namebox-svg" width="280" height="48" viewBox="0 0 280 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Main container with rounded corners -->
+                        <rect x="1" y="1" width="278" height="46" rx="8" ry="8" fill="transparent" stroke="#00FA96" stroke-width="2"/>
+
+                        <!-- Pencil edit icon -->
+                        <g transform="translate(250, 14)">
+                            <path d="M20 3L17 0L1.5 15.5V19H5L20 3Z" fill="#00FA96" stroke="#00FA96" stroke-width="0.5"/>
+                            <path d="M18.5 1.5L21.5 4.5" stroke="#00FA96" stroke-width="1" stroke-linecap="round"/>
+                            <line x1="0" y1="18" x2="22" y2="18" stroke="#00FA96" stroke-width="1" stroke-linecap="round"/>
+                        </g>
                     </svg>
                     <div class="name-text" id="nameText">Loading<span class="loading"></span></div>
+                    <button class="edit-name-btn" onclick="editName()" title="Edit Name">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 3L17 0L1.5 15.5V19H5L20 3Z" fill="#00FA96"/>
+                            <path d="M18.5 1.5L21.5 4.5" stroke="#00FA96" stroke-width="1" stroke-linecap="round"/>
+                            <line x1="0" y1="18" x2="22" y2="18" stroke="#00FA96" stroke-width="1" stroke-linecap="round"/>
+                        </svg>
+                    </button>
                 </div>
 
                 <!-- Code box -->
@@ -358,7 +451,31 @@
                     <div class="code-text" id="codeText">Loading<span class="loading"></span></div>
                 </div>
 
-                <button class="copy-button" id="copyButton" onclick="copyRedeemCode()">Copy Redeem Code</button>
+                <!-- Action buttons -->
+                <div class="action-buttons">
+                    <!-- Copy section -->
+                    <div class="copy-section">
+                        <button class="copy-icon-btn" id="copyButton" onclick="copyRedeemCode()" title="Copy to clipboard">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="#00FA96" stroke-width="2" fill="none"/>
+                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="#00FA96" stroke-width="2" fill="none"/>
+                            </svg>
+                        </button>
+                        <div class="copy-text">copy to clipboard</div>
+                    </div>
+
+                    <!-- Save section -->
+                    <div class="save-section">
+                        <button class="save-icon-btn" onclick="saveAsImage()" title="Save as Image">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="#00FA96" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <polyline points="7,10 12,15 17,10" stroke="#00FA96" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="12" y1="15" x2="12" y2="3" stroke="#00FA96" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <div class="save-text">Save as image</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Back button -->
@@ -427,11 +544,9 @@
             if (codeText && codeText !== 'Loading...') {
                 navigator.clipboard.writeText(codeText).then(() => {
                     const copyButton = document.getElementById('copyButton');
-                    copyButton.textContent = 'Copied!';
                     copyButton.classList.add('copied');
 
                     setTimeout(() => {
-                        copyButton.textContent = 'Copy Redeem Code';
                         copyButton.classList.remove('copied');
                     }, 2000);
                 }).catch(err => {
@@ -439,6 +554,691 @@
                     alert('Failed to copy code to clipboard');
                 });
             }
+        }
+
+        // Edit name function
+        function editName() {
+            const nameElement = document.getElementById('nameText');
+            const currentName = nameElement.textContent;
+
+            const newName = prompt('Enter new name:', currentName);
+            if (newName && newName.trim() !== '') {
+                nameElement.textContent = newName.trim().toUpperCase();
+
+                // Update localStorage if needed
+                const userEmail = localStorage.getItem('userEmail');
+                if (userEmail) {
+                    // You could add API call here to update the name in the database
+                    console.log('Name updated to:', newName);
+                }
+            }
+        }
+
+        // Save as image function
+        function saveAsImage() {
+            // Get current displayed name and code from the UI (not from API)
+            const nameText = document.getElementById('nameText').textContent;
+            const codeText = document.getElementById('codeText').textContent;
+
+            // Parse the displayed name - handle single name or multiple names
+            const nameParts = nameText.trim().split(/\s+/); // Split by any whitespace
+            let firstName, lastName;
+
+            if (nameParts.length === 1) {
+                // Single name - use it as first name, empty last name
+                firstName = nameParts[0];
+                lastName = '';
+            } else if (nameParts.length >= 2) {
+                // Multiple names - first word is first name, rest is last name
+                firstName = nameParts[0];
+                lastName = nameParts.slice(1).join(' ');
+            } else {
+                // Fallback
+                firstName = 'FIRST';
+                lastName = 'NAME';
+            }
+
+            console.log('Parsed names:', { nameText, firstName, lastName });
+
+            // Load your original SVG template
+            fetch('/svg/redeem_image_name.svg')
+                .then(response => {
+                    if (!response.ok) throw new Error('SVG not found');
+                    return response.text();
+                })
+                .then(svgTemplate => {
+                    createRedeemImageFromTemplate(svgTemplate, firstName.toUpperCase(), lastName.toUpperCase(), codeText);
+                })
+                .catch(error => {
+                    console.error('Error loading your SVG template:', error);
+                    alert('Could not load your SVG template. Please ensure the file exists at /svg/redeem_image_name.svg');
+                });
+        }
+
+        // Create redeem image from template
+        function createRedeemImageFromTemplate(svgTemplate, firstName, lastName, redeemCode) {
+            // Replace placeholder text in the SVG template
+            let modifiedSVG = svgTemplate;
+
+            // Replace the actual placeholder text in the SVG based on the pattern we found
+            // First name (appears in a tspan with shorter text)
+            modifiedSVG = modifiedSVG.replace(/>AAAAAAA<\/tspan>/g, `>${firstName}</tspan>`);
+
+            // Last name (appears in a tspan with longer text)
+            modifiedSVG = modifiedSVG.replace(/>AAAAAAAAAAAAA<\/tspan>/g, `>${lastName}</tspan>`);
+
+            // Code (appears in a tspan with CODE prefix)
+            modifiedSVG = modifiedSVG.replace(/>CODEAAAAAAAAAAAAAAAAAAAAAAA<\/tspan>/g, `>${redeemCode}</tspan>`);
+
+            // Also replace common placeholder patterns as fallback
+            modifiedSVG = modifiedSVG.replace(/PIRIYA/g, firstName);
+            modifiedSVG = modifiedSVG.replace(/IPSUM/g, lastName);
+            modifiedSVG = modifiedSVG.replace(/FIRST NAME/g, firstName);
+            modifiedSVG = modifiedSVG.replace(/LAST NAME/g, lastName);
+            modifiedSVG = modifiedSVG.replace(/XXXX-XXXX/g, redeemCode);
+            modifiedSVG = modifiedSVG.replace(/First Name/g, firstName);
+            modifiedSVG = modifiedSVG.replace(/Last Name/g, lastName);
+            modifiedSVG = modifiedSVG.replace(/First_name/g, firstName);
+            modifiedSVG = modifiedSVG.replace(/Last_name/g, lastName);
+            modifiedSVG = modifiedSVG.replace(/first_name/g, firstName);
+            modifiedSVG = modifiedSVG.replace(/last_name/g, lastName);
+
+            console.log('Replacing SVG content:', {
+                originalFirstName: 'PIRIYA',
+                newFirstName: firstName,
+                originalLastName: 'IPSUM',
+                newLastName: lastName,
+                redeemCode
+            });
+
+            // Add Montserrat font import in the SVG defs section
+            const fontImport = `<style type="text/css"><![CDATA[@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');]]></style>`;
+
+            // Insert the font import in the defs section
+            if (modifiedSVG.includes('<defs>')) {
+                modifiedSVG = modifiedSVG.replace('<defs>', `<defs>${fontImport}`);
+            } else {
+                modifiedSVG = modifiedSVG.replace('<svg', `<svg><defs>${fontImport}</defs>`);
+            }
+
+            // Apply Montserrat font to ALL text elements more aggressively
+            modifiedSVG = modifiedSVG.replace(/<text([^>]*)>/gi, (match, attributes) => {
+                // Remove any existing font-family first
+                attributes = attributes.replace(/font-family="[^"]*"/gi, '');
+                attributes = attributes.replace(/font-family='[^']*'/gi, '');
+                // Add Montserrat font-family
+                attributes += ' font-family="Montserrat, sans-serif"';
+                return `<text${attributes}>`;
+            });
+
+            // Also apply Montserrat to tspan elements more aggressively
+            modifiedSVG = modifiedSVG.replace(/<tspan([^>]*)>/gi, (match, attributes) => {
+                // Remove any existing font-family first
+                attributes = attributes.replace(/font-family="[^"]*"/gi, '');
+                attributes = attributes.replace(/font-family='[^']*'/gi, '');
+                // Add Montserrat font-family
+                attributes += ' font-family="Montserrat, sans-serif"';
+                return `<tspan${attributes}>`;
+            });
+
+            // Function to calculate appropriate font size based on text length
+            function calculateFontSize(text, baseSize, maxLength, reductionRate = 0.08) {
+                if (!text || text.length <= maxLength) return baseSize;
+                const reduction = (text.length - maxLength) * (baseSize * reductionRate);
+                return Math.max(baseSize * 0.4, baseSize - reduction); // Min 40% of base size
+            }
+
+            // Apply dynamic font sizing to text elements with tspan content
+            modifiedSVG = modifiedSVG.replace(/<text([^>]*?)>.*?<tspan([^>]*?)>([^<]*?)<\/tspan>.*?<\/text>/gi, (match, textAttributes, tspanAttributes, textContent) => {
+                let fontSize = null;
+                let letterSpacing = '';
+
+                // Determine appropriate font size based on content type
+                if (textContent && textContent === firstName) {
+                    // First name - base size 100, max comfortable length 8 chars
+                    fontSize = calculateFontSize(firstName, 85, 8);
+                    if (firstName.length > 12) {
+                        letterSpacing = '-2px';
+                    } else if (firstName.length > 10) {
+                        letterSpacing = '-1px';
+                    }
+                    console.log('First name font adjustment:', { name: firstName, fontSize, letterSpacing });
+                } else if (textContent && textContent === lastName) {
+                    // Last name - base size 54, max comfortable length 8 chars, 3% reduction per extra char
+                    fontSize = calculateFontSize(lastName, 54, 8, 0.03);
+                    if (lastName.length > 12) {
+                        letterSpacing = '-2px';
+                    } else if (lastName.length > 10) {
+                        letterSpacing = '-1px';
+                    }
+                    console.log('Last name font adjustment:', { name: lastName, fontSize, letterSpacing });
+                } else if (textContent && textContent === redeemCode) {
+                    // Code - base size 26.69, max comfortable length 8 chars
+                    fontSize = calculateFontSize(redeemCode, 26.69, 8);
+                    if (redeemCode.length > 10) {
+                        letterSpacing = '-0.5px';
+                    }
+                    console.log('Code font adjustment:', { code: redeemCode, fontSize, letterSpacing });
+                }
+
+                // Apply calculated font size to text element
+                if (fontSize !== null) {
+                    if (textAttributes.includes('font-size')) {
+                        textAttributes = textAttributes.replace(/font-size="[^"]*"/gi, `font-size="${fontSize}"`);
+                        textAttributes = textAttributes.replace(/font-size='[^']*'/gi, `font-size='${fontSize}'`);
+                    } else {
+                        textAttributes += ` font-size="${fontSize}"`;
+                    }
+                }
+
+                // Apply letter spacing to text element
+                if (letterSpacing) {
+                    if (textAttributes.includes('letter-spacing')) {
+                        textAttributes = textAttributes.replace(/letter-spacing="[^"]*"/gi, `letter-spacing="${letterSpacing}"`);
+                        textAttributes = textAttributes.replace(/letter-spacing='[^']*'/gi, `letter-spacing='${letterSpacing}'`);
+                    } else {
+                        textAttributes += ` letter-spacing="${letterSpacing}"`;
+                    }
+                }
+
+                // Add line spacing
+                if (!textAttributes.includes('line-height')) {
+                    textAttributes += ' style="line-height: 0.84"';
+                } else {
+                    if (textAttributes.includes('style=')) {
+                        textAttributes = textAttributes.replace(/style="([^"]*)"/gi, (styleMatch, styleContent) => {
+                            if (styleContent.includes('line-height')) {
+                                return styleMatch.replace(/line-height:\s*[^;]*;?/gi, 'line-height: 0.84;');
+                            } else {
+                                return `style="${styleContent}; line-height: 0.84"`;
+                            }
+                        });
+                    } else {
+                        textAttributes += ' style="line-height: 0.84"';
+                    }
+                }
+
+                return `<text${textAttributes}><tspan${tspanAttributes}>${textContent}</tspan></text>`;
+            });
+
+            // For long names, remove filters entirely to prevent truncation
+            if (firstName.length > 8 || lastName.length > 8 || redeemCode.length > 8) {
+                console.log('Removing filters for long text to prevent truncation');
+
+                // Remove filter attributes from text groups for long names
+                if (firstName.length > 8) {
+                    modifiedSVG = modifiedSVG.replace(/<g id="First_name" filter="url\(#filter0_i_156_1133\)">/gi, '<g id="First_name">');
+                }
+                if (lastName.length > 8) {
+                    modifiedSVG = modifiedSVG.replace(/<g id="Last_name" filter="url\(#filter2_i_156_1133\)">/gi, '<g id="Last_name">');
+                }
+                if (redeemCode.length > 8) {
+                    modifiedSVG = modifiedSVG.replace(/<g id="CODE" filter="url\(#filter1_i_156_1133\)">/gi, '<g id="CODE">');
+                }
+            } else {
+                // For shorter text, expand filters as before
+                // First name filter (filter0_i_156_1133)
+                modifiedSVG = modifiedSVG.replace(/<filter id="filter0_i_156_1133"([^>]*)>/gi, (match, attributes) => {
+                    const estimatedWidth = Math.max(367.267, firstName.length * 35 + 150); // Even more generous
+                    attributes = attributes.replace(/width="[^"]*"/gi, `width="${estimatedWidth}"`);
+                    return `<filter id="filter0_i_156_1133"${attributes}>`;
+                });
+
+                // CODE filter (filter1_i_156_1133)
+                modifiedSVG = modifiedSVG.replace(/<filter id="filter1_i_156_1133"([^>]*)>/gi, (match, attributes) => {
+                    const estimatedWidth = Math.max(79.1268, redeemCode.length * 18 + 80); // Even more generous
+                    attributes = attributes.replace(/width="[^"]*"/gi, `width="${estimatedWidth}"`);
+                    return `<filter id="filter1_i_156_1133"${attributes}>`;
+                });
+
+                // Last name filter (filter2_i_156_1133)
+                modifiedSVG = modifiedSVG.replace(/<filter id="filter2_i_156_1133"([^>]*)>/gi, (match, attributes) => {
+                    const estimatedWidth = Math.max(349.005, lastName.length * 35 + 150); // Even more generous
+                    attributes = attributes.replace(/width="[^"]*"/gi, `width="${estimatedWidth}"`);
+                    return `<filter id="filter2_i_156_1133"${attributes}>`;
+                });
+            }
+
+            // Targeted fix: Only remove filters and masks from text elements for long names
+            const maxNameLength = Math.max(firstName.length, lastName.length);
+
+            // For long names, use a more conservative approach
+            if (maxNameLength > 7) {
+                console.log(`Applying targeted text fixes for name length: ${maxNameLength}`);
+
+                // Only remove masks from the specific text groups, not the entire SVG
+                if (firstName.length > 7) {
+                    // Remove filter and mask only from First_name group
+                    modifiedSVG = modifiedSVG.replace(
+                        /<g id="First_name" filter="url\(#filter0_i_156_1133\)">/gi,
+                        '<g id="First_name">'
+                    );
+                }
+
+                if (lastName.length > 7) {
+                    // Remove filter and mask only from Last_name group
+                    modifiedSVG = modifiedSVG.replace(
+                        /<g id="Last_name" filter="url\(#filter2_i_156_1133\)">/gi,
+                        '<g id="Last_name">'
+                    );
+                }
+
+                if (redeemCode.length > 7) {
+                    // Remove filter and mask only from CODE group
+                    modifiedSVG = modifiedSVG.replace(
+                        /<g id="CODE" filter="url\(#filter1_i_156_1133\)">/gi,
+                        '<g id="CODE">'
+                    );
+                }
+
+                // Expand only the SVG canvas slightly, keeping other elements intact
+                const extraWidth = Math.min(100, (maxNameLength - 7) * 10); // Conservative expansion
+                modifiedSVG = modifiedSVG.replace(/viewBox="0 0 719 832"/gi, `viewBox="0 0 ${719 + extraWidth} 832"`);
+                modifiedSVG = modifiedSVG.replace(/width="719"/gi, `width="${719 + extraWidth}"`);
+
+                console.log(`Applied conservative text fixes, expanded width by ${extraWidth}px`);
+            }
+
+            // Show preview popup
+            showSVGPreview(modifiedSVG, firstName, lastName, redeemCode);
+        }
+
+        // Create redeem image SVG
+        function createRedeemImageSVG(firstName, lastName, redeemCode) {
+            // Enhanced SVG template with better styling
+            const svgTemplate = `
+                <svg width="719" height="832" viewBox="0 0 719 832" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <style>
+                      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&amp;display=swap');
+                      .first-name { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 100px; fill: white; }
+                      .last-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 54px; fill: white; }
+                      .code-text { font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 26.69px; fill: white; }
+                      .title-text { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 32px; fill: #00FA96; }
+                      .subtitle { font-family: 'Montserrat', sans-serif; font-weight: 400; font-size: 18px; fill: #00D17D; }
+                    </style>
+
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#000616;stop-opacity:1" />
+                      <stop offset="30%" style="stop-color:#0A1A2A;stop-opacity:1" />
+                      <stop offset="70%" style="stop-color:#0F2627;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#000616;stop-opacity:1" />
+                    </linearGradient>
+
+                    <linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#22B2B9;stop-opacity:1" />
+                      <stop offset="50%" style="stop-color:#00FA96;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#00946D;stop-opacity:1" />
+                    </linearGradient>
+
+                    <linearGradient id="codeBoxGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#00D17D;stop-opacity:0.3" />
+                      <stop offset="100%" style="stop-color:#00FA96;stop-opacity:0.3" />
+                    </linearGradient>
+
+                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#00FA96" flood-opacity="0.8"/>
+                    </filter>
+                  </defs>
+
+                  <!-- Background -->
+                  <rect width="719" height="832" fill="url(#bgGradient)"/>
+
+                  <!-- Top decorative border -->
+                  <rect x="50" y="40" width="619" height="6" rx="3" fill="url(#borderGradient)" filter="url(#glow)"/>
+
+                  <!-- Bottom decorative border -->
+                  <rect x="50" y="786" width="619" height="6" rx="3" fill="url(#borderGradient)" filter="url(#glow)"/>
+
+                  <!-- Main content frame -->
+                  <rect x="80" y="120" width="559" height="592" rx="25" fill="none" stroke="#00FA96" stroke-width="2" opacity="0.4"/>
+
+                  <!-- Title -->
+                  <text x="359" y="180" text-anchor="middle" class="title-text">CONGRATULATIONS!</text>
+
+                  <!-- Subtitle -->
+                  <text x="359" y="220" text-anchor="middle" class="subtitle">Your CMKL Open House 2025 Redeem Certificate</text>
+
+                  <!-- Name section background -->
+                  <rect x="120" y="280" width="479" height="120" rx="15" fill="none" stroke="#00FA96" stroke-width="1" opacity="0.3"/>
+
+                  <!-- First Name -->
+                  <text x="359" y="340" text-anchor="middle" class="first-name">${firstName}</text>
+
+                  <!-- Last Name -->
+                  <text x="359" y="390" text-anchor="middle" class="last-name">${lastName}</text>
+
+                  <!-- Code section background -->
+                  <rect x="160" y="450" width="399" height="80" rx="20" fill="url(#codeBoxGrad)" stroke="#00D17D" stroke-width="2"/>
+
+                  <!-- Code text -->
+                  <text x="359" y="500" text-anchor="middle" class="code-text">${redeemCode}</text>
+
+                  <!-- Footer instructions -->
+                  <text x="359" y="580" text-anchor="middle" class="subtitle">Keep this code for your redemption</text>
+                  <text x="359" y="620" text-anchor="middle" class="subtitle">Present at CMKL University booth</text>
+                  <text x="359" y="660" text-anchor="middle" class="subtitle">CMKL University Open House 2025</text>
+
+                  <!-- Decorative corner elements -->
+                  <circle cx="120" cy="150" r="4" fill="#00FA96" opacity="0.7"/>
+                  <circle cx="599" cy="150" r="4" fill="#00FA96" opacity="0.7"/>
+                  <circle cx="120" cy="682" r="4" fill="#00FA96" opacity="0.7"/>
+                  <circle cx="599" cy="682" r="4" fill="#00FA96" opacity="0.7"/>
+
+                  <!-- Tech pattern decoration -->
+                  <rect x="100" y="730" width="60" height="2" fill="#22B2B9" opacity="0.6"/>
+                  <rect x="180" y="730" width="40" height="2" fill="#00FA96" opacity="0.6"/>
+                  <rect x="240" y="730" width="80" height="2" fill="#00946D" opacity="0.6"/>
+                  <rect x="399" y="730" width="40" height="2" fill="#00946D" opacity="0.6"/>
+                  <rect x="459" y="730" width="80" height="2" fill="#00FA96" opacity="0.6"/>
+                  <rect x="559" y="730" width="60" height="2" fill="#22B2B9" opacity="0.6"/>
+                </svg>
+            `;
+
+            // Show preview popup
+            showSVGPreview(svgTemplate, firstName, lastName, redeemCode);
+        }
+
+        // Show SVG preview popup
+        function showSVGPreview(svgTemplate, firstName, lastName, redeemCode) {
+            // Create popup overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                backdrop-filter: blur(5px);
+            `;
+
+            // Create popup container
+            const popup = document.createElement('div');
+            popup.style.cssText = `
+                background: #000616;
+                border: 2px solid #00FA96;
+                border-radius: 15px;
+                padding: 20px;
+                max-width: 90vw;
+                max-height: 90vh;
+                overflow: auto;
+                position: relative;
+                margin: auto;
+            `;
+
+            // Create preview title
+            const title = document.createElement('h3');
+            title.textContent = 'Preview Your Redeem Certificate';
+            title.style.cssText = `
+                color: #00FA96;
+                font-family: 'Orbitron', monospace;
+                text-align: center;
+                margin: 0 0 20px 0;
+                font-size: 18px;
+            `;
+
+            // Create SVG preview
+            const svgContainer = document.createElement('div');
+            svgContainer.innerHTML = svgTemplate;
+            svgContainer.style.cssText = `
+                display: flex;
+                justify-content: center;
+                margin-bottom: 20px;
+            `;
+
+            // Scale down the SVG for preview
+            const svgElement = svgContainer.querySelector('svg');
+            if (svgElement) {
+                svgElement.style.cssText = `
+                    max-width: 600px;
+                    max-height: 450px;
+                    width: 100%;
+                    height: auto;
+                `;
+            }
+
+            // Create buttons container
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.style.cssText = `
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+                margin-top: 20px;
+            `;
+
+            // Create download button
+            const downloadBtn = document.createElement('button');
+            downloadBtn.textContent = '💾 Download PNG';
+            downloadBtn.style.cssText = `
+                background: linear-gradient(45deg, #0F2627, #203A43, #2C5530);
+                border: 2px solid #00FA96;
+                border-radius: 10px;
+                padding: 10px 20px;
+                color: #00FA96;
+                font-family: 'Orbitron', monospace;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            `;
+
+            downloadBtn.onmouseover = () => {
+                downloadBtn.style.transform = 'scale(1.05)';
+                downloadBtn.style.boxShadow = '0 4px 15px rgba(0, 250, 150, 0.4)';
+            };
+
+            downloadBtn.onmouseout = () => {
+                downloadBtn.style.transform = 'scale(1)';
+                downloadBtn.style.boxShadow = 'none';
+            };
+
+            downloadBtn.onclick = () => {
+                // Disable button and show loading state
+                downloadBtn.disabled = true;
+                downloadBtn.textContent = '⏳ Preparing...';
+                downloadBtn.style.opacity = '0.7';
+
+                // Prevent overlay click from closing popup during download
+                overlay.style.pointerEvents = 'none';
+                popup.style.pointerEvents = 'auto';
+
+                // Get the already displayed SVG from the popup
+                const displayedSVG = svgContainer.querySelector('svg');
+                if (displayedSVG) {
+                    // Convert the displayed SVG directly to download
+                    downloadDisplayedSVG(displayedSVG, firstName, lastName, redeemCode, () => {
+                        // Callback function - close popup after download is complete
+                        if (document.body.contains(overlay)) {
+                            document.body.removeChild(overlay);
+                        }
+                    });
+                } else {
+                    alert('Could not find displayed image to download');
+                    downloadBtn.disabled = false;
+                    downloadBtn.textContent = '💾 Download PNG';
+                    downloadBtn.style.opacity = '1';
+                }
+            };
+
+            // Create close button
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = '✕ Close';
+            closeBtn.style.cssText = `
+                background: transparent;
+                border: 2px solid #ff4444;
+                border-radius: 10px;
+                padding: 10px 20px;
+                color: #ff4444;
+                font-family: 'Orbitron', monospace;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            `;
+
+            closeBtn.onmouseover = () => {
+                closeBtn.style.transform = 'scale(1.05)';
+                closeBtn.style.background = 'rgba(255, 68, 68, 0.2)';
+            };
+
+            closeBtn.onmouseout = () => {
+                closeBtn.style.transform = 'scale(1)';
+                closeBtn.style.background = 'transparent';
+            };
+
+            closeBtn.onclick = () => {
+                // Only allow closing if not downloading
+                if (!downloadBtn.disabled) {
+                    document.body.removeChild(overlay);
+                }
+            };
+
+            // Assemble popup
+            buttonsContainer.appendChild(downloadBtn);
+            buttonsContainer.appendChild(closeBtn);
+
+            popup.appendChild(title);
+            popup.appendChild(svgContainer);
+            popup.appendChild(buttonsContainer);
+
+            overlay.appendChild(popup);
+            document.body.appendChild(overlay);
+
+            // Close on overlay click
+            overlay.onclick = (e) => {
+                if (e.target === overlay && !downloadBtn.disabled) {
+                    document.body.removeChild(overlay);
+                }
+            };
+        }
+
+        // Download the already displayed SVG directly
+        function downloadDisplayedSVG(svgElement, firstName, lastName, redeemCode, onComplete) {
+            console.log('Downloading already displayed SVG...');
+
+            // Get the SVG's outer HTML
+            const svgString = new XMLSerializer().serializeToString(svgElement);
+            const svgBlob = new Blob([svgString], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(svgBlob);
+
+            // Create canvas to convert SVG to PNG
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            // Use the SVG's actual dimensions
+            const svgRect = svgElement.getBoundingClientRect();
+            canvas.width = svgElement.viewBox?.baseVal?.width || svgRect.width || 719;
+            canvas.height = svgElement.viewBox?.baseVal?.height || svgRect.height || 832;
+
+            img.onload = function() {
+                console.log('Displayed SVG loaded successfully');
+                ctx.drawImage(img, 0, 0);
+
+                // Convert canvas to blob
+                canvas.toBlob(function(blob) {
+                    console.log('Canvas converted to blob from displayed SVG');
+                    const fileName = `cmkl-redeem-${firstName}-${lastName}-${Date.now()}.png`;
+
+                    // Always use regular download
+                    downloadFallback(blob, fileName, onComplete);
+
+                    // Clean up
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+            };
+
+            img.onerror = function(error) {
+                console.error('Failed to load displayed SVG:', error);
+                alert('Failed to download image. Please try again.');
+                if (onComplete) onComplete();
+            };
+
+            img.src = url;
+        }
+
+        // Download SVG as image
+        function downloadSVGAsImage(svgTemplate, firstName, lastName, redeemCode, onComplete) {
+            console.log('Starting download process...');
+
+            const svgBlob = new Blob([svgTemplate], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(svgBlob);
+
+            // Create canvas to convert SVG to PNG
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            canvas.width = 800;
+            canvas.height = 600;
+
+            img.onload = function() {
+                console.log('SVG image loaded successfully');
+                ctx.drawImage(img, 0, 0);
+
+                // Convert canvas to blob
+                canvas.toBlob(function(blob) {
+                    console.log('Canvas converted to blob');
+                    const fileName = `cmkl-redeem-${firstName}-${lastName}-${Date.now()}.png`;
+
+                    // Always use regular download for now (skip Web Share API)
+                    downloadFallback(blob, fileName, onComplete);
+
+                    // Clean up
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+            };
+
+            img.onerror = function(error) {
+                console.error('Failed to load SVG image:', error);
+                alert('Failed to generate image. Please try again.');
+                if (onComplete) onComplete();
+            };
+
+            img.src = url;
+        }
+
+        // Fallback download function
+        function downloadFallback(blob, fileName, onComplete) {
+            console.log('Starting fallback download for:', fileName);
+
+            const link = document.createElement('a');
+            link.download = fileName;
+            link.href = URL.createObjectURL(blob);
+
+            try {
+                // Create a temporary anchor and click it
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                console.log('Download link clicked successfully');
+
+                // For mobile devices, show instruction
+                if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    setTimeout(() => {
+                        alert('Image ready! Check your Downloads folder or Gallery app.');
+                    }, 500);
+                    // Call completion callback after mobile download
+                    if (onComplete) setTimeout(onComplete, 2000);
+                } else {
+                    // Desktop download - wait a bit longer for browser to process
+                    console.log('Desktop download initiated');
+                    if (onComplete) setTimeout(onComplete, 1500);
+                }
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Download failed. Please try again.');
+                if (onComplete) onComplete();
+            }
+
+            // Clean up
+            setTimeout(() => {
+                URL.revokeObjectURL(link.href);
+            }, 3000);
         }
 
         // Load user data and generate redeem code
@@ -456,21 +1256,23 @@
                 return;
             }
 
-            // Fetch user data to get lastname
+            // Fetch user data to get both first and last name
             fetch(`/api/harty/user/${encodeURIComponent(userEmail)}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log('User data received:', data);
 
-                    if (data.success && data.data && data.data.lastName) {
-                        const lastname = data.data.lastName;
-                        const redeemCode = generateRedeemCode(lastname);
+                    if (data.success && data.data) {
+                        const firstName = data.data.firstName || '';
+                        const lastName = data.data.lastName || '';
+                        const redeemCode = generateRedeemCode(lastName);
 
-                        // Display name and code
-                        document.getElementById('nameText').textContent = lastname.toUpperCase();
+                        // Display name with auto-separation (space between first and last name)
+                        const fullName = (firstName + ' ' + lastName).trim().toUpperCase();
+                        document.getElementById('nameText').textContent = fullName;
                         document.getElementById('codeText').textContent = redeemCode;
 
-                        console.log('Generated redeem code:', redeemCode, 'for lastname:', lastname);
+                        console.log('Generated redeem code:', redeemCode, 'for names:', { firstName, lastName });
 
                         // Save redeem code to spreadsheet
                         saveRedeemCodeToSpreadsheet(userEmail, redeemCode);

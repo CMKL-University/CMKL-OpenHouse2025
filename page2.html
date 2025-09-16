@@ -3049,7 +3049,7 @@
         async function checkUserSession() {
             const userEmail = localStorage.getItem('userEmail');
             const userLastName = localStorage.getItem('userLastName');
-            
+
             if (!userEmail || !userLastName) {
                 console.log('No user session found, redirecting to main page');
                 hideLoadingScreen();
@@ -3828,7 +3828,7 @@
         function displayUserLastName() {
             // Get the user's last name from localStorage
             const userLastName = localStorage.getItem('userLastName');
-            
+
             if (userLastName) {
                 // Update the subtitle with the user's last name
                 document.getElementById('lastNameDisplay').textContent = userLastName.toUpperCase();
