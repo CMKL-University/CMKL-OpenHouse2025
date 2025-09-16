@@ -1,34 +1,18 @@
 {
-  "version": 2,
-  "builds": [
+  "functions": {
+    "api/server.js": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
     {
-      "src": "api/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "**/*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "**/*.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "**/*.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "svg/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "model/**",
-      "use": "@vercel/static"
+      "source": "/api/(.*)",
+      "destination": "/api/server.js"
     }
   ],
   "headers": [
     {
-      "source": "**/*.gltf",
+      "source": "/(.*).gltf",
       "headers": [
         {
           "key": "Content-Type",
@@ -37,32 +21,11 @@
         {
           "key": "Access-Control-Allow-Origin",
           "value": "*"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
     {
-      "source": "**/*.bin",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/octet-stream"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "**/*.mind",
+      "source": "/(.*).bin",
       "headers": [
         {
           "key": "Content-Type",
@@ -75,43 +38,17 @@
       ]
     },
     {
-      "source": "/model/**",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/svg/**",
+      "source": "/(.*).mind",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "image/svg+xml"
+          "value": "application/octet-stream"
         },
         {
           "key": "Access-Control-Allow-Origin",
           "value": "*"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/server.js"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
