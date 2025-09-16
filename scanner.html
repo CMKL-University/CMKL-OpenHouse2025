@@ -279,14 +279,14 @@
     </a>
     
     <a-scene
-      mindar-image="imageTargetSrc: /model/registration.mind; maxTrack: 2; uiScanning: #custom-scanning-overlay"
+      mindar-image="imageTargetSrc: model/registration.mind; maxTrack: 2; uiScanning: #custom-scanning-overlay"
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <a-asset-item id="bearModel" src="/model/magic_key/scene.gltf"></a-asset-item>
+        <a-asset-item id="bearModel" src="model/magic_key/scene.gltf"></a-asset-item>
         <a-asset-item id="raccoonModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf"></a-asset-item>
       </a-assets>
 
@@ -357,7 +357,7 @@
       }
 
       // Test if model files are accessible
-      fetch('/model/registration.mind')
+      fetch('model/registration.mind')
         .then(response => {
           console.log('📄 Mind file status:', response.status, response.ok ? '✅' : '❌');
           if (!response.ok) {
@@ -366,7 +366,7 @@
         })
         .catch(err => console.error('❌ Mind file fetch error:', err));
 
-      fetch('/model/magic_key/scene.gltf')
+      fetch('model/magic_key/scene.gltf')
         .then(response => {
           console.log('🎭 GLTF model status:', response.status, response.ok ? '✅' : '❌');
           if (!response.ok) {
@@ -376,7 +376,7 @@
         .catch(err => console.error('❌ GLTF model fetch error:', err));
 
       // Test binary file (.bin) accessibility
-      fetch('/model/magic_key/scene.bin')
+      fetch('model/magic_key/scene.bin')
         .then(response => {
           console.log('🔧 GLTF binary status:', response.status, response.ok ? '✅' : '❌');
           if (!response.ok) {
@@ -386,7 +386,7 @@
         .catch(err => console.error('❌ GLTF binary fetch error:', err));
 
       // Test texture file accessibility
-      fetch('/model/magic_key/textures/Material.001_baseColor.jpeg')
+      fetch('model/magic_key/textures/Material.001_baseColor.jpeg')
         .then(response => {
           console.log('🖼️ Texture file status:', response.status, response.ok ? '✅' : '❌');
           if (!response.ok) {
