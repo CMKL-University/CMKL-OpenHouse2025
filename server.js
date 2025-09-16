@@ -61,6 +61,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
+// Mount svg and model folders for Vercel deployment
+app.use('/svg', express.static(path.join(__dirname, '..', 'svg')));
+app.use('/model', express.static(path.join(__dirname, '..', 'model')));
+
 // In-memory storage (replace with database in production)
 const sessions = new Map();
 const userInteractions = new Map();
@@ -72,30 +76,18 @@ function generateSecureSessionId() {
 
 // SQL Injection Detection Patterns
 const SQL_INJECTION_PATTERNS = [
-    // SQL injection patterns (more specific to avoid false positives)
-    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER)\s+(FROM|INTO|TABLE|DATABASE|SCHEMA)\b)/i,
-    /(\bUNION\s+SELECT\b)/i,
-    /(OR\s+1\s*=\s*1|AND\s+1\s*=\s*1|OR\s+\'1\'\s*=\s*\'1\')/i,
-    
-    // XSS patterns (HTML tags with suspicious attributes)
-    /(<script[^>]*>|<\/script>)/i,
-    /(<iframe[^>]*>|<\/iframe>)/i,
-    /(<object[^>]*>|<\/object>)/i,
-    /(javascript\s*:|vbscript\s*:|data\s*:)/i,
-    /(onload\s*=|onerror\s*=|onclick\s*=|onmouseover\s*=)/i,
-    
-    // Google Sheets/Excel formula injection
-    /^[\s]*[=@\+\-].*[A-Z]+\d+/i, // Formulas starting with = @ + - followed by cell references
-    /(\b(SUM|AVERAGE|COUNT|MAX|MIN|IF|VLOOKUP|INDEX|MATCH)\s*\()/i,
-    /(IMPORTXML|IMPORTHTML|IMPORTDATA|IMPORTRANGE|HYPERLINK)\s*\(/i,
-    
-    // SQL comments (but not email dashes)
-    /(\/\*.*\*\/|--\s+|#\s+)/,
-    
-    // Dangerous characters in suspicious context
-    /['"]\s*(OR|AND|UNION|SELECT)\s+/i,
-    /;\s*(DROP|DELETE|UPDATE|INSERT)\s+/i,
-    
+    // Basic SQL injection patterns
+    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE|UNION|SCRIPT)\b)/i,
+    // Common SQL injection techniques
+    /(\'|\"|;|--|\/\*|\*\/)/,
+    // XSS patterns
+    /(<script|<iframe|<object|<embed|javascript:|vbscript:|onload=|onerror=)/i,
+    // SQL functions and operators
+    /(OR\s+1=1|AND\s+1=1|OR\s+\'1\'=\'1\'|AND\s+\'1\'=\'1\')/i,
+    // Union-based injection
+    /(UNION\s+(ALL\s+)?SELECT)/i,
+    // Comment-based injection
+    /(\/\*.*\*\/|--.*|#.*)/i,
     // Time-based injection
     /(SLEEP\(|WAITFOR\s+DELAY|BENCHMARK\()/i,
     // Information gathering
@@ -170,13 +162,6 @@ function securityMiddleware(req, res, next) {
         if (urlCheck.isMalicious) {
             console.error(`🚨 SECURITY BREACH: URL parameter attack from IP ${clientIP}`);
             console.error(`🚨 Field: ${urlCheck.field}, Value: ${urlCheck.value}`);
-            // For API endpoints, return JSON error instead of redirect
-            if (req.path.startsWith('/api/')) {
-                return res.status(400).json({ 
-                    error: 'SECURITY_VIOLATION', 
-                    message: 'Malicious input detected and blocked' 
-                });
-            }
             return res.redirect('/hacker-detected.html');
         }
     }
@@ -187,13 +172,6 @@ function securityMiddleware(req, res, next) {
         if (queryCheck.isMalicious) {
             console.error(`🚨 SECURITY BREACH: Query parameter attack from IP ${clientIP}`);
             console.error(`🚨 Field: ${queryCheck.field}, Value: ${queryCheck.value}`);
-            // For API endpoints, return JSON error instead of redirect
-            if (req.path.startsWith('/api/')) {
-                return res.status(400).json({ 
-                    error: 'SECURITY_VIOLATION', 
-                    message: 'Malicious input detected and blocked' 
-                });
-            }
             return res.redirect('/hacker-detected.html');
         }
     }
@@ -204,13 +182,6 @@ function securityMiddleware(req, res, next) {
         if (bodyCheck.isMalicious) {
             console.error(`🚨 SECURITY BREACH: Request body attack from IP ${clientIP}`);
             console.error(`🚨 Field: ${bodyCheck.field}, Value: ${bodyCheck.value}`);
-            // For API endpoints, return JSON error instead of redirect
-            if (req.path.startsWith('/api/')) {
-                return res.status(400).json({ 
-                    error: 'SECURITY_VIOLATION', 
-                    message: 'Malicious input detected and blocked' 
-                });
-            }
             return res.redirect('/hacker-detected.html');
         }
         
@@ -220,14 +191,7 @@ function securityMiddleware(req, res, next) {
             if (fieldsCheck.isMalicious) {
                 console.error(`🚨 SECURITY BREACH: Form fields attack from IP ${clientIP}`);
                 console.error(`🚨 Field: ${fieldsCheck.field}, Value: ${fieldsCheck.value}`);
-                // For API endpoints, return JSON error instead of redirect
-            if (req.path.startsWith('/api/')) {
-                return res.status(400).json({ 
-                    error: 'SECURITY_VIOLATION', 
-                    message: 'Malicious input detected and blocked' 
-                });
-            }
-            return res.redirect('/hacker-detected.html');
+                return res.redirect('/hacker-detected.html');
             }
         }
     }
@@ -426,7 +390,7 @@ async function findUserByEmail(email) {
             // Get all data from the sheet
             const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:G', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key
+                range: 'A:I', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key, H=Redeem Key, I=CODE
             });
             
             const rows = response.data.values;
@@ -446,7 +410,9 @@ async function findUserByEmail(email) {
                         checkin: row[3] || '',
                         registerKey: row[4] || '',
                         projectShowcaseKey: row[5] || '',
-                        afternoonSessionKey: row[6] || ''
+                        afternoonSessionKey: row[6] || '',
+                        redeemKey: row[7] || 'FALSE',
+                        code: row[8] || ''
                     }];
                 }
             }
@@ -496,7 +462,9 @@ async function createUserRecord(fields) {
                 checkin: 'checked-in',
                 registerKey: '',
                 projectShowcaseKey: '',
-                afternoonSessionKey: ''
+                afternoonSessionKey: '',
+                redeemKey: 'FALSE',
+                code: ''
             };
         } catch (error) {
             console.error('Error creating user record:', error);
@@ -521,7 +489,7 @@ async function updateUserRecord(rowIndex, fields) {
                 valueInputOption: 'USER_ENTERED',
                 resource: {
                     values: [
-                        [fields.firstname || '', fields.lastname || '', fields.email || '', fields.checkin || '', fields.registerKey || '', fields.projectShowcaseKey || '', fields.afternoonSessionKey || '']
+                        [fields.firstname || '', fields.lastname || '', fields.email || '', fields.checkin || '', fields.registerKey || '', fields.projectShowcaseKey || '', fields.afternoonSessionKey || '', fields.redeemKey || 'FALSE', fields.code || '']
                     ]
                 }
             });
@@ -591,7 +559,9 @@ app.post('/api/harty/submit', securityMiddleware, async (req, res) => {
                     checkin: 'checked-in', // Mark as checked in
                     registerKey: existingUser.registerKey || '', // Keep existing or empty
                     projectShowcaseKey: existingUser.projectShowcaseKey || '', // Keep existing or empty
-                    afternoonSessionKey: existingUser.afternoonSessionKey || '' // Keep existing or empty
+                    afternoonSessionKey: existingUser.afternoonSessionKey || '', // Keep existing or empty
+                    redeemKey: existingUser.redeemKey || 'FALSE', // Keep existing or default
+                    code: existingUser.code || '' // Keep existing or empty
                 };
                 
                 await updateUserRecord(existingUser.rowIndex, updateFields);
@@ -699,6 +669,51 @@ app.post('/api/harty/update', securityMiddleware, async (req, res) => {
     }
 });
 
+// Helper function to get user email by row index
+async function getUserEmailByRowIndex(rowIndex) {
+    try {
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+            range: `C${rowIndex}`, // Column C contains the email
+        });
+
+        const rows = response.data.values;
+        if (rows && rows.length > 0 && rows[0].length > 0) {
+            return rows[0][0];
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting user email by row index:', error);
+        return null;
+    }
+}
+
+// Helper function to check if keys 1, 2, 3 are collected and update Redeem Key
+async function checkAndUpdateRedeemKey(userRecord) {
+    const key1Collected = userRecord.registerKey === 'scanned';
+    const key2Collected = userRecord.projectShowcaseKey === 'scanned';
+    const key3Collected = userRecord.afternoonSessionKey === 'scanned';
+
+    if (key1Collected && key2Collected && key3Collected && userRecord.redeemKey !== 'TRUE') {
+        console.log(`All keys 1, 2, 3 collected for user ${userRecord.email}. Setting Redeem Key to TRUE.`);
+
+        // Update Redeem Key column (H) to TRUE
+        const range = `H${userRecord.rowIndex}`;
+        await sheets.spreadsheets.values.update({
+            spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+            range: range,
+            valueInputOption: 'USER_ENTERED',
+            resource: {
+                values: [['TRUE']]
+            }
+        });
+
+        return true; // Redeem key was updated
+    }
+
+    return false; // No update needed
+}
+
 // Update specific key for a user
 app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
     // Check if mission is enabled
@@ -760,8 +775,27 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
         });
         
         console.log(`Key ${keyField} updated successfully to ${status}`);
-        res.json({ 
-            success: true, 
+
+        // Check if this update means we should enable redeem key
+        if (status === 'scanned' && (keyField === 'key1 status' || keyField === 'key2 status' || keyField === 'key3 status')) {
+            try {
+                // Get updated user record to check all keys
+                const userEmail = await getUserEmailByRowIndex(rowIndex);
+                if (userEmail) {
+                    const updatedUsers = await findUserByEmail(userEmail);
+                    if (updatedUsers && updatedUsers.length > 0) {
+                        const updatedUser = updatedUsers[0];
+                        await checkAndUpdateRedeemKey(updatedUser);
+                    }
+                }
+            } catch (redeemError) {
+                console.error('Error checking/updating redeem key:', redeemError);
+                // Don't fail the main operation if redeem key check fails
+            }
+        }
+
+        res.json({
+            success: true,
             message: `Key ${keyField} updated to ${status}`,
             keyField,
             status
@@ -790,9 +824,67 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
     }
 });
 
+// Save redeem code to user record
+app.post('/api/harty/save-redeem-code', securityMiddleware, async (req, res) => {
+    // Check if mission is enabled
+    if (SERVER_CONFIG.MISSION !== 'ENABLE') {
+        return res.json({ success: false, message: 'Code saving disabled' });
+    }
+
+    const { email, redeemCode } = req.body;
+
+    if (!email || !redeemCode) {
+        return res.status(400).json({
+            success: false,
+            error: 'Missing email or redeemCode'
+        });
+    }
+
+    try {
+        console.log(`Saving redeem code for user ${email}: ${redeemCode}`);
+
+        // Find user by email
+        const users = await findUserByEmail(email);
+        if (!users || users.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        const user = users[0];
+
+        // Update CODE column (I) with the redeem code
+        const range = `I${user.rowIndex}`;
+        await sheets.spreadsheets.values.update({
+            spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+            range: range,
+            valueInputOption: 'USER_ENTERED',
+            resource: {
+                values: [[redeemCode]]
+            }
+        });
+
+        console.log(`Redeem code saved successfully for user ${email}`);
+        res.json({
+            success: true,
+            message: 'Redeem code saved successfully'
+        });
+
+    } catch (error) {
+        console.error('Failed to save redeem code:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to save redeem code',
+            message: error.message
+        });
+    }
+});
+
 // Get user data endpoint
 app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
     try {
+        console.log('=== USER DATA ENDPOINT CALLED ===');
         if (!sheets) {
             return res.status(503).json({ 
                 success: false, 
@@ -817,7 +909,8 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
 
         if (existingUsers && existingUsers.length > 0) {
             const userRecord = existingUsers[0];
-            
+            console.log('DEBUG: Found user record:', JSON.stringify(userRecord, null, 2));
+
             // Map spreadsheet columns to key statuses
             const keyStatuses = {
                 key1: userRecord.registerKey === 'scanned' ? 'scanned' : 'not_scanned', // Column E
@@ -826,14 +919,41 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                 key4: userRecord.checkin === 'scanned' ? 'scanned' : 'not_scanned' // Column D
             };
 
-            res.json({ 
-                success: true, 
+            // Check if keys 1, 2, 3 are all scanned but Redeem Key is still FALSE
+            let redeemKeyEnabled = userRecord.redeemKey === 'TRUE';
+            console.log(`User ${userRecord.email} - Redeem Key: ${userRecord.redeemKey}, Key1: ${keyStatuses.key1}, Key2: ${keyStatuses.key2}, Key3: ${keyStatuses.key3}`);
+
+            if (!redeemKeyEnabled && keyStatuses.key1 === 'scanned' && keyStatuses.key2 === 'scanned' && keyStatuses.key3 === 'scanned') {
+                try {
+                    console.log(`Auto-updating Redeem Key to TRUE for user ${userRecord.email} - all keys 1,2,3 are scanned`);
+
+                    // Update Redeem Key column (H) to TRUE
+                    await sheets.spreadsheets.values.update({
+                        spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+                        range: `H${userRecord.rowIndex}`,
+                        valueInputOption: 'USER_ENTERED',
+                        resource: {
+                            values: [['TRUE']]
+                        }
+                    });
+
+                    redeemKeyEnabled = true;
+                    console.log(`Redeem Key auto-updated to TRUE for user ${userRecord.email}`);
+                } catch (updateError) {
+                    console.error('Failed to auto-update Redeem Key:', updateError);
+                    // Continue with original value if update fails
+                }
+            }
+
+            res.json({
+                success: true,
                 message: 'User data retrieved successfully',
                 data: {
                     recordId: userRecord.rowIndex.toString(),
                     email: userRecord.email,
                     lastName: userRecord.lastName,
-                    keyStatuses: keyStatuses
+                    keyStatuses: keyStatuses,
+                    redeemKeyEnabled: redeemKeyEnabled
                 }
             });
         } else {
@@ -883,7 +1003,13 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 CMKL OpenHouse secure server running on port ${PORT}`);
-    console.log(`📱 Visit: http://localhost:${PORT}`);
-});
+// For Vercel deployment
+module.exports = app;
+
+// For local development
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`🚀 CMKL OpenHouse secure server running on port ${PORT}`);
+        console.log(`📱 Visit: http://localhost:${PORT}`);
+    });
+}
