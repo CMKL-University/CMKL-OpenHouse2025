@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in Key - CMKL Open House 2025</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000616 url('svg/background.svg') no-repeat center center fixed;
+            background-size: cover;
+            color: #6be4f0;
+            font-family: 'Darker Grotesque', sans-serif;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            margin: 0 auto;
+            background: transparent;
+            max-width: 393px;
+            max-height: 874px;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 3;
+            gap: 30px;
+        }
+
+        /* Top decorative border */
+        .top-border {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            z-index: 5;
+        }
+
+        /* Bottom decorative border */
+        .bottom-border {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            z-index: 5;
+        }
+
+        /* Diagonal decorative element */
+        .diagonal-decoration {
+            position: absolute;
+            top: 50%;
+            right: -50px;
+            transform: translateY(-50%) rotate(45deg);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #6be4f0 50%, transparent 100%);
+            opacity: 0.6;
+            z-index: 4;
+        }
+
+        /* Congratulations text */
+        .congratulations {
+            font-family: 'Orbitron', monospace;
+            font-size: 28px;
+            font-weight: 900;
+            color: #00D17D;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 209, 125, 0.8);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(0, 209, 125, 0.8); }
+            to { text-shadow: 0 0 30px rgba(0, 209, 125, 1), 0 0 40px rgba(0, 209, 125, 0.8); }
+        }
+
+        /* Key visual container */
+        .key-visual {
+            position: relative;
+            margin: 20px 0;
+            z-index: 4;
+        }
+
+        .key-image {
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 0 30px #6BE4F0);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Name and Code containers */
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .name-container, .code-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .namebox-svg, .codebox-svg {
+            filter: drop-shadow(0 0 15px rgba(0, 209, 125, 0.6));
+        }
+
+        .name-text, .code-text {
+            position: absolute;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            color: #000616;
+            z-index: 6;
+        }
+
+        .name-text {
+            font-size: 16px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .code-text {
+            font-size: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            letter-spacing: 2px;
+        }
+
+        /* Back button */
+        .back-button {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #0F2627, #203A43, #2C5530);
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            padding: 12px 30px;
+            color: #00ff41;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 255, 65, 0.3);
+            z-index: 6;
+        }
+
+        .back-button:hover {
+            transform: translateX(-50%) translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 25px rgba(0, 255, 65, 0.4);
+            background: linear-gradient(45deg, #1A3A3B, #2C5A63, #3A7040);
+        }
+
+        /* Copy button for redeem code */
+        .copy-button {
+            margin-top: 10px;
+            background: rgba(0, 209, 125, 0.2);
+            border: 1px solid #00D17D;
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #00D17D;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .copy-button:hover {
+            background: rgba(0, 209, 125, 0.4);
+            transform: scale(1.05);
+        }
+
+        .copy-button.copied {
+            background: rgba(0, 255, 65, 0.3);
+            border-color: #00ff41;
+            color: #00ff41;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .congratulations {
+                font-size: 24px;
+            }
+
+            .name-text {
+                font-size: 14px;
+            }
+
+            .code-text {
+                font-size: 12px;
+                letter-spacing: 1px;
+            }
+
+            .key-image {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            color: #6be4f0;
+            font-family: 'Orbitron', monospace;
+            text-align: center;
+        }
+
+        .loading::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Decorative borders -->
+        <div class="top-border"></div>
+        <div class="bottom-border"></div>
+        <div class="diagonal-decoration"></div>
+
+        <div class="container">
+            <!-- Congratulations text -->
+            <div class="congratulations">CONGRATULATIONS!</div>
+
+            <!-- Key visual -->
+            <div class="key-visual">
+                <img src="svg/key4.svg" alt="Check-in Key" class="key-image">
+            </div>
+
+            <!-- Info section -->
+            <div class="info-section">
+                <!-- Name box -->
+                <div class="name-container">
+                    <svg class="namebox-svg" width="161" height="40" viewBox="0 0 161 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 2.50104V34.5759L6.18881 39H160V6.60915L153.421 1H3.03846L1 2.50104Z" stroke="#00D17D" stroke-width="1.8882" stroke-miterlimit="10"/>
+                        <path opacity="0.3" d="M28.1184 2.49492L26.5449 4.06842V9.10361L33.2323 2.41624L28.1184 2.49492Z" fill="#00D17D"/>
+                        <path d="M10.0986 1L1 10.7348V34.1326V34.4742L5.23005 39H35V1H10.0986Z" fill="#00D17D"/>
+                        <path d="M25.3894 27.5134H10.1265C10.1265 24.3979 12.6755 21.8488 15.7911 21.8488H19.7248C22.8561 21.8488 25.3894 24.3979 25.3894 27.5134Z" fill="white"/>
+                        <path d="M17.8365 20.2753C15.9325 20.2753 14.3748 18.7332 14.3748 16.8136C14.3748 14.9096 15.9325 13.3519 17.8365 13.3519C19.7561 13.3519 21.2981 14.9096 21.2981 16.8136C21.2981 18.7332 19.7561 20.2753 17.8365 20.2753Z" fill="white"/>
+                    </svg>
+                    <div class="name-text" id="nameText">Loading<span class="loading"></span></div>
+                </div>
+
+                <!-- Code box -->
+                <div class="code-container">
+                    <svg class="codebox-svg" width="221" height="66" viewBox="0 0 221 66" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M67.2523 2H20.0601L2 33.2875L20.0601 64.575H201.523L219.583 33.2875L201.523 2H189.203" stroke="#00D17D" stroke-width="2.1781" stroke-miterlimit="10"/>
+                        <path d="M42.0671 64.575L50.6888 55.9761H121.681L129.917 64.212L42.0671 64.575Z" fill="#00D17D"/>
+                    </svg>
+                    <div class="code-text" id="codeText">Loading<span class="loading"></span></div>
+                </div>
+
+                <button class="copy-button" id="copyButton" onclick="copyRedeemCode()">Copy Redeem Code</button>
+            </div>
+
+            <!-- Back button -->
+            <a href="page2.html" class="back-button">← Back to Portal</a>
+        </div>
+    </div>
+
+    <script>
+        // CRC32 implementation
+        function crc32(str) {
+            const crcTable = [];
+            for (let i = 0; i < 256; i++) {
+                let crc = i;
+                for (let j = 0; j < 8; j++) {
+                    crc = (crc & 1) ? (0xEDB88320 ^ (crc >>> 1)) : (crc >>> 1);
+                }
+                crcTable[i] = crc;
+            }
+
+            let crc = 0 ^ (-1);
+            for (let i = 0; i < str.length; i++) {
+                crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+            }
+            return ((crc ^ (-1)) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+        }
+
+        // Generate redeem code from lastname
+        function generateRedeemCode(lastname) {
+            if (!lastname) return 'INVALID';
+
+            // Generate CRC32 hash of lastname
+            const hash = crc32(lastname.toUpperCase());
+
+            // Format as XXXX-XXXX for better readability
+            return `${hash.substring(0, 4)}-${hash.substring(4, 8)}`;
+        }
+
+        // Copy redeem code to clipboard
+        function copyRedeemCode() {
+            const codeText = document.getElementById('codeText').textContent;
+            if (codeText && codeText !== 'Loading...') {
+                navigator.clipboard.writeText(codeText).then(() => {
+                    const copyButton = document.getElementById('copyButton');
+                    copyButton.textContent = 'Copied!';
+                    copyButton.classList.add('copied');
+
+                    setTimeout(() => {
+                        copyButton.textContent = 'Copy Redeem Code';
+                        copyButton.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy code to clipboard');
+                });
+            }
+        }
+
+        // Load user data and generate redeem code
+        function loadUserData() {
+            // Get user data from localStorage
+            const userEmail = localStorage.getItem('userEmail');
+            const recordId = localStorage.getItem('airtableRecordId');
+
+            console.log('Loading user data:', { userEmail, recordId });
+
+            if (!userEmail || !recordId) {
+                console.error('User not logged in');
+                document.getElementById('nameText').textContent = 'Not Logged In';
+                document.getElementById('codeText').textContent = 'ERROR';
+                return;
+            }
+
+            // Fetch user data to get lastname
+            fetch(`/api/harty/user/${encodeURIComponent(userEmail)}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('User data received:', data);
+
+                    if (data.success && data.data && data.data.lastName) {
+                        const lastname = data.data.lastName;
+                        const redeemCode = generateRedeemCode(lastname);
+
+                        // Display name and code
+                        document.getElementById('nameText').textContent = lastname.toUpperCase();
+                        document.getElementById('codeText').textContent = redeemCode;
+
+                        console.log('Generated redeem code:', redeemCode, 'for lastname:', lastname);
+                    } else {
+                        console.error('Invalid user data:', data);
+                        document.getElementById('nameText').textContent = 'Invalid User';
+                        document.getElementById('codeText').textContent = 'ERROR';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                    document.getElementById('nameText').textContent = 'Network Error';
+                    document.getElementById('codeText').textContent = 'ERROR';
+                });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadUserData);
+    </script>
+</body>
+</html>

@@ -3273,9 +3273,11 @@
                 // Store which key is being scanned
                 localStorage.setItem('selectedKey', cardNumber);
 
-                // Special handling for key2 - navigate to key2.html first
+                // Special handling for key2 and key4
                 if (cardNumber === 2) {
                     window.location.href = 'key2.html';
+                } else if (cardNumber === 4) {
+                    window.location.href = 'key4.html';
                 } else {
                     // Navigate to AR scanner for other keys
                     window.location.href = `scanner.html?key=${cardNumber}`;
