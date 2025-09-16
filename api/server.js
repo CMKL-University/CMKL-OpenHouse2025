@@ -919,6 +919,8 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
 
             // Check if keys 1, 2, 3 are all scanned but Redeem Key is still FALSE
             let redeemKeyEnabled = userRecord.redeemKey === 'TRUE';
+            console.log(`User ${userRecord.email} - Redeem Key: ${userRecord.redeemKey}, Key1: ${keyStatuses.key1}, Key2: ${keyStatuses.key2}, Key3: ${keyStatuses.key3}`);
+
             if (!redeemKeyEnabled && keyStatuses.key1 === 'scanned' && keyStatuses.key2 === 'scanned' && keyStatuses.key3 === 'scanned') {
                 try {
                     console.log(`Auto-updating Redeem Key to TRUE for user ${userRecord.email} - all keys 1,2,3 are scanned`);
