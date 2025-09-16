@@ -4,6 +4,7 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.iife.js"></script>
     <style>
       body {
         margin: 0;
@@ -214,6 +215,40 @@
         box-shadow: 0 6px 25px rgba(0, 255, 65, 0.4);
       }
 
+      .back-button.done {
+        background: linear-gradient(45deg, #00ff41, #6BE4F0, #00ff41);
+        background-size: 200% 200%;
+        border-color: #00ff41;
+        color: #000616;
+        font-weight: 900;
+        animation: futuristicGlow 2s ease-in-out infinite, shimmer 3s linear infinite;
+      }
+
+      .back-button.done:hover {
+        transform: translateX(-50%) translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(0, 255, 65, 0.6), 0 0 30px rgba(107, 228, 240, 0.8);
+      }
+
+      @keyframes futuristicGlow {
+        0%, 100% {
+          box-shadow: 0 4px 20px rgba(0, 255, 65, 0.6), 0 0 20px rgba(107, 228, 240, 0.4);
+        }
+        50% {
+          box-shadow: 0 8px 30px rgba(0, 255, 65, 0.9), 0 0 35px rgba(107, 228, 240, 0.7);
+        }
+      }
+
+      @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      .button-text, .button-done-text {
+        position: relative;
+        display: inline-block;
+        transition: all 0.5s ease;
+      }
+
     </style>
   </head>
   <body>
@@ -238,17 +273,20 @@
     <div id="status" class="status-overlay">SCANNING FOR KEYS...</div>
     
     <!-- Back Button -->
-    <a href="page2.html" class="back-button">← Back to Portal</a>
+    <a href="page2.html" class="back-button" id="backButton">
+      <span class="button-text">← Back to Portal</span>
+      <span class="button-done-text" style="display: none;">✨ Done</span>
+    </a>
     
-    <a-scene 
-      mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/band.mind; maxTrack: 2; uiScanning: #custom-scanning-overlay" 
-      color-space="sRGB" 
-      renderer="colorManagement: true, physicallyCorrectLights" 
-      vr-mode-ui="enabled: false" 
+    <a-scene
+      mindar-image="imageTargetSrc: /model/registration.mind; maxTrack: 2; uiScanning: #custom-scanning-overlay"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <a-asset-item id="bearModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/bear/scene.gltf"></a-asset-item>
+        <a-asset-item id="bearModel" src="/model/magic_key/scene.gltf"></a-asset-item>
         <a-asset-item id="raccoonModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf"></a-asset-item>
       </a-assets>
 
@@ -260,9 +298,9 @@
           id="model1"
           rotation="0 0 0" 
           position="0 0 0" 
-          scale="0.05 0.05 0.05" 
+          scale="0.5 0.5 0.5"
           src="#bearModel"
-          animation__scale="property: scale; to: 0.1 0.1 0.1; startEvents: targetfound; dur: 1000; easing: easeOutBack"
+          animation__scale="property: scale; to: 1.0 1.0 1.0; startEvents: targetfound; dur: 1000; easing: easeOutBack"
           animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
         </a-gltf-model>
       </a-entity>
@@ -285,10 +323,57 @@
     <script>
       let isProcessing = false;
       const statusEl = document.getElementById('status');
-      
+
       // Get user data from localStorage
       const userEmail = localStorage.getItem('userEmail');
       const recordId = localStorage.getItem('airtableRecordId');
+
+      // Debug logging for production troubleshooting
+      console.log('🔍 AR Scanner Debug Info:');
+      console.log('📍 Current URL:', window.location.href);
+      console.log('📂 Base URL:', window.location.origin);
+      console.log('📧 User Email:', userEmail);
+      console.log('🆔 Record ID:', recordId);
+      console.log('🌐 User Agent:', navigator.userAgent);
+      console.log('🔒 HTTPS:', window.location.protocol === 'https:');
+
+      // Check if camera is available
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        console.log('📹 Camera API available');
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            console.log('✅ Camera permission granted');
+            stream.getTracks().forEach(track => track.stop());
+          })
+          .catch(err => {
+            console.error('❌ Camera permission denied or unavailable:', err);
+            statusEl.textContent = '❌ CAMERA ACCESS REQUIRED';
+            statusEl.className = 'status-overlay error-message';
+          });
+      } else {
+        console.error('❌ Camera API not available');
+        statusEl.textContent = '❌ CAMERA NOT SUPPORTED';
+        statusEl.className = 'status-overlay error-message';
+      }
+
+      // Test if model files are accessible
+      fetch('/model/registration.mind')
+        .then(response => {
+          console.log('📄 Mind file status:', response.status, response.ok ? '✅' : '❌');
+          if (!response.ok) {
+            console.error('❌ Mind file not accessible:', response.statusText);
+          }
+        })
+        .catch(err => console.error('❌ Mind file fetch error:', err));
+
+      fetch('/model/magic_key/scene.gltf')
+        .then(response => {
+          console.log('🎭 GLTF model status:', response.status, response.ok ? '✅' : '❌');
+          if (!response.ok) {
+            console.error('❌ GLTF model not accessible:', response.statusText);
+          }
+        })
+        .catch(err => console.error('❌ GLTF model fetch error:', err));
       
       if (!userEmail || !recordId) {
         showStatus('ERROR: User not logged in. Please go back and register.', true);
@@ -302,11 +387,132 @@
       function showCollectedStatus(keyNumber) {
         statusEl.textContent = `✅ KEY #${keyNumber} COLLECTED!`;
         statusEl.className = 'status-overlay collected-message';
-        
+
+        // Transform button to "Done" with futuristic animation
+        transformButtonToDone();
+
         setTimeout(() => {
           statusEl.textContent = 'SCANNING FOR KEYS...';
           statusEl.className = 'status-overlay';
         }, 3000);
+      }
+
+      function transformButtonToDone() {
+        console.log('transformButtonToDone called!'); // Debug
+        const backButton = document.getElementById('backButton');
+        const buttonText = backButton.querySelector('.button-text');
+        const doneText = backButton.querySelector('.button-done-text');
+
+        if (!backButton.classList.contains('done')) {
+          console.log('Transforming button to done state'); // Debug
+
+          // Check if Motion library is available
+          if (typeof Motion !== 'undefined') {
+            console.log('Using Motion library animation'); // Debug
+            // Use Motion library for fantastic animation
+            const { animate } = Motion;
+
+            // First: Scale down and fade out current text
+            animate(buttonText,
+              {
+                scale: [1, 0.3],
+                opacity: [1, 0],
+                rotateY: [0, 180]
+              },
+              {
+                duration: 0.4,
+                easing: "easeInOut"
+              }
+            ).finished.then(() => {
+              buttonText.style.display = 'none';
+              doneText.style.display = 'inline-block';
+              doneText.style.opacity = '0';
+              doneText.style.transform = 'scale(0.3) rotateY(180deg)';
+
+              // Add done class for CSS animations
+              backButton.classList.add('done');
+
+              // Animate in the new text with particle-like effect
+              animate(doneText,
+                {
+                  scale: [0.3, 1.2, 1],
+                  opacity: [0, 1],
+                  rotateY: [180, 0],
+                },
+                {
+                  duration: 0.6,
+                  easing: "easeOutBack"
+                }
+              );
+
+              // Button transformation with glitch effect
+              animate(backButton,
+                {
+                  scale: [1, 1.05, 0.95, 1.02, 1],
+                  rotateZ: [0, -2, 2, -1, 0]
+                },
+                {
+                  duration: 0.8,
+                  easing: "easeOutElastic"
+                }
+              );
+            });
+          } else {
+            console.log('Motion library not available, using CSS fallback'); // Debug
+            // Fallback: Use CSS transitions
+            useCSSFallbackAnimation(backButton, buttonText, doneText);
+          }
+        }
+      }
+
+      function useCSSFallbackAnimation(backButton, buttonText, doneText) {
+        // Add CSS transition classes
+        buttonText.style.transition = 'all 0.4s ease-in-out';
+        doneText.style.transition = 'all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        backButton.style.transition = 'all 0.8s ease-in-out';
+
+        // Start animation
+        buttonText.style.transform = 'scale(0.3) rotateY(180deg)';
+        buttonText.style.opacity = '0';
+
+        setTimeout(() => {
+          buttonText.style.display = 'none';
+          doneText.style.display = 'inline-block';
+          doneText.style.opacity = '0';
+          doneText.style.transform = 'scale(0.3) rotateY(180deg)';
+
+          // Add done class
+          backButton.classList.add('done');
+
+          // Animate in new text
+          setTimeout(() => {
+            doneText.style.transform = 'scale(1.2) rotateY(0deg)';
+            doneText.style.opacity = '1';
+
+            setTimeout(() => {
+              doneText.style.transform = 'scale(1) rotateY(0deg)';
+            }, 300);
+          }, 50);
+
+          // Button glitch effect
+          let glitchStep = 0;
+          const glitchSteps = [
+            'scale(1.05) rotate(-2deg)',
+            'scale(0.95) rotate(2deg)',
+            'scale(1.02) rotate(-1deg)',
+            'scale(1) rotate(0deg)'
+          ];
+
+          const glitchInterval = setInterval(() => {
+            if (glitchStep < glitchSteps.length) {
+              backButton.style.transform = `translateX(-50%) translateY(-2px) ${glitchSteps[glitchStep]}`;
+              glitchStep++;
+            } else {
+              clearInterval(glitchInterval);
+              backButton.style.transform = 'translateX(-50%) translateY(-2px)';
+            }
+          }, 200);
+        }, 400);
       }
 
       async function updateKeyInAirtable(targetIndex) {
@@ -368,6 +574,10 @@
           console.log(`Key #${keyNumber} already scanned - showing status only`);
           statusEl.textContent = `✅ KEY #${keyNumber} ALREADY COLLECTED`;
           statusEl.className = 'status-overlay collected-message';
+
+          // Transform button to "Done" with futuristic animation for already collected keys too
+          transformButtonToDone();
+
           setTimeout(() => {
             statusEl.textContent = 'SCANNING FOR KEYS...';
             statusEl.className = 'status-overlay';
