@@ -50,22 +50,14 @@
 
         .container {
             width: 100%;
-            height: 100vh;
+            height: 100%;
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             padding: 20px;
             z-index: 3;
-        }
-
-        .content-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
             gap: 30px;
         }
 
@@ -199,6 +191,10 @@
 
         /* Back button */
         .back-button {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
             background: linear-gradient(45deg, #0F2627, #203A43, #2C5530);
             border: 2px solid #00ff41;
             border-radius: 15px;
@@ -211,11 +207,10 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 255, 65, 0.3);
             z-index: 6;
-            margin-top: 20px;
         }
 
         .back-button:hover {
-            transform: translateY(-2px) scale(1.05);
+            transform: translateX(-50%) translateY(-2px) scale(1.05);
             box-shadow: 0 6px 25px rgba(0, 255, 65, 0.4);
             background: linear-gradient(45deg, #1A3A3B, #2C5A63, #3A7040);
         }
@@ -295,41 +290,38 @@
         <div class="diagonal-decoration"></div>
 
         <div class="container">
-            <!-- Main content wrapper - centered in Y-axis -->
-            <div class="content-wrapper">
-                <!-- Congratulations text -->
-                <div class="congratulations">CONGRATULATIONS!</div>
+            <!-- Congratulations text -->
+            <div class="congratulations">CONGRATULATIONS!</div>
 
-                <!-- Key visual -->
-                <div class="key-visual">
-                    <img src="svg/key4.svg" alt="Your redeem code" class="key-image">
+            <!-- Key visual -->
+            <div class="key-visual">
+                <img src="svg/key4.svg" alt="Your redeem code" class="key-image">
+            </div>
+
+            <!-- Info section -->
+            <div class="info-section">
+                <!-- Name box -->
+                <div class="name-container">
+                    <svg class="namebox-svg" width="161" height="40" viewBox="0 0 161 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 2.50104V34.5759L6.18881 39H160V6.60915L153.421 1H3.03846L1 2.50104Z" stroke="#00D17D" stroke-width="1.8882" stroke-miterlimit="10"/>
+                        <path opacity="0.3" d="M28.1184 2.49492L26.5449 4.06842V9.10361L33.2323 2.41624L28.1184 2.49492Z" fill="#00D17D"/>
+                        <path d="M10.0986 1L1 10.7348V34.1326V34.4742L5.23005 39H35V1H10.0986Z" fill="#00D17D"/>
+                        <path d="M25.3894 27.5134H10.1265C10.1265 24.3979 12.6755 21.8488 15.7911 21.8488H19.7248C22.8561 21.8488 25.3894 24.3979 25.3894 27.5134Z" fill="white"/>
+                        <path d="M17.8365 20.2753C15.9325 20.2753 14.3748 18.7332 14.3748 16.8136C14.3748 14.9096 15.9325 13.3519 17.8365 13.3519C19.7561 13.3519 21.2981 14.9096 21.2981 16.8136C21.2981 18.7332 19.7561 20.2753 17.8365 20.2753Z" fill="white"/>
+                    </svg>
+                    <div class="name-text" id="nameText">Loading<span class="loading"></span></div>
                 </div>
 
-                <!-- Info section -->
-                <div class="info-section">
-                    <!-- Name box -->
-                    <div class="name-container">
-                        <svg class="namebox-svg" width="161" height="40" viewBox="0 0 161 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 2.50104V34.5759L6.18881 39H160V6.60915L153.421 1H3.03846L1 2.50104Z" stroke="#00D17D" stroke-width="1.8882" stroke-miterlimit="10"/>
-                            <path opacity="0.3" d="M28.1184 2.49492L26.5449 4.06842V9.10361L33.2323 2.41624L28.1184 2.49492Z" fill="#00D17D"/>
-                            <path d="M10.0986 1L1 10.7348V34.1326V34.4742L5.23005 39H35V1H10.0986Z" fill="#00D17D"/>
-                            <path d="M25.3894 27.5134H10.1265C10.1265 24.3979 12.6755 21.8488 15.7911 21.8488H19.7248C22.8561 21.8488 25.3894 24.3979 25.3894 27.5134Z" fill="white"/>
-                            <path d="M17.8365 20.2753C15.9325 20.2753 14.3748 18.7332 14.3748 16.8136C14.3748 14.9096 15.9325 13.3519 17.8365 13.3519C19.7561 13.3519 21.2981 14.9096 21.2981 16.8136C21.2981 18.7332 19.7561 20.2753 17.8365 20.2753Z" fill="white"/>
-                        </svg>
-                        <div class="name-text" id="nameText">Loading<span class="loading"></span></div>
-                    </div>
-
-                    <!-- Code box -->
-                    <div class="code-container">
-                        <svg class="codebox-svg" width="221" height="66" viewBox="0 0 221 66" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M67.2523 2H20.0601L2 33.2875L20.0601 64.575H201.523L219.583 33.2875L201.523 2H189.203" stroke="#00D17D" stroke-width="2.1781" stroke-miterlimit="10"/>
-                            <path d="M42.0671 64.575L50.6888 55.9761H121.681L129.917 64.212L42.0671 64.575Z" fill="#00D17D"/>
-                        </svg>
-                        <div class="code-text" id="codeText">Loading<span class="loading"></span></div>
-                    </div>
-
-                    <button class="copy-button" id="copyButton" onclick="copyRedeemCode()">Copy Redeem Code</button>
+                <!-- Code box -->
+                <div class="code-container">
+                    <svg class="codebox-svg" width="221" height="66" viewBox="0 0 221 66" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M67.2523 2H20.0601L2 33.2875L20.0601 64.575H201.523L219.583 33.2875L201.523 2H189.203" stroke="#00D17D" stroke-width="2.1781" stroke-miterlimit="10"/>
+                        <path d="M42.0671 64.575L50.6888 55.9761H121.681L129.917 64.212L42.0671 64.575Z" fill="#00D17D"/>
+                    </svg>
+                    <div class="code-text" id="codeText">Loading<span class="loading"></span></div>
                 </div>
+
+                <button class="copy-button" id="copyButton" onclick="copyRedeemCode()">Copy Redeem Code</button>
             </div>
 
             <!-- Back button -->
