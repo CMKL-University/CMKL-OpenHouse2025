@@ -374,6 +374,26 @@
           }
         })
         .catch(err => console.error('❌ GLTF model fetch error:', err));
+
+      // Test binary file (.bin) accessibility
+      fetch('/model/magic_key/scene.bin')
+        .then(response => {
+          console.log('🔧 GLTF binary status:', response.status, response.ok ? '✅' : '❌');
+          if (!response.ok) {
+            console.error('❌ GLTF binary not accessible:', response.statusText);
+          }
+        })
+        .catch(err => console.error('❌ GLTF binary fetch error:', err));
+
+      // Test texture file accessibility
+      fetch('/model/magic_key/textures/Material.001_baseColor.jpeg')
+        .then(response => {
+          console.log('🖼️ Texture file status:', response.status, response.ok ? '✅' : '❌');
+          if (!response.ok) {
+            console.error('❌ Texture file not accessible:', response.statusText);
+          }
+        })
+        .catch(err => console.error('❌ Texture file fetch error:', err));
       
       if (!userEmail || !recordId) {
         showStatus('ERROR: User not logged in. Please go back and register.', true);
