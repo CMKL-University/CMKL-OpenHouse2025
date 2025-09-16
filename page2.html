@@ -2984,6 +2984,7 @@
                     localStorage.setItem('userKeyStatuses', JSON.stringify(data.data.keyStatuses));
                     localStorage.setItem('userRecordId', data.data.recordId);
                     localStorage.setItem('userLastName', data.data.lastName);
+                    localStorage.setItem('redeemKeyEnabled', data.data.redeemKeyEnabled || false);
                     
                     // Update the display
                     updateKeyStatusDisplay();
@@ -3066,9 +3067,11 @@
                     card.classList.remove('key-available', 'key-collected', 'key-locked');
 
                     if (i === 4) {
-                        // Special handling for 4th card (locked until 2 keys scanned)
-                        if (scannedCount >= 2) {
-                            // Unlock the 4th card
+                        // Special handling for 4th card - check both scanned count AND redeem key status
+                        const redeemKeyEnabled = localStorage.getItem('redeemKeyEnabled') === 'true';
+
+                        if (scannedCount >= 2 && redeemKeyEnabled) {
+                            // Unlock the 4th card only if redeem key is enabled
                             card.classList.remove('locked');
                             if (keyStatus === 'scanned') {
                                 // Show check-in key SVG when scanned
@@ -3084,10 +3087,17 @@
                                 card.classList.add('key-available');
                             }
                         } else {
-                            // Keep 4th card locked with unknown icon
+                            // Keep 4th card locked - either not enough keys or redeem key disabled
                             card.classList.add('locked', 'key-locked');
                             cardIcon.innerHTML = `<img src="svg/unknow.svg" alt="Locked Key" style="width: 100%; height: 100%; object-fit: contain;"/>`;
                             card.style.opacity = '0.6';
+
+                            // Show different message based on condition
+                            if (scannedCount < 2) {
+                                card.title = 'Scan 2 keys first to unlock';
+                            } else {
+                                card.title = 'Complete keys 1, 2, and 3 to unlock redeem code';
+                            }
                         }
                     } else {
                         // Normal cards (1-3) - conditional key display logic
@@ -3239,11 +3249,20 @@
             const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
             const keyStatus = keyStatuses[`key${cardNumber}`] || 'not_scanned';
             
+            // Special check for key 4 - verify redeem key is enabled
+            if (cardNumber === 4) {
+                const redeemKeyEnabled = localStorage.getItem('redeemKeyEnabled') === 'true';
+                if (!redeemKeyEnabled) {
+                    showVRMessage('Complete keys 1, 2, and 3 first to unlock redeem code!');
+                    return;
+                }
+            }
+
             // Check if key is already scanned
             if (keyStatus === 'scanned') {
                 // Show confirmation for rescanning
                 showVRMessage(`Key ${cardNumber} already scanned! Scan again?`);
-                
+
                 // Add temporary click handler for confirmation
                 const confirmHandler = function(e) {
                     if (e.target.closest('.nav-card')) {
@@ -3251,11 +3270,11 @@
                         proceedToScanner(cardNumber, selectedCard);
                     }
                 };
-                
+
                 setTimeout(() => {
                     document.addEventListener('click', confirmHandler);
                 }, 1000);
-                
+
                 return;
             }
             

@@ -917,14 +917,15 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                 key4: userRecord.checkin === 'scanned' ? 'scanned' : 'not_scanned' // Column D
             };
 
-            res.json({ 
-                success: true, 
+            res.json({
+                success: true,
                 message: 'User data retrieved successfully',
                 data: {
                     recordId: userRecord.rowIndex.toString(),
                     email: userRecord.email,
                     lastName: userRecord.lastName,
-                    keyStatuses: keyStatuses
+                    keyStatuses: keyStatuses,
+                    redeemKeyEnabled: userRecord.redeemKey === 'TRUE'
                 }
             });
         } else {
