@@ -61,6 +61,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
+// Mount svg and model folders for Vercel deployment
+app.use('/svg', express.static(path.join(__dirname, '..', 'svg')));
+app.use('/model', express.static(path.join(__dirname, '..', 'model')));
+
 // In-memory storage (replace with database in production)
 const sessions = new Map();
 const userInteractions = new Map();
