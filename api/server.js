@@ -954,6 +954,7 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                     recordId: userRecord.rowIndex.toString(),
                     email: userRecord.email,
                     lastName: userRecord.lastName,
+                    checkinStatus: userRecord.checkin, // Add check-in status from spreadsheet
                     keyStatuses: keyStatuses,
                     redeemKeyEnabled: redeemKeyEnabled
                 }
