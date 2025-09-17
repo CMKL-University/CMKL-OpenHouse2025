@@ -16,6 +16,42 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap"></noscript>
 
+    <!-- Preload key pages during loading phase -->
+    <link rel="prefetch" href="key2.html" as="document">
+    <link rel="prefetch" href="key4.html" as="document">
+    <link rel="prefetch" href="scanner.html" as="document">
+    <link rel="prefetch" href="scanner-auto.html" as="document">
+
+    <!-- Preload AR models for better AR experience -->
+    <link rel="preload" href="model/key1.glb" as="fetch" crossorigin>
+    <link rel="preload" href="model/key_1_3.gltf" as="fetch" crossorigin>
+    <link rel="preload" href="model/registration.mind" as="fetch" crossorigin>
+
+    <!-- Preload key SVG assets -->
+    <link rel="preload" href="svg/key1.svg" as="image">
+    <link rel="preload" href="svg/key2.svg" as="image">
+    <link rel="preload" href="svg/key3.svg" as="image">
+    <link rel="preload" href="svg/key4.svg" as="image">
+
+    <!-- Preload A-Frame and MindAR camera libraries for scanner pages -->
+    <link rel="preload" href="https://aframe.io/releases/1.5.0/aframe.min.js" as="script" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js" as="script" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js" as="script" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.iife.js" as="script" crossorigin>
+
+    <!-- Preload AR example models and targets -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/bear/scene.gltf" as="fetch" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf" as="fetch" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/band.mind" as="fetch" crossorigin>
+
+    <!-- Preload magic key AR model and its assets (scanner.html specific) -->
+    <link rel="preload" href="model/magic_key/scene.gltf" as="fetch" crossorigin>
+    <link rel="preload" href="model/magic_key/scene.bin" as="fetch" crossorigin>
+    <link rel="preload" href="model/magic_key/textures/Material.001_baseColor.jpeg" as="image" crossorigin>
+    <link rel="preload" href="model/magic_key/textures/Material.001_emissive.jpeg" as="image" crossorigin>
+    <link rel="preload" href="model/magic_key/textures/Material.001_normal.jpeg" as="image" crossorigin>
+    <link rel="preload" href="model/magic_key/textures/Material.001_metallicRoughness.png" as="image" crossorigin>
+
     <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.iife.js"></script>
     <!-- Configuration -->
     <script src="config.js?v=20250904"></script>
@@ -2722,7 +2758,7 @@
             <!-- Header -->
             <div class="loading-header">
                 <h1>LOADING PORTAL...</h1>
-                <p>Fetching key status data</p>
+                <p>Preloading AR camera & models, fetching key data</p>
             </div>
             
             <!-- Main Loading Animation -->
@@ -3042,6 +3078,7 @@
         // Initialize page with Ready Player One style loading
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('CMKL Openhouse 2025 - Portal Loading...');
+            console.log('✅ Scanner libraries preloaded: A-Frame, MindAR, Motion.js, and AR models');
 
             // Progressive font loading to prevent mobile CLS
             if ('fonts' in document) {
@@ -3086,7 +3123,7 @@
         function hideLoadingScreen() {
             const loadingScreen = document.getElementById('loadingScreen');
             const mainContainer = document.querySelector('.main-container');
-            
+
             if (loadingScreen) {
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
@@ -3115,12 +3152,18 @@
                 
                 if (data.success) {
                     console.log('Fresh user data retrieved:', data.data);
-                    
+                    console.log('=== STORING USER DATA ===');
+                    console.log('keyStatuses being stored:', data.data.keyStatuses);
+                    console.log('checkinStatus from API:', data.data.checkinStatus);
+
                     // Update localStorage with fresh data
                     localStorage.setItem('userKeyStatuses', JSON.stringify(data.data.keyStatuses));
                     localStorage.setItem('userRecordId', data.data.recordId);
                     localStorage.setItem('userLastName', data.data.lastName);
+                    localStorage.setItem('userCheckinStatus', data.data.checkinStatus || ''); // Store check-in status
                     localStorage.setItem('redeemKeyEnabled', data.data.redeemKeyEnabled || false);
+
+                    console.log('Stored in localStorage:', localStorage.getItem('userKeyStatuses'));
                     
                     // Update the display
                     updateKeyStatusDisplay();
@@ -3170,7 +3213,25 @@
                 if (document.getElementById('lastNameDisplay')) {
                     document.getElementById('lastNameDisplay').textContent = freshLastName.toUpperCase();
                 }
-                
+
+                // Check if should show rules modal - using direct check-in status
+                setTimeout(() => {
+                    const checkinStatus = localStorage.getItem('userCheckinStatus');
+                    const isCheckedIn = (checkinStatus === 'checked-in' || checkinStatus === 'scanned');
+
+                    console.log('=== RULES MODAL CHECK ===');
+                    console.log('checkinStatus from spreadsheet:', checkinStatus);
+                    console.log('isCheckedIn:', isCheckedIn);
+
+                    // Only show rules modal if user hasn't checked in yet
+                    if (!isCheckedIn) {
+                        console.log('User NOT checked in - showing rules modal');
+                        showRules();
+                    } else {
+                        console.log('User IS checked in - NOT showing rules modal');
+                    }
+                }, 500);
+
                 return true;
             } catch (error) {
                 console.error('Error during user session check:', error);
@@ -3281,7 +3342,7 @@
         }
         
         function startMainAnimations() {
-            
+
             // Cyberpunk animation sequence
             const cyberpunkElements = [
                 '.top-border',
@@ -3770,7 +3831,7 @@
         function showRules() {
             const modal = document.getElementById('rulesModal');
             modal.style.display = 'flex';
-            
+
             // Add glitchy entrance animation
             modal.style.animation = 'modalGlitchIn 0.4s ease-out';
             modal.style.opacity = '1';
@@ -3947,10 +4008,7 @@
             // Display the user's last name from localStorage
             displayUserLastName();
             
-            // Auto-show rules modal after a short delay
-            setTimeout(() => {
-                showRules();
-            }, 800);
+            // Auto-show rules modal is now handled after fresh data is loaded in checkUserSession
             
             document.querySelectorAll('.nav-card').forEach((card, index) => {
                 card.addEventListener('mouseenter', function() {

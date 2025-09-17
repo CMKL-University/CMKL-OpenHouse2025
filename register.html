@@ -7,6 +7,34 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>CMKL Openhouse 2025 - Welcome</title>
+
+    <!-- Preload page2.html assets during AR experience initialization -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+
+    <!-- Preload critical fonts for page2.html -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap" as="style">
+
+    <!-- Preload page2.html document -->
+    <link rel="prefetch" href="page2.html" as="document">
+
+    <!-- Preload key SVG assets for page2.html -->
+    <link rel="preload" href="svg/key1.svg" as="image">
+    <link rel="preload" href="svg/key2.svg" as="image">
+    <link rel="preload" href="svg/key3.svg" as="image">
+    <link rel="preload" href="svg/key4.svg" as="image">
+    <link rel="preload" href="svg/background.svg" as="image">
+
+    <!-- Preload AR models for page2.html -->
+    <link rel="preload" href="model/key1.glb" as="fetch" crossorigin>
+    <link rel="preload" href="model/key_1_3.gltf" as="fetch" crossorigin>
+    <link rel="preload" href="model/registration.mind" as="fetch" crossorigin>
+
+    <!-- Preload A-Frame and AR libraries -->
+    <link rel="preload" href="https://aframe.io/releases/1.5.0/aframe.min.js" as="script" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js" as="script" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js" as="script" crossorigin>
+
     <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.iife.js"></script>
     <!-- Configuration -->
     <script src="config.js?v=20250904"></script>
@@ -1889,9 +1917,99 @@
                     debugLog.innerHTML = '<div class="debug-line">[00:00:00] System initialization started...</div>';
                 }
                 updateProgress(0, 'INITIALIZING...');
+                console.log('🚀 Starting AR experience initialization - preloading page2.html assets in background...');
+
+                // Actively preload page2.html assets during initialization
+                preloadPage2Assets();
             }
         }
         
+        // Actively preload and cache page2.html assets during initialization
+        async function preloadPage2Assets() {
+            console.log('📦 Starting active preload of page2.html assets...');
+
+            // Assets to preload
+            const assetsToPreload = [
+                // Core page
+                { url: 'page2.html', type: 'document' },
+
+                // Fonts
+                { url: 'https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap', type: 'style' },
+
+                // SVG assets
+                { url: 'svg/key1.svg', type: 'image' },
+                { url: 'svg/key2.svg', type: 'image' },
+                { url: 'svg/key3.svg', type: 'image' },
+                { url: 'svg/key4.svg', type: 'image' },
+                { url: 'svg/background.svg', type: 'image' },
+
+                // AR models
+                { url: 'model/key1.glb', type: 'fetch' },
+                { url: 'model/key_1_3.gltf', type: 'fetch' },
+                { url: 'model/registration.mind', type: 'fetch' },
+
+                // AR libraries
+                { url: 'https://aframe.io/releases/1.5.0/aframe.min.js', type: 'script' },
+                { url: 'https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js', type: 'script' },
+                { url: 'https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js', type: 'script' }
+            ];
+
+            let loadedCount = 0;
+            const totalAssets = assetsToPreload.length;
+
+            console.log(`📋 Total assets to preload: ${totalAssets}`);
+
+            // Preload each asset
+            for (const asset of assetsToPreload) {
+                try {
+                    console.log(`⬇️ Preloading: ${asset.url}`);
+
+                    if (asset.type === 'fetch' || asset.type === 'document' || asset.type === 'style') {
+                        // Use fetch for data assets
+                        const response = await fetch(asset.url);
+                        if (response.ok) {
+                            // For text/css assets, read the content to cache it
+                            if (asset.type === 'style' || asset.type === 'document') {
+                                await response.text();
+                            } else {
+                                await response.blob();
+                            }
+                            loadedCount++;
+                            console.log(`✅ Cached: ${asset.url}`);
+                        }
+                    } else if (asset.type === 'image') {
+                        // Use Image object for images
+                        const img = new Image();
+                        await new Promise((resolve, reject) => {
+                            img.onload = () => {
+                                loadedCount++;
+                                console.log(`✅ Cached image: ${asset.url}`);
+                                resolve();
+                            };
+                            img.onerror = reject;
+                            img.src = asset.url;
+                        });
+                    } else if (asset.type === 'script') {
+                        // Create script element to preload JS
+                        const script = document.createElement('link');
+                        script.rel = 'preload';
+                        script.as = 'script';
+                        script.href = asset.url;
+                        script.crossOrigin = 'anonymous';
+                        document.head.appendChild(script);
+                        loadedCount++;
+                        console.log(`✅ Preload initiated: ${asset.url}`);
+                    }
+                } catch (error) {
+                    console.warn(`⚠️ Failed to preload ${asset.url}:`, error);
+                    loadedCount++; // Continue even if some assets fail
+                }
+            }
+
+            console.log(`🎉 Preloading complete! ${loadedCount}/${totalAssets} assets processed`);
+            console.log('💾 page2.html assets are now cached and ready for instant loading!');
+        }
+
         function hideLoadingScreen() {
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) {

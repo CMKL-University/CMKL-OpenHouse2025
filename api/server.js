@@ -916,12 +916,14 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                 key1: userRecord.registerKey === 'scanned' ? 'scanned' : 'not_scanned', // Column E
                 key2: userRecord.projectShowcaseKey === 'scanned' ? 'scanned' : 'not_scanned', // Column F
                 key3: userRecord.afternoonSessionKey === 'scanned' ? 'scanned' : 'not_scanned', // Column G
-                key4: userRecord.checkin === 'scanned' ? 'scanned' : 'not_scanned' // Column D
+                key4: (userRecord.checkin === 'scanned' || userRecord.checkin === 'checked-in') ? 'scanned' : 'not_scanned' // Column D - check-in status
             };
 
             // Check if keys 1, 2, 3 are all scanned but Redeem Key is still FALSE
             let redeemKeyEnabled = userRecord.redeemKey === 'TRUE';
-            console.log(`User ${userRecord.email} - Redeem Key: ${userRecord.redeemKey}, Key1: ${keyStatuses.key1}, Key2: ${keyStatuses.key2}, Key3: ${keyStatuses.key3}`);
+            console.log(`User ${userRecord.email} - Redeem Key: ${userRecord.redeemKey}, Key1: ${keyStatuses.key1}, Key2: ${keyStatuses.key2}, Key3: ${keyStatuses.key3}, Key4: ${keyStatuses.key4}`);
+            console.log('=== SENDING KEY STATUSES TO FRONTEND ===');
+            console.log('keyStatuses object:', JSON.stringify(keyStatuses, null, 2));
 
             if (!redeemKeyEnabled && keyStatuses.key1 === 'scanned' && keyStatuses.key2 === 'scanned' && keyStatuses.key3 === 'scanned') {
                 try {
