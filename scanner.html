@@ -353,39 +353,70 @@
 
       // Get user data from localStorage
       const userEmail = localStorage.getItem('userEmail');
-      const recordId = localStorage.getItem('airtableRecordId');
+      const recordId = localStorage.getItem('userRecordId');
 
-      // Check if this is Innovation Key scanning
+      // Check key type from URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const keyType = urlParams.get('key');
       const isInnovationKey = keyType === 'key2';
+      const isWonderKey = keyType === 'key3';
 
-      console.log('🔑 Key Type:', keyType, '| Innovation Key:', isInnovationKey);
+      console.log('🔑 Key Type:', keyType, '| Innovation Key:', isInnovationKey, '| Wonder Key:', isWonderKey);
 
-      // Set the correct back button href for Innovation Key mode
+      // Set the correct back button href for special key modes
       if (isInnovationKey) {
         const backButton = document.getElementById('backButton');
         backButton.href = 'key2.html';
         console.log('🔗 Back button redirected to key2.html for Innovation Key mode');
+      } else if (isWonderKey) {
+        const backButton = document.getElementById('backButton');
+        backButton.href = 'key3.html';
+        console.log('🔗 Back button redirected to key3.html for Wonder Key mode');
       }
 
       // Set the correct .mind file for Innovation Key
       if (isInnovationKey) {
         const sceneElement = document.getElementById('ar-scene');
-        // Start with the first Innovation Key target
-        const innovationMindFile = 'model/Innovation_key/1.mind';
+
+        // Check URL parameter for specific Innovation target
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetParam = urlParams.get('target') || '2'; // Default to target 2 for Innovation Key
+        const targetIndex = parseInt(targetParam) - 1; // Convert to 0-based index
+
+        // Use the specific Innovation Key target
+        const innovationMindFile = `model/Innovation_key/${targetParam}.mind`;
         sceneElement.setAttribute('mindar-image', `imageTargetSrc: ${innovationMindFile}; maxTrack: 1; uiScanning: #custom-scanning-overlay`);
         console.log('🎯 Using Innovation Key file:', innovationMindFile);
-        console.log('🎯 Current target: IN1 (will cycle through IN1-IN4)');
+        console.log(`🎯 Current target: IN${targetParam}`);
 
-        // Store which mind files we need to cycle through
-        window.innovationMindFiles = [
-          'model/Innovation_key/1.mind',
-          'model/Innovation_key/2.mind',
-          'model/Innovation_key/3.mind',
-          'model/Innovation_key/4.mind'
-        ];
-        window.currentMindFileIndex = 0;
+        // Store current target info
+        window.currentInnovationTarget = {
+          index: targetIndex,
+          number: parseInt(targetParam),
+          mindFile: innovationMindFile,
+          key: `in${targetParam}`
+        };
+      } else if (isWonderKey) {
+        const sceneElement = document.getElementById('ar-scene');
+
+        // Check URL parameter for specific Wonder Key target
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetParam = urlParams.get('target') || '1'; // Default to target 1 for Wonder Key
+        const targetIndex = parseInt(targetParam) - 1; // Convert to 0-based index
+
+        // Use the specific Wonder Key target
+        const wonderMindFile = `model/Wonder_key/${targetParam}.mind`;
+        sceneElement.setAttribute('mindar-image', `imageTargetSrc: ${wonderMindFile}; maxTrack: 1; uiScanning: #custom-scanning-overlay`);
+        console.log('🎯 Using Wonder Key file:', wonderMindFile);
+        console.log(`🎯 Current target: WD${targetParam}`);
+
+        // Store current target info
+        window.currentWonderTarget = {
+          index: targetIndex,
+          number: parseInt(targetParam),
+          mindFile: wonderMindFile,
+          key: `wd${targetParam}`
+        };
       } else {
         console.log('🎯 Using default registration.mind file');
       }
@@ -458,8 +489,38 @@
         .catch(err => console.error('❌ Texture file fetch error:', err));
       
       if (!userEmail || !recordId) {
-        showStatus('ERROR: User not logged in. Please go back and register.', true);
+        showStatus('ERROR: User not logged in. Redirecting to registration...', true);
+        setTimeout(() => {
+          window.location.href = 'register.html';
+        }, 2000);
+      } else {
+
+      // Load Innovation progress from server for accurate duplicate checking
+      async function loadProgressFromServer() {
+        if ((isInnovationKey || isWonderKey) && userEmail) {
+          try {
+            const keyTypeName = isInnovationKey ? 'Innovation' : 'Wonder';
+            console.log(`🔄 Loading ${keyTypeName} progress from server for duplicate checking...`);
+            const response = await fetch(`/api/harty/user/${encodeURIComponent(userEmail)}`);
+            const userData = await response.json();
+
+            if (userData.success) {
+              if (isInnovationKey && userData.data.innovationProgress) {
+                console.log('✅ Server Innovation progress loaded:', userData.data.innovationProgress);
+                localStorage.setItem('innovationProgress', JSON.stringify(userData.data.innovationProgress));
+              } else if (isWonderKey && userData.data.wonderProgress) {
+                console.log('✅ Server Wonder progress loaded:', userData.data.wonderProgress);
+                localStorage.setItem('wonderProgress', JSON.stringify(userData.data.wonderProgress));
+              }
+            }
+          } catch (error) {
+            console.error(`❌ Failed to load ${keyTypeName} progress from server:`, error);
+          }
+        }
       }
+
+      // Load server data when scanner initializes
+      loadProgressFromServer();
 
       function showStatus(message, isError = false) {
         statusEl.textContent = message;
@@ -607,6 +668,11 @@
           keyNumber = targetIndex + 1;
           keyField = `in${keyNumber} status`;
           console.log(`Auto-collecting Innovation AR Target #${keyNumber} (IN${keyNumber})...`);
+        } else if (isWonderKey) {
+          // For Wonder Key, use WD1-WD5 fields
+          keyNumber = targetIndex + 1;
+          keyField = `wd${keyNumber} status`;
+          console.log(`Auto-collecting Wonder Key #${keyNumber} (WD${keyNumber})...`);
         } else {
           // For regular keys, use key1-key4 fields
           keyNumber = targetIndex + 1;
@@ -630,25 +696,55 @@
           const data = await response.json();
           
           if (data.success) {
-            if (isInnovationKey) {
-              console.log(`Innovation AR Target #${keyNumber} (IN${keyNumber}) successfully saved`);
-
-              // Update localStorage for innovation progress
-              const innovationStatuses = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
-              innovationStatuses[`in${keyNumber}`] = 'scanned';
-              localStorage.setItem('innovationProgress', JSON.stringify(innovationStatuses));
+            // Check if this was a duplicate scan
+            if (data.duplicate) {
+              console.log(`⚠️ Duplicate scan detected: ${data.message}`);
+              if (isInnovationKey) {
+                console.log(`Innovation AR Target #${keyNumber} (IN${keyNumber}) already scanned - no update needed`);
+              } else if (isWonderKey) {
+                console.log(`Wonder Key #${keyNumber} (WD${keyNumber}) already scanned - no update needed`);
+              } else {
+                console.log(`Key #${keyNumber} already scanned - no update needed`);
+              }
+              return 'duplicate';
             } else {
-              console.log(`Key #${keyNumber} successfully saved to Airtable`);
+              // Normal successful scan
+              if (isInnovationKey) {
+                console.log(`Innovation AR Target #${keyNumber} (IN${keyNumber}) successfully saved`);
 
-              // Update localStorage
-              const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
-              keyStatuses[`key${keyNumber}`] = 'scanned';
-              localStorage.setItem('userKeyStatuses', JSON.stringify(keyStatuses));
+                // Update localStorage for innovation progress
+                const innovationStatuses = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
+                innovationStatuses[`in${keyNumber}`] = 'scanned';
+                localStorage.setItem('innovationProgress', JSON.stringify(innovationStatuses));
+              } else if (isWonderKey) {
+                console.log(`Wonder Key #${keyNumber} (WD${keyNumber}) successfully saved`);
+
+                // Update localStorage for wonder progress
+                const wonderStatuses = JSON.parse(localStorage.getItem('wonderProgress') || '{}');
+                wonderStatuses[`wd${keyNumber}`] = 'scanned';
+                localStorage.setItem('wonderProgress', JSON.stringify(wonderStatuses));
+              } else {
+                console.log(`Key #${keyNumber} successfully saved to Airtable`);
+
+                // Update localStorage
+                const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
+                keyStatuses[`key${keyNumber}`] = 'scanned';
+                localStorage.setItem('userKeyStatuses', JSON.stringify(keyStatuses));
+              }
+
+              return true;
             }
-
-            return true;
           } else {
             console.error('Failed to update:', data.error);
+
+            // Check if it's an invalid recordId error (user not logged in)
+            if (data.error && data.error.includes('Invalid recordId')) {
+              showStatus('ERROR: Please register first before scanning', true);
+              setTimeout(() => {
+                window.location.href = 'register.html';
+              }, 3000);
+            }
+
             return false;
           }
         } catch (error) {
@@ -657,15 +753,24 @@
         }
       }
 
-      function checkIfAlreadyScanned(targetIndex) {
-        const keyNumber = targetIndex + 1;
-
+      function checkIfAlreadyScanned(targetIndex, keyNumber = null) {
         if (isInnovationKey) {
+          // For Innovation Keys, use the actual Innovation Key number (IN1, IN2, IN3, IN4)
           const innovationStatuses = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
-          return innovationStatuses[`in${keyNumber}`] === 'scanned';
+          const keyToCheck = keyNumber ? `in${keyNumber}` : `in${targetIndex + 1}`;
+          console.log(`🔍 Checking if ${keyToCheck.toUpperCase()} is already scanned:`, innovationStatuses[keyToCheck]);
+          return innovationStatuses[keyToCheck] === 'scanned';
+        } else if (isWonderKey) {
+          // For Wonder Keys, use the actual Wonder Key number (WD1, WD2, WD3, WD4, WD5)
+          const wonderStatuses = JSON.parse(localStorage.getItem('wonderProgress') || '{}');
+          const keyToCheck = keyNumber ? `wd${keyNumber}` : `wd${targetIndex + 1}`;
+          console.log(`🔍 Checking if ${keyToCheck.toUpperCase()} is already scanned:`, wonderStatuses[keyToCheck]);
+          return wonderStatuses[keyToCheck] === 'scanned';
         } else {
+          // For regular keys, use target index
+          const keyNum = targetIndex + 1;
           const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
-          return keyStatuses[`key${keyNumber}`] === 'scanned';
+          return keyStatuses[`key${keyNum}`] === 'scanned';
         }
       }
 
@@ -676,17 +781,37 @@
         let keyNumber = targetIndex + 1;
 
         if (isInnovationKey) {
-          // For Innovation Keys, map to current mind file index
-          actualTargetIndex = window.currentMindFileIndex || 0;
-          keyNumber = actualTargetIndex + 1;
-          console.log(`🎯 Innovation AR Target detected!`);
-          console.log(`🎯 Current mind file index: ${window.currentMindFileIndex}`);
-          console.log(`🎯 Mapping to IN${keyNumber} (actualTargetIndex: ${actualTargetIndex})`);
+          // For Innovation Keys, use the current target information
+          const currentTarget = window.currentInnovationTarget;
+          actualTargetIndex = currentTarget.index;
+          keyNumber = currentTarget.number;
+          const innovationKey = currentTarget.key;
 
-          // Check if already scanned
-          if (checkIfAlreadyScanned(actualTargetIndex)) {
-            console.log(`Innovation Target IN${keyNumber} already scanned - showing status only`);
-            statusEl.textContent = `✅ INNOVATION TARGET IN${keyNumber} ALREADY SCANNED`;
+          console.log(`🎯 Innovation AR Target detected!`);
+          console.log(`🎯 Mind file: ${currentTarget.mindFile}`);
+          console.log(`🎯 Mapping to ${innovationKey.toUpperCase()} (actualTargetIndex: ${actualTargetIndex})`);
+
+          // Check if already scanned using the actual Innovation Key number
+          if (checkIfAlreadyScanned(actualTargetIndex, keyNumber)) {
+            console.log(`Innovation Target ${innovationKey.toUpperCase()} already scanned - showing status only`);
+            statusEl.textContent = `✅ INNOVATION TARGET ${innovationKey.toUpperCase()} ALREADY SCANNED`;
+            statusEl.className = 'status-overlay collected-message';
+          }
+        } else if (isWonderKey) {
+          // For Wonder Keys, use the current target information
+          const currentTarget = window.currentWonderTarget;
+          actualTargetIndex = currentTarget.index;
+          keyNumber = currentTarget.number;
+          const wonderKey = currentTarget.key;
+
+          console.log(`🎯 Wonder Key Target detected!`);
+          console.log(`🎯 Mind file: ${currentTarget.mindFile}`);
+          console.log(`🎯 Mapping to ${wonderKey.toUpperCase()} (actualTargetIndex: ${actualTargetIndex})`);
+
+          // Check if already scanned using the actual Wonder Key number
+          if (checkIfAlreadyScanned(actualTargetIndex, keyNumber)) {
+            console.log(`Wonder Target ${wonderKey.toUpperCase()} already scanned - showing status only`);
+            statusEl.textContent = `✅ WONDER TARGET ${wonderKey.toUpperCase()} ALREADY SCANNED`;
             statusEl.className = 'status-overlay collected-message';
           }
         } else {
@@ -700,7 +825,7 @@
           }
         }
 
-        if (checkIfAlreadyScanned(isInnovationKey ? actualTargetIndex : targetIndex)) {
+        if (checkIfAlreadyScanned((isInnovationKey || isWonderKey) ? actualTargetIndex : targetIndex, (isInnovationKey || isWonderKey) ? keyNumber : null)) {
 
           // Transform button to "Done" with futuristic animation for already collected keys too
           transformButtonToDone();
@@ -715,42 +840,94 @@
         isProcessing = true;
 
         if (isInnovationKey) {
-          showStatus(`🔄 SCANNING INNOVATION TARGET IN${keyNumber}...`);
-          console.log(`🔄 Processing Innovation Target IN${keyNumber}`);
+          const currentTarget = window.currentInnovationTarget;
+          const innovationKey = currentTarget.key;
+          showStatus(`🔄 SCANNING INNOVATION TARGET ${innovationKey.toUpperCase()}...`);
+          console.log(`🔄 Processing Innovation Target ${innovationKey.toUpperCase()}`);
+        } else if (isWonderKey) {
+          const currentTarget = window.currentWonderTarget;
+          const wonderKey = currentTarget.key;
+          showStatus(`🔄 SCANNING WONDER TARGET ${wonderKey.toUpperCase()}...`);
+          console.log(`🔄 Processing Wonder Target ${wonderKey.toUpperCase()}`);
         } else {
           showStatus(`🔄 COLLECTING KEY #${keyNumber}...`);
         }
 
         // Auto-collect after a short delay (let animation play)
         setTimeout(async () => {
-          const success = await updateKeyInAirtable(isInnovationKey ? actualTargetIndex : targetIndex);
+          const success = await updateKeyInAirtable((isInnovationKey || isWonderKey) ? actualTargetIndex : targetIndex);
 
-          if (success) {
+          if (success === true) {
+            // New successful scan
             if (isInnovationKey) {
-              statusEl.textContent = `✅ INNOVATION TARGET IN${keyNumber} SCANNED!`;
+              const currentTarget = window.currentInnovationTarget;
+              const innovationKey = currentTarget.key;
+              statusEl.textContent = `✅ INNOVATION TARGET ${innovationKey.toUpperCase()} SCANNED!`;
               statusEl.className = 'status-overlay collected-message';
-              console.log(`Innovation Target IN${keyNumber} auto-scanned successfully!`);
+              console.log(`Innovation Target ${innovationKey.toUpperCase()} auto-scanned successfully!`);
 
               // Transform button to "Done" with futuristic animation
               transformButtonToDone();
 
-              // For Innovation Key, switch to next target after successful scan
+              // Show completion message
               setTimeout(() => {
                 statusEl.textContent = 'SCANNING FOR TARGETS...';
                 statusEl.className = 'status-overlay';
+              }, 3000);
+            } else if (isWonderKey) {
+              const currentTarget = window.currentWonderTarget;
+              const wonderKey = currentTarget.key;
+              statusEl.textContent = `✅ WONDER TARGET ${wonderKey.toUpperCase()} SCANNED!`;
+              statusEl.className = 'status-overlay collected-message';
+              console.log(`Wonder Target ${wonderKey.toUpperCase()} auto-scanned successfully!`);
 
-                // Switch to next Innovation target for continuous scanning
-                if (isInnovationKey) {
-                  switchToNextInnovationTarget();
-                }
+              // Transform button to "Done" with futuristic animation
+              transformButtonToDone();
+
+              // Show completion message
+              setTimeout(() => {
+                statusEl.textContent = 'SCANNING FOR TARGETS...';
+                statusEl.className = 'status-overlay';
               }, 3000);
             } else {
               showCollectedStatus(keyNumber);
               console.log(`Key #${keyNumber} auto-collected successfully!`);
             }
+          } else if (success === 'duplicate') {
+            // Duplicate scan - show already scanned message
+            if (isInnovationKey) {
+              const currentTarget = window.currentInnovationTarget;
+              const innovationKey = currentTarget.key;
+              statusEl.textContent = `✅ INNOVATION TARGET ${innovationKey.toUpperCase()} ALREADY SCANNED`;
+              statusEl.className = 'status-overlay collected-message';
+              console.log(`Innovation Target ${innovationKey.toUpperCase()} already scanned - duplicate prevented`);
+            } else if (isWonderKey) {
+              const currentTarget = window.currentWonderTarget;
+              const wonderKey = currentTarget.key;
+              statusEl.textContent = `✅ WONDER TARGET ${wonderKey.toUpperCase()} ALREADY SCANNED`;
+              statusEl.className = 'status-overlay collected-message';
+              console.log(`Wonder Target ${wonderKey.toUpperCase()} already scanned - duplicate prevented`);
+            } else {
+              statusEl.textContent = `✅ KEY #${keyNumber} ALREADY COLLECTED`;
+              statusEl.className = 'status-overlay collected-message';
+              console.log(`Key #${keyNumber} already scanned - duplicate prevented`);
+            }
+
+            // Transform button to "Done" and reset after delay
+            transformButtonToDone();
+            setTimeout(() => {
+              statusEl.textContent = 'SCANNING FOR KEYS...';
+              statusEl.className = 'status-overlay';
+            }, 3000);
           } else {
             if (isInnovationKey) {
-              showStatus(`❌ FAILED TO SAVE TARGET #${keyNumber}`, true);
+              const currentTarget = window.currentInnovationTarget;
+              const innovationKey = currentTarget.key;
+              showStatus(`❌ FAILED TO SAVE TARGET ${innovationKey.toUpperCase()}`, true);
+            } else if (isWonderKey) {
+              const currentTarget = window.currentWonderTarget;
+              const wonderKey = currentTarget.key;
+              showStatus(`❌ FAILED TO SAVE TARGET ${wonderKey.toUpperCase()}`, true);
             } else {
               showStatus(`❌ FAILED TO SAVE KEY #${keyNumber}`, true);
             }
@@ -763,20 +940,6 @@
             isProcessing = false;
           }, 2000);
         }, 1500);
-      }
-
-      // Function to switch to next Innovation Key target
-      function switchToNextInnovationTarget() {
-        if (isInnovationKey && window.innovationMindFiles) {
-          window.currentMindFileIndex = (window.currentMindFileIndex + 1) % window.innovationMindFiles.length;
-          const nextMindFile = window.innovationMindFiles[window.currentMindFileIndex];
-          const sceneElement = document.getElementById('ar-scene');
-
-          console.log(`🔄 Switching to Innovation Key target ${window.currentMindFileIndex + 1}: ${nextMindFile}`);
-
-          // Update the mind file - need to reinitialize the scene
-          location.reload(); // Simple solution: reload with next target
-        }
       }
 
       // Set up event listeners when scene is ready
@@ -881,12 +1044,20 @@
           }
         });
       });
+      } // End of else block for user login check
     </script>
 
-    <!-- Speed Insights -->
+    <!-- Speed Insights (only load in production/Vercel) -->
     <script>
       window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+
+      // Only load Vercel speed insights in production
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const script = document.createElement('script');
+        script.defer = true;
+        script.src = '/_vercel/speed-insights/script.js';
+        document.head.appendChild(script);
+      }
     </script>
-    <script defer src="/_vercel/speed-insights/script.js"></script>
   </body>
 </html>

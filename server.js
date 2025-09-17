@@ -390,7 +390,7 @@ async function findUserByEmail(email) {
             // Get all data from the sheet
             const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:M', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key, H=Redeem Key, I=CODE, J=IN1, K=IN2, L=IN3, M=IN4
+                range: 'A:R', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key, H=Redeem Key, I=CODE, J=IN1, K=IN2, L=IN3, M=IN4, N=WD1, O=WD2, P=WD3, Q=WD4, R=WD5
             });
             
             const rows = response.data.values;
@@ -416,7 +416,12 @@ async function findUserByEmail(email) {
                         in1: row[9] || '',
                         in2: row[10] || '',
                         in3: row[11] || '',
-                        in4: row[12] || ''
+                        in4: row[12] || '',
+                        wd1: row[13] || '',
+                        wd2: row[14] || '',
+                        wd3: row[15] || '',
+                        wd4: row[16] || '',
+                        wd5: row[17] || ''
                     }];
                 }
             }
@@ -736,8 +741,15 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
     
     try {
         console.log(`Updating key ${keyField} to ${status} for row ${recordId}`);
-        
+
         const rowIndex = parseInt(recordId);
+        if (isNaN(rowIndex) || rowIndex <= 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid recordId: must be a positive number',
+                recordId: recordId
+            });
+        }
         
         // Map key fields to spreadsheet columns
         let columnLetter = '';
@@ -776,13 +788,53 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
                 columnLetter = 'M'; // Innovation AR 4
                 columnIndex = 12;
                 break;
+            case 'wd1 status':
+                columnLetter = 'N'; // Wonder Key 1
+                columnIndex = 13;
+                break;
+            case 'wd2 status':
+                columnLetter = 'O'; // Wonder Key 2
+                columnIndex = 14;
+                break;
+            case 'wd3 status':
+                columnLetter = 'P'; // Wonder Key 3
+                columnIndex = 15;
+                break;
+            case 'wd4 status':
+                columnLetter = 'Q'; // Wonder Key 4
+                columnIndex = 16;
+                break;
+            case 'wd5 status':
+                columnLetter = 'R'; // Wonder Key 5
+                columnIndex = 17;
+                break;
             default:
                 return res.status(400).json({
                     success: false,
                     error: 'Invalid keyField: ' + keyField
                 });
         }
-        
+
+        // Check if key is already scanned to prevent duplicates
+        if (status === 'scanned') {
+            const currentResponse = await sheets.spreadsheets.values.get({
+                spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+                range: `${columnLetter}${rowIndex}`,
+            });
+
+            const currentValue = currentResponse.data.values?.[0]?.[0];
+            if (currentValue === 'scanned') {
+                console.log(`Key ${keyField} already scanned - preventing duplicate collection`);
+                return res.json({
+                    success: true,
+                    message: `Key ${keyField} already scanned`,
+                    keyField,
+                    status: 'already_scanned',
+                    duplicate: true
+                });
+            }
+        }
+
         // Update specific cell
         const range = `${columnLetter}${rowIndex}`;
         await sheets.spreadsheets.values.update({
@@ -793,7 +845,7 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
                 values: [[status]]
             }
         });
-        
+
         console.log(`Key ${keyField} updated successfully to ${status}`);
 
         // Check if this update means we should enable redeem key
@@ -951,6 +1003,19 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
             const scannedCount = Object.values(innovationProgress).filter(status => status === 'scanned').length;
             const innovationPercentage = (scannedCount / 4) * 100;
 
+            // Wonder Key AR tracking (WD1-WD5 columns N-R)
+            const wonderProgress = {
+                wd1: userRecord.wd1 === 'scanned' ? 'scanned' : 'not_scanned', // Column N
+                wd2: userRecord.wd2 === 'scanned' ? 'scanned' : 'not_scanned', // Column O
+                wd3: userRecord.wd3 === 'scanned' ? 'scanned' : 'not_scanned', // Column P
+                wd4: userRecord.wd4 === 'scanned' ? 'scanned' : 'not_scanned', // Column Q
+                wd5: userRecord.wd5 === 'scanned' ? 'scanned' : 'not_scanned'  // Column R
+            };
+
+            // Calculate wonder progress percentage (0, 20, 40, 60, 80, 100)
+            const wonderScannedCount = Object.values(wonderProgress).filter(status => status === 'scanned').length;
+            const wonderPercentage = (wonderScannedCount / 5) * 100;
+
             // Check if keys 1, 2, 3 are all scanned but Redeem Key is still FALSE
             let redeemKeyEnabled = userRecord.redeemKey === 'TRUE';
             console.log(`User ${userRecord.email} - Redeem Key: ${userRecord.redeemKey}, Key1: ${keyStatuses.key1}, Key2: ${keyStatuses.key2}, Key3: ${keyStatuses.key3}`);
@@ -988,6 +1053,8 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                     keyStatuses: keyStatuses,
                     innovationProgress: innovationProgress,
                     innovationPercentage: innovationPercentage,
+                    wonderProgress: wonderProgress,
+                    wonderPercentage: wonderPercentage,
                     redeemKeyEnabled: redeemKeyEnabled
                 }
             });

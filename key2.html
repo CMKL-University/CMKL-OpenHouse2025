@@ -441,9 +441,63 @@
             pointer-events: none;
             z-index: 1;
         }
+
+        /* Back button styles */
+        .back-button {
+            position: absolute;
+            top: 35px;
+            left: 20px;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #00fa96, #00946D);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #00fa96;
+            box-shadow: 0 0 15px rgba(0, 250, 150, 0.5);
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #00ff60, #00a030);
+            box-shadow: 0 0 25px rgba(0, 250, 150, 0.8);
+            transform: translateY(-2px);
+            animation: backGlitch 0.3s ease-in-out;
+            opacity: 1;
+        }
+
+        @keyframes backGlitch {
+            0%, 100% {
+                transform: translateY(-2px);
+                filter: brightness(1);
+            }
+            25% {
+                transform: translateY(-2px) translateX(-1px);
+                filter: brightness(1.2) hue-rotate(15deg);
+            }
+            50% {
+                transform: translateY(-2px) translateX(1px);
+                filter: brightness(0.9) hue-rotate(-15deg);
+            }
+            75% {
+                transform: translateY(-2px) translateX(-1px);
+                filter: brightness(1.1) hue-rotate(10deg);
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Back button -->
+    <a href="page2.html" class="back-button">
+        <span>← BACK</span>
+    </a>
+
     <div class="main-container">
 
         <!-- Top decorative border -->
@@ -473,24 +527,58 @@
 
     <script>
         function navigateToScanner() {
+            // Check if user is logged in before proceeding
+            const userEmail = localStorage.getItem('userEmail');
+            const recordId = localStorage.getItem('userRecordId');
+
+            if (!userEmail || !recordId) {
+                alert('Please register first before accessing the AR scanner.');
+                window.location.href = 'register.html';
+                return;
+            }
+
             // Add click effect to key frame
             const keyFrame = document.querySelector('.key-frame');
             keyFrame.style.transform = 'scale(0.98)';
             keyFrame.style.filter = 'drop-shadow(0 0 40px rgba(0, 250, 150, 0.8))';
 
+            // Determine which Innovation target to scan next
+            const innovationProgress = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
+            let nextTarget = 2; // Default to second target (IN2 with 2.mind)
+
+            // Find the next unscanned target, starting from IN2
+            for (let i = 2; i <= 4; i++) {
+                if (innovationProgress[`in${i}`] !== 'scanned') {
+                    nextTarget = i;
+                    break;
+                }
+            }
+
+            // If all 2-4 are scanned, check IN1
+            if (nextTarget === 2 && innovationProgress['in2'] === 'scanned') {
+                for (let i = 1; i <= 4; i++) {
+                    if (innovationProgress[`in${i}`] !== 'scanned') {
+                        nextTarget = i;
+                        break;
+                    }
+                }
+            }
+            
+            console.log(`🎯 Navigating to Innovation target ${nextTarget}`);
+
             setTimeout(() => {
-                // Navigate to scanner for key2
-                window.location.href = 'scanner.html?key=key2';
+                // Navigate to scanner for key2 with specific target
+                window.location.href = `scanner.html?key=key2&target=${nextTarget}`;
             }, 200);
         }
 
-        // Fetch user data with real-time Innovation progress
+        // Fetch user data once on page load
         async function fetchUserData(showLoadingState = true) {
             const progressText = document.querySelector('.progress-text');
             const percentageText = document.getElementById('innovationPercentage');
 
             try {
-                // Show loading state only on initial load
+                // Show loading state
                 if (showLoadingState) {
                     progressText.textContent = 'Loading AR progress...';
                     percentageText.textContent = '???';
@@ -503,22 +591,22 @@
                 const userEmail = urlParams.get('email') || localStorage.getItem('userEmail');
 
                 if (!userEmail) {
-                    console.warn('No user email found, using default progress');
+                    console.warn('No user email found, redirecting to registration');
                     if (showLoadingState) {
+                        progressText.textContent = 'Please register first...';
+                        percentageText.textContent = '???';
                         setTimeout(() => {
-                            percentageText.classList.remove('glitch-animation');
-                            progressText.classList.remove('glitch-animation');
-                            updateKeyProgress(0);
-                        }, 800);
+                            window.location.href = 'register.html';
+                        }, 2000);
                     } else {
-                        updateKeyProgress(0);
+                        window.location.href = 'register.html';
                     }
                     return;
                 }
 
-                console.log('Fetching real-time user data for:', userEmail);
+                console.log('Fetching user data for:', userEmail);
 
-                // Fetch fresh user data including Innovation progress
+                // Fetch user data including Innovation progress
                 const response = await fetch(`/api/harty/user/${encodeURIComponent(userEmail)}`, {
                     method: 'GET',
                     headers: {
@@ -533,16 +621,16 @@
                         const innovationPercentage = userData.data.innovationPercentage || 0;
                         const innovationProgress = userData.data.innovationProgress || {};
 
-                        console.log('Real-time Innovation progress:', {
+                        console.log('Innovation progress loaded:', {
                             percentage: innovationPercentage,
                             progress: innovationProgress
                         });
 
-                        // Update localStorage with fresh Innovation data
+                        // Update localStorage with Innovation data
                         localStorage.setItem('innovationProgress', JSON.stringify(innovationProgress));
                         localStorage.setItem('innovationPercentage', innovationPercentage.toString());
 
-                        // Update progress with or without loading animation
+                        // Update progress with loading animation
                         if (showLoadingState) {
                             setTimeout(() => {
                                 percentageText.classList.remove('glitch-animation');
@@ -550,58 +638,99 @@
                                 updateKeyProgress(innovationPercentage);
                             }, 600);
                         } else {
-                            // Quick update for real-time polling
                             updateKeyProgress(innovationPercentage);
                         }
 
                         return userData.data;
                     } else {
                         console.warn('Failed to get user data:', userData.message);
-                        if (showLoadingState) {
-                            setTimeout(() => {
-                                percentageText.classList.remove('glitch-animation');
-                                progressText.classList.remove('glitch-animation');
-                                updateKeyProgress(0);
-                            }, 800);
-                        } else {
-                            updateKeyProgress(0);
-                        }
-                    }
-                } else {
-                    console.error('Error fetching user data:', response.status);
-                    if (showLoadingState) {
                         setTimeout(() => {
                             percentageText.classList.remove('glitch-animation');
                             progressText.classList.remove('glitch-animation');
                             updateKeyProgress(0);
                         }, 800);
-                    } else {
-                        updateKeyProgress(0);
                     }
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                if (showLoadingState) {
+                } else {
+                    console.error('Error fetching user data:', response.status);
                     setTimeout(() => {
                         percentageText.classList.remove('glitch-animation');
                         progressText.classList.remove('glitch-animation');
                         updateKeyProgress(0);
                     }, 800);
-                } else {
-                    updateKeyProgress(0);
                 }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                setTimeout(() => {
+                    percentageText.classList.remove('glitch-animation');
+                    progressText.classList.remove('glitch-animation');
+                    updateKeyProgress(0);
+                }, 800);
             }
         }
 
-        // Set up real-time data polling for Innovation progress
-        function startRealTimeUpdates() {
-            // Initial load with loading animation
+        // Load data once on page initialization
+        function loadInitialData() {
+            // Initial load with loading animation - only once
             fetchUserData(true);
+        }
 
-            // Poll for updates every 3 seconds to catch AR scan progress (without loading animation)
-            setInterval(() => {
-                fetchUserData(false);
-            }, 3000);
+        // Function to update Project showcase Key when all Innovation Keys are scanned
+        async function updateProjectShowcaseKey() {
+            const userEmail = localStorage.getItem('userEmail');
+            const recordId = localStorage.getItem('userRecordId');
+
+            if (!userEmail || !recordId) {
+                console.error('Missing user credentials for Project showcase Key update');
+                return false;
+            }
+
+            try {
+                console.log('🎯 Updating Project showcase Key to scanned...');
+
+                const response = await fetch('/api/harty/update-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        recordId: recordId,
+                        keyField: 'key2 status',
+                        status: 'scanned'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log('✅ Project showcase Key successfully updated to scanned');
+
+                    // Update localStorage
+                    const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
+                    keyStatuses['key2'] = 'scanned';
+                    localStorage.setItem('userKeyStatuses', JSON.stringify(keyStatuses));
+
+                    return true;
+                } else {
+                    console.error('❌ Failed to update Project showcase Key:', data.error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Error updating Project showcase Key:', error);
+                return false;
+            }
+        }
+
+        // Function to check if all Innovation Keys are scanned
+        function areAllInnovationKeysScanned() {
+            const innovationProgress = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
+            const requiredKeys = ['in1', 'in2', 'in3', 'in4'];
+
+            for (const key of requiredKeys) {
+                if (innovationProgress[key] !== 'scanned') {
+                    return false;
+                }
+            }
+            return true;
         }
 
         // Update key appearance based on progress percentage
@@ -624,11 +753,17 @@
                 const scannedCount = Math.floor(percentage / 25);
                 const remainingKeys = 4 - scannedCount;
 
-                // Update progress text
+                // Update progress text and check if all Innovation Keys are scanned
                 if (remainingKeys > 0) {
                     progressText.textContent = `Click to scan ${remainingKeys} more keys`;
                 } else {
-                    progressText.textContent = 'All keys scanned! Click to continue';
+                    progressText.textContent = 'All keys scanned! Innovation Key unlocked!';
+
+                    // Check if all Innovation Keys are scanned and update Project showcase Key
+                    if (areAllInnovationKeysScanned()) {
+                        console.log('🎉 All Innovation Keys scanned! Updating Project showcase Key...');
+                        updateProjectShowcaseKey();
+                    }
                 }
             }, 200);
 
@@ -660,8 +795,8 @@
 
         // Add some interactive effects
         document.addEventListener('DOMContentLoaded', function() {
-            // Start real-time Innovation progress updates
-            startRealTimeUpdates();
+            // Load data only once on page initialization
+            loadInitialData();
 
             // Animate the key image on load
             const keyImage = document.querySelector('.key-image');
@@ -678,10 +813,17 @@
         });
     </script>
 
-    <!-- Speed Insights -->
+    <!-- Speed Insights (only load in production/Vercel) -->
     <script>
       window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+
+      // Only load Vercel speed insights in production
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const script = document.createElement('script');
+        script.defer = true;
+        script.src = '/_vercel/speed-insights/script.js';
+        document.head.appendChild(script);
+      }
     </script>
-    <script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
 </html>

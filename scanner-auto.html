@@ -97,7 +97,7 @@
       
       // Get user data from localStorage
       const userEmail = localStorage.getItem('userEmail');
-      const recordId = localStorage.getItem('airtableRecordId');
+      const recordId = localStorage.getItem('userRecordId');
       
       if (!userEmail || !recordId) {
         showStatus('ERROR: User not logged in. Please go back and register.', true);
@@ -257,6 +257,6 @@
     <script>
       window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
     </script>
-    <script defer src="/_vercel/speed-insights/script.js"></script>
+    <!-- Speed Insights script conditionally loaded in production via JavaScript -->
   </body>
 </html>

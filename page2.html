@@ -3489,9 +3489,11 @@
                 // Store which key is being scanned
                 localStorage.setItem('selectedKey', cardNumber);
 
-                // Special handling for key2 and key4
+                // Special handling for key2, key3, and key4
                 if (cardNumber === 2) {
                     window.location.href = 'key2.html';
+                } else if (cardNumber === 3) {
+                    window.location.href = 'key3.html';
                 } else if (cardNumber === 4) {
                     window.location.href = 'key4.html';
                 } else {
@@ -4139,6 +4141,6 @@
     <script>
       window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
     </script>
-    <script defer src="/_vercel/speed-insights/script.js"></script>
+    <!-- Speed Insights script conditionally loaded in production via JavaScript -->
 </body>
 </html>

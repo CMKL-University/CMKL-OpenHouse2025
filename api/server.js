@@ -390,7 +390,7 @@ async function findUserByEmail(email) {
             // Get all data from the sheet
             const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:I', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key, H=Redeem Key, I=CODE
+                range: 'A:R', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key, H=Redeem Key, I=CODE, J=IN1, K=IN2, L=IN3, M=IN4, N=WD1, O=WD2, P=WD3, Q=WD4, R=WD5
             });
             
             const rows = response.data.values;
@@ -412,7 +412,16 @@ async function findUserByEmail(email) {
                         projectShowcaseKey: row[5] || '',
                         afternoonSessionKey: row[6] || '',
                         redeemKey: row[7] || 'FALSE',
-                        code: row[8] || ''
+                        code: row[8] || '',
+                        in1: row[9] || '',
+                        in2: row[10] || '',
+                        in3: row[11] || '',
+                        in4: row[12] || '',
+                        wd1: row[13] || '',
+                        wd2: row[14] || '',
+                        wd3: row[15] || '',
+                        wd4: row[16] || '',
+                        wd5: row[17] || ''
                     }];
                 }
             }
@@ -436,7 +445,7 @@ async function createUserRecord(fields) {
             // Find the next empty row
             const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:G',
+                range: 'A:M',
             });
             
             const rows = response.data.values || [];
@@ -445,11 +454,11 @@ async function createUserRecord(fields) {
             // Append new row with first name, last name, email
             await sheets.spreadsheets.values.append({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:G',
+                range: 'A:M',
                 valueInputOption: 'USER_ENTERED',
                 resource: {
                     values: [
-                        [fields.firstname || '', fields.lastname || '', fields.email, 'checked-in', '', '', '']
+                        [fields.firstname || '', fields.lastname || '', fields.email, 'checked-in', '', '', '', 'FALSE', '', '', '', '', '']
                     ]
                 }
             });
@@ -464,7 +473,11 @@ async function createUserRecord(fields) {
                 projectShowcaseKey: '',
                 afternoonSessionKey: '',
                 redeemKey: 'FALSE',
-                code: ''
+                code: '',
+                in1: '',
+                in2: '',
+                in3: '',
+                in4: ''
             };
         } catch (error) {
             console.error('Error creating user record:', error);
@@ -482,14 +495,14 @@ async function updateUserRecord(rowIndex, fields) {
     return await withRetry(async () => {
         try {
             // Update specific row
-            const range = `A${rowIndex}:G${rowIndex}`;
+            const range = `A${rowIndex}:M${rowIndex}`;
             await sheets.spreadsheets.values.update({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
                 range: range,
                 valueInputOption: 'USER_ENTERED',
                 resource: {
                     values: [
-                        [fields.firstname || '', fields.lastname || '', fields.email || '', fields.checkin || '', fields.registerKey || '', fields.projectShowcaseKey || '', fields.afternoonSessionKey || '', fields.redeemKey || 'FALSE', fields.code || '']
+                        [fields.firstname || '', fields.lastname || '', fields.email || '', fields.checkin || '', fields.registerKey || '', fields.projectShowcaseKey || '', fields.afternoonSessionKey || '', fields.redeemKey || 'FALSE', fields.code || '', fields.in1 || '', fields.in2 || '', fields.in3 || '', fields.in4 || '']
                     ]
                 }
             });
@@ -732,8 +745,15 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
     
     try {
         console.log(`Updating key ${keyField} to ${status} for row ${recordId}`);
-        
+
         const rowIndex = parseInt(recordId);
+        if (isNaN(rowIndex) || rowIndex <= 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid recordId: must be a positive number',
+                recordId: recordId
+            });
+        }
         
         // Map key fields to spreadsheet columns
         let columnLetter = '';
@@ -756,13 +776,69 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
                 columnLetter = 'D'; // Check-in (if needed)
                 columnIndex = 3;
                 break;
+            case 'in1 status':
+                columnLetter = 'J'; // Innovation AR 1
+                columnIndex = 9;
+                break;
+            case 'in2 status':
+                columnLetter = 'K'; // Innovation AR 2
+                columnIndex = 10;
+                break;
+            case 'in3 status':
+                columnLetter = 'L'; // Innovation AR 3
+                columnIndex = 11;
+                break;
+            case 'in4 status':
+                columnLetter = 'M'; // Innovation AR 4
+                columnIndex = 12;
+                break;
+            case 'wd1 status':
+                columnLetter = 'N'; // Wonder Key 1
+                columnIndex = 13;
+                break;
+            case 'wd2 status':
+                columnLetter = 'O'; // Wonder Key 2
+                columnIndex = 14;
+                break;
+            case 'wd3 status':
+                columnLetter = 'P'; // Wonder Key 3
+                columnIndex = 15;
+                break;
+            case 'wd4 status':
+                columnLetter = 'Q'; // Wonder Key 4
+                columnIndex = 16;
+                break;
+            case 'wd5 status':
+                columnLetter = 'R'; // Wonder Key 5
+                columnIndex = 17;
+                break;
             default:
-                return res.status(400).json({ 
-                    success: false, 
-                    error: 'Invalid keyField: ' + keyField 
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid keyField: ' + keyField
                 });
         }
-        
+
+        // Check if key is already scanned to prevent duplicates
+        if (status === 'scanned') {
+            const currentResponse = await sheets.spreadsheets.values.get({
+                spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
+                range: `${columnLetter}${rowIndex}`,
+            });
+
+            const currentValue = currentResponse.data.values?.[0]?.[0];
+            if (currentValue === 'scanned') {
+                console.log(`Key ${keyField} already scanned - preventing duplicate collection`);
+                return res.json({
+                    success: true,
+                    message: `Key ${keyField} already scanned`,
+                    keyField,
+                    status: 'already_scanned',
+                    duplicate: true
+                });
+            }
+        }
+
         // Update specific cell
         const range = `${columnLetter}${rowIndex}`;
         await sheets.spreadsheets.values.update({
@@ -773,7 +849,7 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
                 values: [[status]]
             }
         });
-        
+
         console.log(`Key ${keyField} updated successfully to ${status}`);
 
         // Check if this update means we should enable redeem key
@@ -919,6 +995,41 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                 key4: 'not_scanned' // Hardcoded to not_scanned by default
             };
 
+            // Innovation Key AR tracking (IN1-IN4 columns J-M)
+            const innovationProgress = {
+                in1: userRecord.in1 === 'scanned' ? 'scanned' : 'not_scanned',
+                in2: userRecord.in2 === 'scanned' ? 'scanned' : 'not_scanned',
+                in3: userRecord.in3 === 'scanned' ? 'scanned' : 'not_scanned',
+                in4: userRecord.in4 === 'scanned' ? 'scanned' : 'not_scanned'
+            };
+
+            // Calculate innovation percentage (prioritize IN2-IN4, then IN1)
+            let scannedCount = 0;
+            // Count IN2-IN4 first
+            for (let i = 2; i <= 4; i++) {
+                if (innovationProgress[`in${i}`] === 'scanned') {
+                    scannedCount++;
+                }
+            }
+            // Count IN1 last
+            if (innovationProgress.in1 === 'scanned') {
+                scannedCount++;
+            }
+            const innovationPercentage = (scannedCount / 4) * 100;
+
+            // Wonder Key AR tracking (WD1-WD5 columns N-R)
+            const wonderProgress = {
+                wd1: userRecord.wd1 === 'scanned' ? 'scanned' : 'not_scanned', // Column N
+                wd2: userRecord.wd2 === 'scanned' ? 'scanned' : 'not_scanned', // Column O
+                wd3: userRecord.wd3 === 'scanned' ? 'scanned' : 'not_scanned', // Column P
+                wd4: userRecord.wd4 === 'scanned' ? 'scanned' : 'not_scanned', // Column Q
+                wd5: userRecord.wd5 === 'scanned' ? 'scanned' : 'not_scanned'  // Column R
+            };
+
+            // Calculate wonder progress percentage (0, 20, 40, 60, 80, 100)
+            const wonderScannedCount = Object.values(wonderProgress).filter(status => status === 'scanned').length;
+            const wonderPercentage = (wonderScannedCount / 5) * 100;
+
             // Check if keys 1, 2, 3 are all scanned but Redeem Key is still FALSE
             let redeemKeyEnabled = userRecord.redeemKey === 'TRUE';
             console.log(`User ${userRecord.email} - Redeem Key: ${userRecord.redeemKey}, Key1: ${keyStatuses.key1}, Key2: ${keyStatuses.key2}, Key3: ${keyStatuses.key3}, Key4: ${keyStatuses.key4}`);
@@ -956,7 +1067,11 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                     lastName: userRecord.lastName,
                     checkinStatus: userRecord.checkin, // Add check-in status from spreadsheet
                     keyStatuses: keyStatuses,
-                    redeemKeyEnabled: redeemKeyEnabled
+                    redeemKeyEnabled: redeemKeyEnabled,
+                    innovationPercentage: innovationPercentage,
+                    innovationProgress: innovationProgress,
+                    wonderProgress: wonderProgress,
+                    wonderPercentage: wonderPercentage
                 }
             });
         } else {

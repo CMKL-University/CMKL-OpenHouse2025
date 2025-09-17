@@ -1282,7 +1282,7 @@
         function loadUserData() {
             // Get user data from localStorage
             const userEmail = localStorage.getItem('userEmail');
-            const recordId = localStorage.getItem('airtableRecordId');
+            const recordId = localStorage.getItem('userRecordId');
 
             console.log('Loading user data:', { userEmail, recordId });
 
@@ -1330,10 +1330,17 @@
         document.addEventListener('DOMContentLoaded', loadUserData);
     </script>
 
-    <!-- Speed Insights -->
+    <!-- Speed Insights (only load in production/Vercel) -->
     <script>
       window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+
+      // Only load Vercel speed insights in production
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const script = document.createElement('script');
+        script.defer = true;
+        script.src = '/_vercel/speed-insights/script.js';
+        document.head.appendChild(script);
+      }
     </script>
-    <script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
 </html>
