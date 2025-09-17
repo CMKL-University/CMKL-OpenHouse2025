@@ -15,13 +15,20 @@
         }
 
         body {
-            background: #000616 url('svg/background.svg') no-repeat center center fixed;
-            background-size: cover;
-            color: #6be4f0;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 25%, #2a0a2a 50%, #1a0a1a 75%, #0a0a0a 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #e6b3ff;
             font-family: 'Darker Grotesque', sans-serif;
             height: 100vh;
             margin: 0;
             position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         body::before {
@@ -31,7 +38,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(10, 10, 10, 0.3);
+            backdrop-filter: blur(1px);
             z-index: 1;
             pointer-events: none;
         }
@@ -68,11 +76,14 @@
             width: 100%;
             max-width: 400px;
             height: 25px;
-            background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+            background: linear-gradient(90deg, #8b5cf6 0%, #a855f7 25%, #c084fc 50%, #a855f7 75%, #8b5cf6 100%);
+            background-size: 200% 100%;
+            animation: borderPulse 3s ease-in-out infinite;
             mask: url('svg/Group 1.svg');
             mask-size: contain;
             mask-repeat: no-repeat;
             mask-position: center;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.6));
             z-index: 5;
         }
 
@@ -85,12 +96,20 @@
             width: 100%;
             max-width: 400px;
             height: 25px;
-            background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+            background: linear-gradient(90deg, #8b5cf6 0%, #a855f7 25%, #c084fc 50%, #a855f7 75%, #8b5cf6 100%);
+            background-size: 200% 100%;
+            animation: borderPulse 3s ease-in-out infinite reverse;
             mask: url('svg/Group 1.svg');
             mask-size: contain;
             mask-repeat: no-repeat;
             mask-position: center;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.6));
             z-index: 5;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         /* Diagonal decorative element */
@@ -100,10 +119,16 @@
             right: -50px;
             transform: translateY(-50%) rotate(45deg);
             width: 200px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent 0%, #6be4f0 50%, transparent 100%);
-            opacity: 0.6;
+            height: 3px;
+            background: linear-gradient(90deg, transparent 0%, #c084fc 50%, transparent 100%);
+            opacity: 0.8;
+            animation: diagonalGlow 4s ease-in-out infinite;
             z-index: 4;
+        }
+
+        @keyframes diagonalGlow {
+            0%, 100% { opacity: 0.4; filter: blur(1px); }
+            50% { opacity: 0.9; filter: blur(0px); }
         }
 
         /* Congratulations text */
@@ -111,10 +136,10 @@
             font-family: 'Orbitron', monospace;
             font-size: 28px;
             font-weight: 900;
-            color: #00D17D;
+            color: #d946ef;
             text-align: center;
-            text-shadow: 0 0 20px rgba(0, 209, 125, 0.8);
-            animation: glow 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 20px rgba(217, 70, 239, 0.8), 0 0 40px rgba(139, 92, 246, 0.6);
+            animation: purpleGlow 2s ease-in-out infinite alternate;
             position: absolute;
             top: 80px;
             left: 50%;
@@ -122,9 +147,15 @@
             z-index: 6;
         }
 
-        @keyframes glow {
-            from { text-shadow: 0 0 20px rgba(0, 209, 125, 0.8); }
-            to { text-shadow: 0 0 30px rgba(0, 209, 125, 1), 0 0 40px rgba(0, 209, 125, 0.8); }
+        @keyframes purpleGlow {
+            from {
+                text-shadow: 0 0 20px rgba(217, 70, 239, 0.8), 0 0 40px rgba(139, 92, 246, 0.6);
+                color: #d946ef;
+            }
+            to {
+                text-shadow: 0 0 30px rgba(217, 70, 239, 1), 0 0 50px rgba(139, 92, 246, 0.9), 0 0 70px rgba(168, 85, 247, 0.7);
+                color: #e879f9;
+            }
         }
 
         /* Key visual container */
@@ -137,7 +168,7 @@
         .key-image {
             width: 120px;
             height: 120px;
-            filter: drop-shadow(0 0 30px #6BE4F0);
+            filter: drop-shadow(0 0 30px #c084fc) drop-shadow(0 0 15px #a855f7);
             animation: float 3s ease-in-out infinite;
         }
 
@@ -167,7 +198,7 @@
         }
 
         .namebox-svg, .codebox-svg {
-            filter: drop-shadow(0 0 15px rgba(0, 250, 150, 0.6));
+            filter: drop-shadow(0 0 15px rgba(192, 132, 252, 0.7)) drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
         }
 
         .name-text, .code-text {
@@ -201,34 +232,36 @@
             bottom: 150px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(45deg, #0F2627, #203A43, #2C5530);
-            border: 2px solid #00ff41;
+            background: linear-gradient(45deg, #2a0a2a, #3a1a3a, #4a2a4a);
+            border: 2px solid #c084fc;
             border-radius: 15px;
             padding: 12px 30px;
-            color: #00ff41;
+            color: #c084fc;
             text-decoration: none;
             font-family: 'Orbitron', monospace;
             font-weight: 700;
             font-size: 14px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 255, 65, 0.3);
+            box-shadow: 0 4px 15px rgba(192, 132, 252, 0.3);
             z-index: 6;
         }
 
         .back-button:hover {
             transform: translateX(-50%) translateY(-2px) scale(1.05);
-            box-shadow: 0 6px 25px rgba(0, 255, 65, 0.4);
-            background: linear-gradient(45deg, #1A3A3B, #2C5A63, #3A7040);
+            box-shadow: 0 6px 25px rgba(192, 132, 252, 0.5);
+            background: linear-gradient(45deg, #3a1a3a, #4a2a4a, #5a3a5a);
+            color: #e879f9;
+            border-color: #e879f9;
         }
 
         /* Copy button for redeem code */
         .copy-button {
             margin-top: 10px;
-            background: rgba(0, 209, 125, 0.2);
-            border: 1px solid #00D17D;
+            background: rgba(217, 70, 239, 0.2);
+            border: 1px solid #d946ef;
             border-radius: 8px;
             padding: 8px 16px;
-            color: #00D17D;
+            color: #d946ef;
             font-family: 'Darker Grotesque', sans-serif;
             font-weight: 600;
             cursor: pointer;
@@ -237,14 +270,14 @@
         }
 
         .copy-button:hover {
-            background: rgba(0, 209, 125, 0.4);
+            background: rgba(217, 70, 239, 0.4);
             transform: scale(1.05);
         }
 
         .copy-button.copied {
-            background: rgba(0, 255, 65, 0.3);
-            border-color: #00ff41;
-            color: #00ff41;
+            background: rgba(192, 132, 252, 0.3);
+            border-color: #c084fc;
+            color: #c084fc;
         }
 
         /* Edit name button */
@@ -263,7 +296,7 @@
         }
 
         .edit-name-btn:hover {
-            background: rgba(0, 250, 150, 0.2);
+            background: rgba(192, 132, 252, 0.2);
             transform: translateY(-50%) scale(1.1);
         }
 
@@ -284,17 +317,17 @@
         }
 
         .copy-icon-btn.copied {
-            background: rgba(0, 255, 65, 0.3);
-            border-color: #00ff41;
+            background: rgba(192, 132, 252, 0.3);
+            border-color: #c084fc;
         }
 
         .copy-icon-btn.copied svg {
-            stroke: #00ff41;
+            stroke: #c084fc;
         }
 
         .copy-icon-btn, .save-icon-btn {
             background: transparent;
-            border: 2px solid #00FA96;
+            border: 2px solid #c084fc;
             border-radius: 8px;
             padding: 8px;
             cursor: pointer;
@@ -305,14 +338,14 @@
         }
 
         .copy-icon-btn:hover, .save-icon-btn:hover {
-            background: rgba(0, 250, 150, 0.2);
+            background: rgba(192, 132, 252, 0.2);
             transform: scale(1.1);
         }
 
         .copy-text, .save-text {
             font-family: 'Darker Grotesque', sans-serif;
             font-size: 14px;
-            color: #00FA96;
+            color: #c084fc;
             text-align: center;
             line-height: 1.2;
         }
@@ -388,7 +421,7 @@
 
         /* Loading animation */
         .loading {
-            color: #6be4f0;
+            color: #c084fc;
             font-family: 'Orbitron', monospace;
             text-align: center;
         }
@@ -423,21 +456,21 @@
                 <div class="name-container">
                     <svg class="namebox-svg" width="280" height="48" viewBox="0 0 280 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <!-- Main container with rounded corners -->
-                        <rect x="1" y="1" width="278" height="46" rx="8" ry="8" fill="transparent" stroke="#00FA96" stroke-width="2"/>
+                        <rect x="1" y="1" width="278" height="46" rx="8" ry="8" fill="transparent" stroke="#c084fc" stroke-width="2"/>
 
                         <!-- Pencil edit icon -->
                         <g transform="translate(250, 14)">
-                            <path d="M20 3L17 0L1.5 15.5V19H5L20 3Z" fill="#00FA96" stroke="#00FA96" stroke-width="0.5"/>
-                            <path d="M18.5 1.5L21.5 4.5" stroke="#00FA96" stroke-width="1" stroke-linecap="round"/>
-                            <line x1="0" y1="18" x2="22" y2="18" stroke="#00FA96" stroke-width="1" stroke-linecap="round"/>
+                            <path d="M20 3L17 0L1.5 15.5V19H5L20 3Z" fill="#c084fc" stroke="#c084fc" stroke-width="0.5"/>
+                            <path d="M18.5 1.5L21.5 4.5" stroke="#c084fc" stroke-width="1" stroke-linecap="round"/>
+                            <line x1="0" y1="18" x2="22" y2="18" stroke="#c084fc" stroke-width="1" stroke-linecap="round"/>
                         </g>
                     </svg>
                     <div class="name-text" id="nameText">Loading<span class="loading"></span></div>
                     <button class="edit-name-btn" onclick="editName()" title="Edit Name">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 3L17 0L1.5 15.5V19H5L20 3Z" fill="#00FA96"/>
-                            <path d="M18.5 1.5L21.5 4.5" stroke="#00FA96" stroke-width="1" stroke-linecap="round"/>
-                            <line x1="0" y1="18" x2="22" y2="18" stroke="#00FA96" stroke-width="1" stroke-linecap="round"/>
+                            <path d="M20 3L17 0L1.5 15.5V19H5L20 3Z" fill="#c084fc"/>
+                            <path d="M18.5 1.5L21.5 4.5" stroke="#c084fc" stroke-width="1" stroke-linecap="round"/>
+                            <line x1="0" y1="18" x2="22" y2="18" stroke="#c084fc" stroke-width="1" stroke-linecap="round"/>
                         </svg>
                     </button>
                 </div>
@@ -445,8 +478,8 @@
                 <!-- Code box -->
                 <div class="code-container">
                     <svg class="codebox-svg" width="221" height="66" viewBox="0 0 221 66" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M67.2523 2H20.0601L2 33.2875L20.0601 64.575H201.523L219.583 33.2875L201.523 2H189.203" stroke="#00D17D" stroke-width="2.1781" stroke-miterlimit="10"/>
-                        <path d="M42.0671 64.575L50.6888 55.9761H121.681L129.917 64.212L42.0671 64.575Z" fill="#00D17D"/>
+                        <path d="M67.2523 2H20.0601L2 33.2875L20.0601 64.575H201.523L219.583 33.2875L201.523 2H189.203" stroke="#d946ef" stroke-width="2.1781" stroke-miterlimit="10"/>
+                        <path d="M42.0671 64.575L50.6888 55.9761H121.681L129.917 64.212L42.0671 64.575Z" fill="#d946ef"/>
                     </svg>
                     <div class="code-text" id="codeText">Loading<span class="loading"></span></div>
                 </div>
@@ -457,8 +490,8 @@
                     <div class="copy-section">
                         <button class="copy-icon-btn" id="copyButton" onclick="copyRedeemCode()" title="Copy to clipboard">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="#00FA96" stroke-width="2" fill="none"/>
-                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="#00FA96" stroke-width="2" fill="none"/>
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="#c084fc" stroke-width="2" fill="none"/>
+                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="#c084fc" stroke-width="2" fill="none"/>
                             </svg>
                         </button>
                         <div class="copy-text">copy to clipboard</div>
@@ -468,9 +501,9 @@
                     <div class="save-section">
                         <button class="save-icon-btn" onclick="saveAsImage()" title="Save as Image">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="#00FA96" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <polyline points="7,10 12,15 17,10" stroke="#00FA96" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <line x1="12" y1="15" x2="12" y2="3" stroke="#00FA96" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <polyline points="7,10 12,15 17,10" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="12" y1="15" x2="12" y2="3" stroke="#c084fc" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                         </button>
                         <div class="save-text">Save as image</div>
