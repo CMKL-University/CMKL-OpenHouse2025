@@ -717,11 +717,27 @@
                 innovationStatuses[`in${keyNumber}`] = 'scanned';
                 localStorage.setItem('innovationProgress', JSON.stringify(innovationStatuses));
               } else if (isWonderKey) {
-                console.log(`Wonder Key #${keyNumber} (WD${keyNumber}) successfully saved`);
+                console.log(`Wonder Key scanned from ${keyNumber}.mind file`);
 
-                // Update localStorage for wonder progress
+                // Update localStorage for wonder progress - Sequential filling system
                 const wonderStatuses = JSON.parse(localStorage.getItem('wonderProgress') || '{}');
-                wonderStatuses[`wd${keyNumber}`] = 'scanned';
+
+                // Find the first available WD slot (WD1 -> WD2 -> WD3 -> WD4 -> WD5)
+                let nextAvailableSlot = null;
+                for (let i = 1; i <= 5; i++) {
+                  if (wonderStatuses[`wd${i}`] !== 'scanned') {
+                    nextAvailableSlot = i;
+                    break;
+                  }
+                }
+
+                if (nextAvailableSlot) {
+                  wonderStatuses[`wd${nextAvailableSlot}`] = 'scanned';
+                  console.log(`Sequential filling: Marked WD${nextAvailableSlot} as scanned (from ${keyNumber}.mind file)`);
+                } else {
+                  console.log('All Wonder Keys already scanned - no action needed');
+                }
+
                 localStorage.setItem('wonderProgress', JSON.stringify(wonderStatuses));
               } else {
                 console.log(`Key #${keyNumber} successfully saved to Airtable`);
@@ -761,11 +777,16 @@
           console.log(`🔍 Checking if ${keyToCheck.toUpperCase()} is already scanned:`, innovationStatuses[keyToCheck]);
           return innovationStatuses[keyToCheck] === 'scanned';
         } else if (isWonderKey) {
-          // For Wonder Keys, use the actual Wonder Key number (WD1, WD2, WD3, WD4, WD5)
+          // For Wonder Keys with sequential filling - check if all 5 slots are filled
           const wonderStatuses = JSON.parse(localStorage.getItem('wonderProgress') || '{}');
-          const keyToCheck = keyNumber ? `wd${keyNumber}` : `wd${targetIndex + 1}`;
-          console.log(`🔍 Checking if ${keyToCheck.toUpperCase()} is already scanned:`, wonderStatuses[keyToCheck]);
-          return wonderStatuses[keyToCheck] === 'scanned';
+          let filledCount = 0;
+          for (let i = 1; i <= 5; i++) {
+            if (wonderStatuses[`wd${i}`] === 'scanned') {
+              filledCount++;
+            }
+          }
+          console.log(`🔍 Wonder Key progress: ${filledCount}/5 slots filled`);
+          return filledCount >= 5; // All slots filled = already "scanned"
         } else {
           // For regular keys, use target index
           const keyNum = targetIndex + 1;

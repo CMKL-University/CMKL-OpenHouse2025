@@ -679,35 +679,35 @@
                     <!-- WD1 -->
                     <div class="key-station required" data-key="1" onclick="navigateToScanner(1)">
                         <span class="key-number">1</span>
-                        <span class="key-label">Wonder Key 1 (Required)</span>
+                        <span class="key-label">Wonder Key Slot 1 (Required)</span>
                     </div>
                     <div class="connection-line" id="line1"></div>
 
                     <!-- WD2 -->
                     <div class="key-station required" data-key="2" onclick="navigateToScanner(2)">
                         <span class="key-number">2</span>
-                        <span class="key-label">Wonder Key 2 (Required)</span>
+                        <span class="key-label">Wonder Key Slot 2 (Required)</span>
                     </div>
                     <div class="connection-line" id="line2"></div>
 
                     <!-- WD3 -->
                     <div class="key-station required" data-key="3" onclick="navigateToScanner(3)">
                         <span class="key-number">3</span>
-                        <span class="key-label">Wonder Key 3 (Required)</span>
+                        <span class="key-label">Wonder Key Slot 3 (Required)</span>
                     </div>
                     <div class="connection-line" id="line3"></div>
 
                     <!-- WD4 -->
                     <div class="key-station optional" data-key="4" onclick="navigateToScanner(4)">
                         <span class="key-number">4</span>
-                        <span class="key-label">Wonder Key 4 (Optional)</span>
+                        <span class="key-label">Wonder Key Slot 4 (Optional)</span>
                     </div>
                     <div class="connection-line" id="line4"></div>
 
                     <!-- WD5 -->
                     <div class="key-station optional" data-key="5" onclick="navigateToScanner(5)">
                         <span class="key-number">5</span>
-                        <span class="key-label">Wonder Key 5 (Optional)</span>
+                        <span class="key-label">Wonder Key Slot 5 (Optional)</span>
                     </div>
                 </div>
             </div>
@@ -742,24 +742,22 @@
         function navigateToNextKey() {
             const wonderProgress = JSON.parse(localStorage.getItem('wonderProgress') || '{}');
 
-            // Find next unscanned key, prioritizing required keys (1-3) first
-            for (let i = 1; i <= 3; i++) {
-                if (wonderProgress[`wd${i}`] !== 'scanned') {
-                    navigateToScanner(i);
-                    return;
+            // Count how many WD slots are filled (sequential filling system)
+            let filledSlots = 0;
+            for (let i = 1; i <= 5; i++) {
+                if (wonderProgress[`wd${i}`] === 'scanned') {
+                    filledSlots++;
                 }
             }
 
-            // If all required keys are done, check optional keys
-            for (let i = 4; i <= 5; i++) {
-                if (wonderProgress[`wd${i}`] !== 'scanned') {
-                    navigateToScanner(i);
-                    return;
-                }
+            if (filledSlots < 5) {
+                // Still have slots available - send to scan any .mind file (default to 1.mind)
+                console.log(`Sequential filling: ${filledSlots}/5 slots filled, sending to scan 1.mind`);
+                navigateToScanner(1);
+            } else {
+                // All 5 slots filled
+                console.log('All Wonder Keys have been scanned!');
             }
-
-            // All keys scanned
-            console.log('All Wonder Keys have been scanned!');
         }
 
         // Function to update Afternoon session Key when 3+ Wonder Keys are scanned
