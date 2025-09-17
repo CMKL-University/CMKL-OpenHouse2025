@@ -222,7 +222,7 @@
             height: 60px;
             border-radius: 50%;
             border: 3px solid #B2A600;
-            background: rgba(0, 6, 22, 0.9);
+            background: #000;
             position: relative;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -269,6 +269,10 @@
         }
 
         .key-station.scanned .key-number {
+            color: #FFD700;
+        }
+
+        .key-station.scanned.animation-complete .key-number {
             color: #000;
         }
 
@@ -387,9 +391,15 @@
         @keyframes keyPopOut {
             0% {
                 transform: scale(1);
-                background: rgba(0, 6, 22, 0.9);
+                background: #000;
                 border-color: #B2A600;
                 box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            }
+            15% {
+                transform: scale(1.1);
+                background: #000;
+                border-color: #FFD700;
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
             }
             30% {
                 transform: scale(1.4);
@@ -461,14 +471,42 @@
             pointer-events: none;
         }
 
+        /* Key number color transition during animation */
+        .key-station.animate-scan .key-number {
+            animation: numberColorTransition 0.8s ease-out forwards;
+        }
+
+        @keyframes numberColorTransition {
+            0% {
+                color: #FFD700;
+            }
+            15% {
+                color: #FFD700;
+            }
+            30% {
+                color: #000;
+            }
+            100% {
+                color: #000;
+            }
+        }
+
 
         .connection-line.animate-connect {
             animation: lineConnect 0.6s ease-out forwards;
             transform-origin: top;
         }
 
-        /* Enhanced scanned state with motion */
+        /* Enhanced scanned state - stays black until animation */
         .key-station.scanned {
+            background: #000;
+            border-color: #FFD700;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            transform: scale(1.1);
+        }
+
+        /* Only show gradient AFTER animation completes */
+        .key-station.scanned.animation-complete {
             background: linear-gradient(135deg, #FFD700, #FFA500);
             border-color: #FFD700;
             box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
@@ -1006,9 +1044,10 @@
                 // Add immediate scan animation for real-time feedback
                 station.classList.add('animate-scan');
 
-                // Remove animation class after it completes
+                // Remove animation class and add gradient after it completes
                 setTimeout(() => {
                     station.classList.remove('animate-scan');
+                    station.classList.add('animation-complete');
                 }, 800);
 
                 // Animate the connection line immediately for real-time feedback
@@ -1047,6 +1086,7 @@
                         station.classList.add('animate-scan');
                         setTimeout(() => {
                             station.classList.remove('animate-scan');
+                            station.classList.add('animation-complete');
                         }, 800);
                     }, index * 300);
 

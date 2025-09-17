@@ -136,8 +136,8 @@
             left: 50%;
             top: 260px;
             transform: translateX(-50%);
-            width: 335px;
-            height: 209px;
+            width: 345px;
+            height: 220px;
             background-image: url('svg/Group 4.svg');
             background-size: contain;
             background-repeat: no-repeat;
@@ -263,9 +263,14 @@
 
         /* Registration link styling */
         .registration-link {
-            margin-top: 5px;
+            position: absolute;
+            left: 50%;
+            top: 480px;
+            transform: translateX(-50%);
             text-align: center;
             z-index: 10;
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
         .registration-link small {
@@ -287,6 +292,105 @@
             color: #33E7FF;
             text-shadow: 0 0 10px rgba(107, 228, 240, 0.8);
             text-decoration: underline;
+        }
+
+        .registration-link:hover {
+            transform: translateX(-50%) translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Privacy Policy checkbox styling */
+        .privacy-policy-container {
+            margin: 5px 0 3px 0;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .cyber-checkbox-container {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 13px;
+            color: rgba(107, 228, 240, 0.9);
+            font-weight: 400;
+            transition: all 0.3s ease;
+        }
+
+        .cyber-checkbox {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            height: 18px;
+            width: 18px;
+            background: rgba(0, 6, 22, 0.8);
+            border: 2px solid #22B2B9;
+            border-radius: 3px;
+            margin-right: 8px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px rgba(107, 228, 240, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .cyber-checkbox-container:hover .checkmark {
+            border-color: #6BE4F0;
+            box-shadow: 0 0 10px rgba(107, 228, 240, 0.5);
+        }
+
+        .cyber-checkbox:checked ~ .checkmark {
+            background: linear-gradient(135deg, #22B2B9, #6BE4F0);
+            border-color: #6BE4F0;
+            box-shadow: 0 0 15px rgba(107, 228, 240, 0.8);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 5px;
+            top: 1px;
+            width: 6px;
+            height: 10px;
+            border: solid #000;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .cyber-checkbox:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .privacy-policy-text {
+            line-height: 1.4;
+        }
+
+        .privacy-policy-text a {
+            color: #6BE4F0;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(107, 228, 240, 0.5);
+        }
+
+        .privacy-policy-text a:hover {
+            color: #33E7FF;
+            text-shadow: 0 0 10px rgba(107, 228, 240, 0.8);
+            text-decoration: underline;
+        }
+
+        /* Error state for checkbox */
+        .cyber-checkbox-container.error .checkmark {
+            border-color: #ff0040;
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.6);
+            background: rgba(139, 0, 0, 0.3);
+            animation: inputErrorShake 0.5s ease-in-out;
         }
 
         /* Background matrix text elements */
@@ -428,6 +532,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            transition: all 0.3s ease;
         }
         
         .nav-card {
@@ -537,6 +642,14 @@
             .registration-link small {
                 font-size: 11px;
             }
+
+            .privacy-policy-container {
+                margin: 4px 0 2px 0;
+            }
+
+            .cyber-checkbox-container {
+                font-size: 12px;
+            }
             
             .section-divider-2 {
                 width: 90vw;
@@ -548,6 +661,10 @@
                 top: 36vh;
             }
             
+            .registration-link {
+                top: 60vh;
+            }
+
             .nav-cards {
                 width: 90vw;
                 max-width: 220px;
@@ -594,8 +711,19 @@
             .registration-link small {
                 font-size: 10px;
             }
+
+            .cyber-checkbox-container {
+                font-size: 11px;
+            }
         }
-        
+
+        /* Height-based media query for nav-cards scaling */
+        @media (max-height: 680px) {
+            .nav-cards {
+                transform: translateX(-50%) scale(0.95);
+            }
+        }
+
         @media (min-width: 481px) and (max-width: 768px) {
             .main-container {
                 max-width: 450px;
@@ -614,6 +742,10 @@
                 top: 38vh;
             }
             
+            .registration-link {
+                top: 63vh;
+            }
+
             .nav-cards {
                 top: 68vh;
             }
@@ -671,6 +803,10 @@
                 top: 25vh;
             }
             
+            .registration-link {
+                top: 40vh;
+            }
+
             .nav-cards {
                 top: 45vh;
                 gap: 8px;
@@ -1121,9 +1257,16 @@
             <div class="input-container">
                 <input type="text" class="cyber-input" placeholder="Enter your last name..." id="userLastName">
             </div>
-            <div class="registration-link">
-                <small>Haven't registered yet? <a href="https://airtable.com/appE4SeDTpEI6XTRX/pagOUHvMAlLgJS2Pf/form" target="_blank">Click here</a></small>
+            <div class="privacy-policy-container">
+                <label class="cyber-checkbox-container">
+                    <input type="checkbox" id="privacyPolicyCheckbox" class="cyber-checkbox">
+                    <span class="checkmark"></span>
+                    <span class="privacy-policy-text">I agree to the <a href="https://cmkl.ac.th/privacy-policy" target="_blank">Privacy Policy</a></span>
+                </label>
             </div>
+            <!-- <div class="registration-link">
+                <small>Haven't registered yet? <a href="https://airtable.com/appE4SeDTpEI6XTRX/pagOUHvMAlLgJS2Pf/form" target="_blank">Click here</a></small>
+            </div> -->
         </div>
         <div class="center-triangle cyberpunk-element"></div>
         <div class="section-divider-2 cyberpunk-element"></div>
@@ -1139,6 +1282,9 @@
         <div class="matrix-element-9 cyberpunk-element"></div>
         
         <!-- Navigation cards -->
+        <div class="registration-link">
+            <small>Haven't registered yet? <a href="https://airtable.com/appE4SeDTpEI6XTRX/pagOUHvMAlLgJS2Pf/form" target="_blank">Click here</a></small>
+        </div>
         <div class="nav-cards">
             <div class="nav-card cyberpunk-element" onclick="startARExperience()"></div>
             <div class="nav-card cyberpunk-element" onclick="showAbout()"></div>
@@ -1259,6 +1405,7 @@
                 '.matrix-element-7',
                 '.matrix-element-8',
                 '.matrix-element-9',
+                '.registration-link',
                 '.nav-card:nth-child(1)',
                 '.nav-card:nth-child(2)',
                 '.nav-card:nth-child(3)',
@@ -1794,24 +1941,17 @@
                         }
                         return { id: data.recordId, fields: { email, lastname: lastName } };
                     } else {
-                        // Handle specific error cases
-                        if (data.error === 'EMAIL_ALREADY_USED') {
-                            addDebugLog(`Email validation error: ${data.message}`, 'error');
-                            throw new Error(data.message);
-                        } else {
-                            addDebugLog(`Server error: ${data.message || 'Unknown error'}`, 'error');
-                            return { id: 'local_session', fields: { email, lastname: lastName } };
-                        }
+                        // Handle server errors - allow continuation
+                        addDebugLog(`Server error: ${data.message || 'Unknown error'}`, 'error');
+                        return { id: 'local_session', fields: { email, lastname: lastName } };
                     }
                 } else {
                     // Handle HTTP error responses
                     if (response.status === 409) {
-                        // Conflict - email already used with different name
+                        // Conflict - handle gracefully and allow continuation
                         const errorData = await response.json();
-                        if (errorData.error === 'EMAIL_ALREADY_USED') {
-                            addDebugLog(`Email validation error: ${errorData.message}`, 'error');
-                            throw new Error(errorData.message);
-                        }
+                        addDebugLog(`Conflict detected: ${errorData.message || 'Unknown conflict'}`, 'warning');
+                        return { id: 'local_session', fields: { email, lastname: lastName } };
                     }
                     
                     if (response.status === 403) {
@@ -1848,10 +1988,7 @@
                 addDebugLog(`System error: ${error.message}`, 'error');
                 console.error('System error:', error);
                 
-                // For EMAIL_ALREADY_USED errors, throw them up to be handled by the caller
-                if (error.message.includes('already registered with a different name')) {
-                    throw error;
-                }
+                // Allow continuation for all errors - no email validation blocking
                 
                 // For other errors, don't throw - allow AR experience to continue
                 addDebugLog('Falling back to local session', 'warning');
@@ -2023,14 +2160,31 @@
         async function startARExperience() {
             const emailInput = document.getElementById('userEmail');
             const lastNameInput = document.getElementById('userLastName');
+            const privacyPolicyCheckbox = document.getElementById('privacyPolicyCheckbox');
             const emailValue = emailInput.value.trim();
             const lastNameValue = lastNameInput.value.trim();
             const emailValid = emailValue !== '' && emailValue.includes('@');
             const lastNameValid = lastNameValue !== '';
-            
+            const privacyPolicyAccepted = privacyPolicyCheckbox.checked;
+
             if (!emailValid || !lastNameValid) {
                 // Show red terminal popup
                 showTerminalError('ERROR: You must fill your email and last name first!');
+                return;
+            }
+
+            if (!privacyPolicyAccepted) {
+                // Show red terminal popup for privacy policy
+                showTerminalError('ERROR: You must accept the Privacy Policy to continue!');
+
+                // Add error animation to checkbox
+                const checkboxContainer = document.querySelector('.cyber-checkbox-container');
+                if (checkboxContainer) {
+                    checkboxContainer.classList.add('error');
+                    setTimeout(() => {
+                        checkboxContainer.classList.remove('error');
+                    }, 1000);
+                }
                 return;
             }
             
@@ -2059,15 +2213,10 @@
                 try {
                     userRecord = await createOrUpdateUser(emailValue, lastNameValue);
                 } catch (error) {
-                    // Handle specific errors like EMAIL_ALREADY_USED
+                    // Handle errors gracefully - allow continuation
                     addDebugLog(`Validation error: ${error.message}`, 'error');
-                    
-                    if (error.message.includes('already registered with a different name')) {
-                        triggerEmailValidationError(error.message);
-                    } else {
-                        hideLoadingScreen();
-                        showTerminalError(error.message);
-                    }
+                    hideLoadingScreen();
+                    showTerminalError(error.message);
                     return;
                 }
                 
@@ -2143,18 +2292,14 @@
                 console.error('Failed to create user:', error);
                 addDebugLog(`ERROR: ${error.message}`, 'error');
                 
-                // Check if this is an email validation error
-                if (error.message.includes('already registered with a different name')) {
-                    triggerEmailValidationError(error.message);
-                } else {
-                    addDebugLog('System initialization failed', 'error');
-                    updateProgress(currentProgress, 'ERROR OCCURRED');
-                    
-                    setTimeout(() => {
-                        hideLoadingScreen();
-                        showTerminalError('ERROR: Failed to create user profile. Please try again.');
-                    }, 2000);
-                }
+                // Handle all errors gracefully
+                addDebugLog('System initialization failed', 'error');
+                updateProgress(currentProgress, 'ERROR OCCURRED');
+
+                setTimeout(() => {
+                    hideLoadingScreen();
+                    showTerminalError('ERROR: Failed to create user profile. Please try again.');
+                }, 2000);
             }
         }
         
@@ -2164,49 +2309,11 @@
         }
         
         // Global error handler for email validation errors
-        function handleEmailValidationError(errorMessage) {
-            // Clear any existing loading screens
-            hideLoadingScreen();
-            
-            // Clear form inputs
-            const emailInput = document.getElementById('userEmail');
-            const lastNameInput = document.getElementById('userLastName');
-            if (emailInput) emailInput.value = '';
-            if (lastNameInput) lastNameInput.value = '';
-            
-            // Show the error
-            showTerminalError(`🚫 EMAIL ALREADY IN USE Please use a different email.`);
-        }
-        
-        // Function to trigger email validation error from anywhere in the app
-        function triggerEmailValidationError(errorMessage) {
-            if (typeof window.storeEmailValidationError === 'function') {
-                window.storeEmailValidationError(errorMessage);
-                // If we're not on register.html, the global handler will redirect
-                // If we are on register.html, handle it directly
-                const currentPath = window.location.pathname;
-                if (currentPath.endsWith('register.html')) {
-                    handleEmailValidationError(errorMessage);
-                }
-            } else {
-                // Fallback if global handler isn't loaded
-                handleEmailValidationError(errorMessage);
-            }
-        }
+        // Email validation functions removed - allow all email registrations
         
         // Terminal error popup function
         function showTerminalError(message) {
-            // Check if this is an email validation error and highlight the email field
-            if (message.includes('already registered with a different name')) {
-                const emailInput = document.getElementById('userEmail');
-                if (emailInput) {
-                    emailInput.classList.add('error');
-                    // Remove error class after animation
-                    setTimeout(() => {
-                        emailInput.classList.remove('error');
-                    }, 3000);
-                }
-            }
+            // Show terminal error without email validation checks
             
             const errorDiv = document.createElement('div');
             errorDiv.style.cssText = `
