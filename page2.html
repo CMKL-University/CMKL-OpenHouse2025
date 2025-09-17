@@ -7,6 +7,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>CMKL Openhouse 2025 - Your Key</title>
+
+    <!-- Preload critical fonts to prevent CLS -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap"></noscript>
+
     <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.iife.js"></script>
     <!-- Configuration -->
     <script src="config.js?v=20250904"></script>
@@ -16,14 +21,15 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap');
-        
+
+        /* Optimize font loading to prevent CLS */
         body {
+            font-family: 'Darker Grotesque', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #000616 url('svg/background.svg') no-repeat center center fixed;
             background-size: cover;
             color: #6be4f0;
-            font-family: 'Darker Grotesque', sans-serif;
             height: 100vh;
             overflow: hidden;
             position: relative;
@@ -51,7 +57,19 @@
             max-height: 874px;
             overflow: hidden;
             z-index: 2;
-            display: none; /* Initially hidden while loading */
+            opacity: 0; /* Prevent CLS - use opacity instead of display:none */
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        .main-container.loaded {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Optimize elements that will be animated */
+        .nav-card, .header-section, .top-border, .bottom-border {
+            will-change: transform, opacity, filter;
         }
         
         /* Top decorative border - using Group 1.svg like index.html */
@@ -123,6 +141,8 @@
             top: 120px;
             transform: translateX(-50%);
             width: 400px;
+            height: auto; /* Reserve space to prevent CLS */
+            min-height: 500px; /* Stable height for cards */
             display: flex;
             flex-direction: column;
             gap: 35px;
@@ -133,7 +153,7 @@
             width: 350px;
             height: 105px;
             cursor: pointer;
-            transition: none;
+            transition: transform 0.2s ease, filter 0.2s ease; /* Smooth but fast transitions */
             position: relative;
             display: flex;
             align-items: center;
@@ -144,6 +164,8 @@
             background-color: transparent;
             filter: none;
             box-shadow: none;
+            /* Contain layout to prevent shifts */
+            contain: layout;
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -2991,16 +3013,16 @@
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
                     if (mainContainer) {
-                        mainContainer.style.display = 'block';
+                        mainContainer.classList.add('loaded');
                     }
                 }, 500);
             }
         }
-        
+
         function showMainContent() {
             const mainContainer = document.querySelector('.main-container');
             if (mainContainer) {
-                mainContainer.style.display = 'block';
+                mainContainer.classList.add('loaded');
             }
         }
 
