@@ -916,7 +916,7 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                 key1: userRecord.registerKey === 'scanned' ? 'scanned' : 'not_scanned', // Column E
                 key2: userRecord.projectShowcaseKey === 'scanned' ? 'scanned' : 'not_scanned', // Column F
                 key3: userRecord.afternoonSessionKey === 'scanned' ? 'scanned' : 'not_scanned', // Column G
-                key4: (userRecord.checkin === 'scanned' || userRecord.checkin === 'checked-in') ? 'scanned' : 'not_scanned' // Column D - check-in status
+                key4: 'not_scanned' // Hardcoded to not_scanned by default
             };
 
             // Check if keys 1, 2, 3 are all scanned but Redeem Key is still FALSE
