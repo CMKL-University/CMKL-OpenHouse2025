@@ -948,9 +948,15 @@
                 completionStatus.textContent = `${scannedCount}/5 Wonder Keys collected`;
 
                 // Update progress text based on completion
-                if (scannedCount >= 3) {
+                if (scannedCount === 5) {
+                    // All 5 WD keys are scanned - hide the action button
+                    progressText.textContent = 'All Wonder Keys collected!';
+                    actionButton.style.display = 'none';
+                    console.log('🎉 All 5 Wonder Keys scanned! Hiding action button.');
+                } else if (scannedCount >= 3) {
                     progressText.textContent = 'Wonder Key unlocked!';
                     actionButton.textContent = 'CONTINUE SCANNING';
+                    actionButton.style.display = 'block'; // Ensure button is visible
 
                     // Check if we should update the Afternoon session Key
                     if (areThreeWonderKeysScanned()) {
@@ -961,6 +967,7 @@
                     const remaining = 3 - scannedCount;
                     progressText.textContent = `Scan ${remaining} more key${remaining !== 1 ? 's' : ''} to unlock!`;
                     actionButton.textContent = 'START SCANNING';
+                    actionButton.style.display = 'block'; // Ensure button is visible
                 }
 
                 // Update roadmap visual state
