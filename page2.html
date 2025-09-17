@@ -3015,10 +3015,10 @@
                 drop.className = 'rain-drop';
                 drop.textContent = characters[Math.floor(Math.random() * characters.length)];
                 drop.style.left = Math.random() * 100 + '%';
-                drop.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                drop.style.animationDelay = Math.random() * 2 + 's';
-                drop.style.fontSize = (Math.random() * 8 + 8) + 'px';
-                drop.style.opacity = Math.random() * 0.7 + 0.3;
+                drop.style.animationDuration = (Math.random() * 3 + 4) + 's'; // Slower animation
+                drop.style.animationDelay = Math.random() * 3 + 's';
+                drop.style.fontSize = (Math.random() * 6 + 8) + 'px'; // Smaller characters
+                drop.style.opacity = Math.random() * 0.4 + 0.1; // Much more transparent
                 
                 rainContainer.appendChild(drop);
                 
@@ -3030,13 +3030,13 @@
                 }, 5000);
             }
             
-            // Create initial rain drops
-            for (let i = 0; i < 20; i++) {
-                setTimeout(() => createRainDrop(), i * 100);
+            // Create initial rain drops - reduced for less visual noise
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => createRainDrop(), i * 200);
             }
-            
-            // Continue creating rain drops
-            setInterval(createRainDrop, 300);
+
+            // Continue creating rain drops - reduced frequency
+            setInterval(createRainDrop, 800);
         }
         
         // Initialize page with Ready Player One style loading
