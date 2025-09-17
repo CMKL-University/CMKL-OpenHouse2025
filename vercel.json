@@ -12,11 +12,55 @@
   ],
   "headers": [
     {
+      "source": "/(.*).html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/(.*).css",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*).js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/svg/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=31536000, immutable"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
       "source": "/(.*).gltf",
       "headers": [
         {
           "key": "Content-Type",
           "value": "model/gltf+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=31536000, immutable"
         },
         {
           "key": "Access-Control-Allow-Origin",
@@ -32,6 +76,10 @@
           "value": "application/octet-stream"
         },
         {
+          "key": "Cache-Control",
+          "value": "s-maxage=31536000, immutable"
+        },
+        {
           "key": "Access-Control-Allow-Origin",
           "value": "*"
         }
@@ -43,6 +91,10 @@
         {
           "key": "Content-Type",
           "value": "application/octet-stream"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=31536000, immutable"
         },
         {
           "key": "Access-Control-Allow-Origin",

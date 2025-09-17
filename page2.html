@@ -2,10 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Critical resource hints for mobile -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <title>CMKL Openhouse 2025 - Your Key</title>
 
     <!-- Preload critical fonts to prevent CLS -->
@@ -24,12 +28,20 @@
 
         @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300;400;500;600;700;800;900&display=swap');
 
-        /* Optimize font loading to prevent CLS */
+        /* Optimize font loading to prevent CLS - Mobile First */
         body {
-            font-family: 'Darker Grotesque', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: #000616 url('svg/background.svg') no-repeat center center fixed;
             background-size: cover;
             color: #6be4f0;
+            /* Critical for mobile CLS */
+            text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Progressive font enhancement - loads after critical render */
+        .fonts-loaded body {
+            font-family: 'Darker Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             height: 100vh;
             overflow: hidden;
             position: relative;
@@ -70,6 +82,30 @@
         /* Optimize elements that will be animated */
         .nav-card, .header-section, .top-border, .bottom-border {
             will-change: transform, opacity, filter;
+        }
+
+        /* Critical mobile CLS prevention */
+        @supports (contain: layout) {
+            .main-container {
+                contain: layout;
+            }
+            .nav-cards-container {
+                contain: layout;
+            }
+        }
+
+        /* Prevent animation-induced mobile CLS */
+        @media (max-width: 480px) {
+            .main-container {
+                /* Force stable positioning on mobile */
+                contain: layout style;
+            }
+
+            .nav-card {
+                /* Ensure transforms don't affect layout */
+                backface-visibility: hidden;
+                perspective: 1000px;
+            }
         }
         
         /* Top decorative border - using Group 1.svg like index.html */
@@ -1187,6 +1223,15 @@
             .nav-card {
                 width: 100%;
                 height: 70px;
+                /* Prevent mobile layout shifts */
+                contain: layout style;
+                transform-origin: center;
+            }
+
+            .nav-cards-container {
+                /* Reserve stable space for mobile cards */
+                min-height: 400px;
+                contain: layout;
             }
             
             .action-buttons-container {
@@ -1230,10 +1275,26 @@
             .nav-card {
                 transform: scale(0.9);
                 height: 65px;
+                /* Prevent layout shifts on mobile */
+                transform-origin: center;
+                contain: layout style;
             }
-            
+
             .nav-cards-container {
                 gap: 25px;
+                /* Adjust min-height for smaller mobile screens */
+                min-height: 350px;
+            }
+
+            /* Stabilize mobile typography */
+            .header-title {
+                font-size: 20px; /* Fixed size to prevent shifts */
+                line-height: 1.2;
+            }
+
+            .header-subtitle {
+                font-size: 8px;
+                line-height: 1.2;
             }
         }
         
@@ -2981,9 +3042,26 @@
         // Initialize page with Ready Player One style loading
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('CMKL Openhouse 2025 - Portal Loading...');
-            
+
+            // Progressive font loading to prevent mobile CLS
+            if ('fonts' in document) {
+                try {
+                    await document.fonts.ready;
+                    document.documentElement.classList.add('fonts-loaded');
+                    console.log('Fonts loaded - preventing CLS');
+                } catch (error) {
+                    console.warn('Font loading failed, using fallback:', error);
+                    document.documentElement.classList.add('fonts-loaded');
+                }
+            } else {
+                // Fallback for older browsers - delay to allow font loading
+                setTimeout(function() {
+                    document.documentElement.classList.add('fonts-loaded');
+                }, 800);
+            }
+
             // Loading screen disabled - start immediately
-            
+
             // Check user session and fetch fresh data
             await checkUserSession();
             
