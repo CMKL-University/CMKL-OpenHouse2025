@@ -78,8 +78,8 @@
         /* Progressive font enhancement - loads after critical render */
         .fonts-loaded body {
             font-family: 'Darker Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-y: auto;
             position: relative;
         }
         
@@ -97,13 +97,12 @@
         
         .main-container {
             width: 100vw;
-            height: 100vh;
+            min-height: 100vh;
             position: relative;
             margin: 0 auto;
             background: transparent;
             max-width: 393px;
-            max-height: 874px;
-            overflow: hidden;
+            overflow: visible;
             z-index: 2;
             opacity: 0; /* Prevent CLS - use opacity instead of display:none */
             visibility: hidden;
