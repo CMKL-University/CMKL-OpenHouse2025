@@ -3156,6 +3156,36 @@
                     console.log('keyStatuses being stored:', data.data.keyStatuses);
                     console.log('checkinStatus from API:', data.data.checkinStatus);
 
+                    // Auto check-in user if not already checked in
+                    if (!data.data.checkinStatus || data.data.checkinStatus === '') {
+                        console.log('User not checked in yet, auto-checking in...');
+
+                        try {
+                            const checkInResponse = await fetch(`/api/harty/submit`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    fields: {
+                                        email: email,
+                                        lastname: data.data.lastName
+                                    }
+                                })
+                            });
+
+                            const checkInData = await checkInResponse.json();
+                            if (checkInData.success) {
+                                console.log('Auto check-in successful:', checkInData.message);
+                                data.data.checkinStatus = 'checked-in'; // Update the data to reflect check-in
+                            } else {
+                                console.error('Auto check-in failed:', checkInData.error || checkInData.message);
+                            }
+                        } catch (checkInError) {
+                            console.error('Error during auto check-in:', checkInError);
+                        }
+                    }
+
                     // Update localStorage with fresh data
                     localStorage.setItem('userKeyStatuses', JSON.stringify(data.data.keyStatuses));
                     localStorage.setItem('userRecordId', data.data.recordId);

@@ -491,7 +491,7 @@ async function updateUserRecord(rowIndex, fields) {
     return await withRetry(async () => {
         try {
             // Update specific row
-            const range = `A${rowIndex}:G${rowIndex}`;
+            const range = `A${rowIndex}:I${rowIndex}`;
             await sheets.spreadsheets.values.update({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
                 range: range,

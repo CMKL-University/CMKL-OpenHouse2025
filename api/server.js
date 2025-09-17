@@ -495,14 +495,14 @@ async function updateUserRecord(rowIndex, fields) {
     return await withRetry(async () => {
         try {
             // Update specific row
-            const range = `A${rowIndex}:M${rowIndex}`;
+            const range = `A${rowIndex}:R${rowIndex}`;
             await sheets.spreadsheets.values.update({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
                 range: range,
                 valueInputOption: 'USER_ENTERED',
                 resource: {
                     values: [
-                        [fields.firstname || '', fields.lastname || '', fields.email || '', fields.checkin || '', fields.registerKey || '', fields.projectShowcaseKey || '', fields.afternoonSessionKey || '', fields.redeemKey || 'FALSE', fields.code || '', fields.in1 || '', fields.in2 || '', fields.in3 || '', fields.in4 || '']
+                        [fields.firstname || '', fields.lastname || '', fields.email || '', fields.checkin || '', fields.registerKey || '', fields.projectShowcaseKey || '', fields.afternoonSessionKey || '', fields.redeemKey || 'FALSE', fields.code || '', fields.in1 || '', fields.in2 || '', fields.in3 || '', fields.in4 || '', fields.wd1 || '', fields.wd2 || '', fields.wd3 || '', fields.wd4 || '', fields.wd5 || '']
                     ]
                 }
             });
@@ -574,7 +574,16 @@ app.post('/api/harty/submit', securityMiddleware, async (req, res) => {
                     projectShowcaseKey: existingUser.projectShowcaseKey || '', // Keep existing or empty
                     afternoonSessionKey: existingUser.afternoonSessionKey || '', // Keep existing or empty
                     redeemKey: existingUser.redeemKey || 'FALSE', // Keep existing or default
-                    code: existingUser.code || '' // Keep existing or empty
+                    code: existingUser.code || '', // Keep existing or empty
+                    in1: existingUser.in1 || '', // Keep existing IN1 or empty
+                    in2: existingUser.in2 || '', // Keep existing IN2 or empty
+                    in3: existingUser.in3 || '', // Keep existing IN3 or empty
+                    in4: existingUser.in4 || '', // Keep existing IN4 or empty
+                    wd1: existingUser.wd1 || '', // Keep existing WD1 or empty
+                    wd2: existingUser.wd2 || '', // Keep existing WD2 or empty
+                    wd3: existingUser.wd3 || '', // Keep existing WD3 or empty
+                    wd4: existingUser.wd4 || '', // Keep existing WD4 or empty
+                    wd5: existingUser.wd5 || '' // Keep existing WD5 or empty
                 };
                 
                 await updateUserRecord(existingUser.rowIndex, updateFields);
