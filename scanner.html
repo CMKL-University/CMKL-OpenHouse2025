@@ -279,7 +279,8 @@
     </a>
     
     <a-scene
-      mindar-image="imageTargetSrc: model/registration.mind; maxTrack: 2; uiScanning: #custom-scanning-overlay"
+      id="ar-scene"
+      mindar-image="imageTargetSrc: model/registration.mind; maxTrack: 4; uiScanning: #custom-scanning-overlay"
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
@@ -307,11 +308,37 @@
 
       <!-- Target 2 - Raccoon Model -->
       <a-entity id="target2" mindar-image-target="targetIndex: 1">
-        <a-gltf-model 
+        <a-gltf-model
           id="model2"
-          rotation="0 0 0" 
-          position="0 0 0" 
-          scale="0.05 0.05 0.05" 
+          rotation="0 0 0"
+          position="0 0 0"
+          scale="0.05 0.05 0.05"
+          src="#raccoonModel"
+          animation__scale="property: scale; to: 0.1 0.1 0.1; startEvents: targetfound; dur: 1000; easing: easeOutBack"
+          animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
+        </a-gltf-model>
+      </a-entity>
+
+      <!-- Target 3 - For Innovation Key (IN3) -->
+      <a-entity id="target3" mindar-image-target="targetIndex: 2">
+        <a-gltf-model
+          id="model3"
+          rotation="0 0 0"
+          position="0 0 0"
+          scale="0.5 0.5 0.5"
+          src="#bearModel"
+          animation__scale="property: scale; to: 1.0 1.0 1.0; startEvents: targetfound; dur: 1000; easing: easeOutBack"
+          animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
+        </a-gltf-model>
+      </a-entity>
+
+      <!-- Target 4 - For Innovation Key (IN4) -->
+      <a-entity id="target4" mindar-image-target="targetIndex: 3">
+        <a-gltf-model
+          id="model4"
+          rotation="0 0 0"
+          position="0 0 0"
+          scale="0.05 0.05 0.05"
           src="#raccoonModel"
           animation__scale="property: scale; to: 0.1 0.1 0.1; startEvents: targetfound; dur: 1000; easing: easeOutBack"
           animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
@@ -327,6 +354,41 @@
       // Get user data from localStorage
       const userEmail = localStorage.getItem('userEmail');
       const recordId = localStorage.getItem('airtableRecordId');
+
+      // Check if this is Innovation Key scanning
+      const urlParams = new URLSearchParams(window.location.search);
+      const keyType = urlParams.get('key');
+      const isInnovationKey = keyType === 'key2';
+
+      console.log('🔑 Key Type:', keyType, '| Innovation Key:', isInnovationKey);
+
+      // Set the correct back button href for Innovation Key mode
+      if (isInnovationKey) {
+        const backButton = document.getElementById('backButton');
+        backButton.href = 'key2.html';
+        console.log('🔗 Back button redirected to key2.html for Innovation Key mode');
+      }
+
+      // Set the correct .mind file for Innovation Key
+      if (isInnovationKey) {
+        const sceneElement = document.getElementById('ar-scene');
+        // Start with the first Innovation Key target
+        const innovationMindFile = 'model/Innovation_key/1.mind';
+        sceneElement.setAttribute('mindar-image', `imageTargetSrc: ${innovationMindFile}; maxTrack: 1; uiScanning: #custom-scanning-overlay`);
+        console.log('🎯 Using Innovation Key file:', innovationMindFile);
+        console.log('🎯 Current target: IN1 (will cycle through IN1-IN4)');
+
+        // Store which mind files we need to cycle through
+        window.innovationMindFiles = [
+          'model/Innovation_key/1.mind',
+          'model/Innovation_key/2.mind',
+          'model/Innovation_key/3.mind',
+          'model/Innovation_key/4.mind'
+        ];
+        window.currentMindFileIndex = 0;
+      } else {
+        console.log('🎯 Using default registration.mind file');
+      }
 
       // Debug logging for production troubleshooting
       console.log('🔍 AR Scanner Debug Info:');
@@ -537,13 +599,22 @@
 
       async function updateKeyInAirtable(targetIndex) {
         if (!userEmail || !recordId) return false;
-        
-        const keyNumber = targetIndex + 1;
-        const keyField = `key${keyNumber} status`;
-        
-        try {
+
+        let keyField, keyNumber;
+
+        if (isInnovationKey) {
+          // For Innovation Key, use IN1-IN4 fields
+          keyNumber = targetIndex + 1;
+          keyField = `in${keyNumber} status`;
+          console.log(`Auto-collecting Innovation AR Target #${keyNumber} (IN${keyNumber})...`);
+        } else {
+          // For regular keys, use key1-key4 fields
+          keyNumber = targetIndex + 1;
+          keyField = `key${keyNumber} status`;
           console.log(`Auto-collecting Key #${keyNumber}...`);
-          
+        }
+
+        try {
           const response = await fetch('/api/harty/update-key', {
             method: 'POST',
             headers: {
@@ -559,16 +630,25 @@
           const data = await response.json();
           
           if (data.success) {
-            console.log(`Key #${keyNumber} successfully saved to Airtable`);
-            
-            // Update localStorage
-            const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
-            keyStatuses[`key${keyNumber}`] = 'scanned';
-            localStorage.setItem('userKeyStatuses', JSON.stringify(keyStatuses));
-            
+            if (isInnovationKey) {
+              console.log(`Innovation AR Target #${keyNumber} (IN${keyNumber}) successfully saved`);
+
+              // Update localStorage for innovation progress
+              const innovationStatuses = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
+              innovationStatuses[`in${keyNumber}`] = 'scanned';
+              localStorage.setItem('innovationProgress', JSON.stringify(innovationStatuses));
+            } else {
+              console.log(`Key #${keyNumber} successfully saved to Airtable`);
+
+              // Update localStorage
+              const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
+              keyStatuses[`key${keyNumber}`] = 'scanned';
+              localStorage.setItem('userKeyStatuses', JSON.stringify(keyStatuses));
+            }
+
             return true;
           } else {
-            console.error('Failed to update Airtable:', data.error);
+            console.error('Failed to update:', data.error);
             return false;
           }
         } catch (error) {
@@ -578,22 +658,49 @@
       }
 
       function checkIfAlreadyScanned(targetIndex) {
-        const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
         const keyNumber = targetIndex + 1;
-        return keyStatuses[`key${keyNumber}`] === 'scanned';
+
+        if (isInnovationKey) {
+          const innovationStatuses = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
+          return innovationStatuses[`in${keyNumber}`] === 'scanned';
+        } else {
+          const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
+          return keyStatuses[`key${keyNumber}`] === 'scanned';
+        }
       }
 
       async function handleTargetFound(targetIndex) {
         if (isProcessing) return;
-        
-        const keyNumber = targetIndex + 1;
-        console.log(`Target ${targetIndex} found - Key #${keyNumber} (Bear=Key#1, Raccoon=Key#2)`);
-        
-        // Check if already scanned
-        if (checkIfAlreadyScanned(targetIndex)) {
-          console.log(`Key #${keyNumber} already scanned - showing status only`);
-          statusEl.textContent = `✅ KEY #${keyNumber} ALREADY COLLECTED`;
-          statusEl.className = 'status-overlay collected-message';
+
+        let actualTargetIndex = targetIndex;
+        let keyNumber = targetIndex + 1;
+
+        if (isInnovationKey) {
+          // For Innovation Keys, map to current mind file index
+          actualTargetIndex = window.currentMindFileIndex || 0;
+          keyNumber = actualTargetIndex + 1;
+          console.log(`🎯 Innovation AR Target detected!`);
+          console.log(`🎯 Current mind file index: ${window.currentMindFileIndex}`);
+          console.log(`🎯 Mapping to IN${keyNumber} (actualTargetIndex: ${actualTargetIndex})`);
+
+          // Check if already scanned
+          if (checkIfAlreadyScanned(actualTargetIndex)) {
+            console.log(`Innovation Target IN${keyNumber} already scanned - showing status only`);
+            statusEl.textContent = `✅ INNOVATION TARGET IN${keyNumber} ALREADY SCANNED`;
+            statusEl.className = 'status-overlay collected-message';
+          }
+        } else {
+          console.log(`Target ${targetIndex} found - Key #${keyNumber} (Bear=Key#1, Raccoon=Key#2)`);
+
+          // Check if already scanned
+          if (checkIfAlreadyScanned(targetIndex)) {
+            console.log(`Key #${keyNumber} already scanned - showing status only`);
+            statusEl.textContent = `✅ KEY #${keyNumber} ALREADY COLLECTED`;
+            statusEl.className = 'status-overlay collected-message';
+          }
+        }
+
+        if (checkIfAlreadyScanned(isInnovationKey ? actualTargetIndex : targetIndex)) {
 
           // Transform button to "Done" with futuristic animation for already collected keys too
           transformButtonToDone();
@@ -604,19 +711,49 @@
           }, 3000);
           return;
         }
-        
+
         isProcessing = true;
-        showStatus(`🔄 COLLECTING KEY #${keyNumber}...`);
-        
+
+        if (isInnovationKey) {
+          showStatus(`🔄 SCANNING INNOVATION TARGET IN${keyNumber}...`);
+          console.log(`🔄 Processing Innovation Target IN${keyNumber}`);
+        } else {
+          showStatus(`🔄 COLLECTING KEY #${keyNumber}...`);
+        }
+
         // Auto-collect after a short delay (let animation play)
         setTimeout(async () => {
-          const success = await updateKeyInAirtable(targetIndex);
-          
+          const success = await updateKeyInAirtable(isInnovationKey ? actualTargetIndex : targetIndex);
+
           if (success) {
-            showCollectedStatus(keyNumber);
-            console.log(`Key #${keyNumber} auto-collected successfully!`);
+            if (isInnovationKey) {
+              statusEl.textContent = `✅ INNOVATION TARGET IN${keyNumber} SCANNED!`;
+              statusEl.className = 'status-overlay collected-message';
+              console.log(`Innovation Target IN${keyNumber} auto-scanned successfully!`);
+
+              // Transform button to "Done" with futuristic animation
+              transformButtonToDone();
+
+              // For Innovation Key, switch to next target after successful scan
+              setTimeout(() => {
+                statusEl.textContent = 'SCANNING FOR TARGETS...';
+                statusEl.className = 'status-overlay';
+
+                // Switch to next Innovation target for continuous scanning
+                if (isInnovationKey) {
+                  switchToNextInnovationTarget();
+                }
+              }, 3000);
+            } else {
+              showCollectedStatus(keyNumber);
+              console.log(`Key #${keyNumber} auto-collected successfully!`);
+            }
           } else {
-            showStatus(`❌ FAILED TO SAVE KEY #${keyNumber}`, true);
+            if (isInnovationKey) {
+              showStatus(`❌ FAILED TO SAVE TARGET #${keyNumber}`, true);
+            } else {
+              showStatus(`❌ FAILED TO SAVE KEY #${keyNumber}`, true);
+            }
             setTimeout(() => {
               showStatus('SCANNING FOR KEYS...');
             }, 3000);
@@ -626,6 +763,20 @@
             isProcessing = false;
           }, 2000);
         }, 1500);
+      }
+
+      // Function to switch to next Innovation Key target
+      function switchToNextInnovationTarget() {
+        if (isInnovationKey && window.innovationMindFiles) {
+          window.currentMindFileIndex = (window.currentMindFileIndex + 1) % window.innovationMindFiles.length;
+          const nextMindFile = window.innovationMindFiles[window.currentMindFileIndex];
+          const sceneElement = document.getElementById('ar-scene');
+
+          console.log(`🔄 Switching to Innovation Key target ${window.currentMindFileIndex + 1}: ${nextMindFile}`);
+
+          // Update the mind file - need to reinitialize the scene
+          location.reload(); // Simple solution: reload with next target
+        }
       }
 
       // Set up event listeners when scene is ready
@@ -651,12 +802,18 @@
               
               // Map based on which target element triggered (if available)
               const targetElement = event.target;
-              if (targetElement && targetElement.id === 'target2') {
-                targetIndex = 1;
-                console.log('Detected target2 element, forcing Key #2');
-              } else if (targetElement && targetElement.id === 'target1') {
+              if (targetElement && targetElement.id === 'target1') {
                 targetIndex = 0;
                 console.log('Detected target1 element, forcing Key #1');
+              } else if (targetElement && targetElement.id === 'target2') {
+                targetIndex = 1;
+                console.log('Detected target2 element, forcing Key #2');
+              } else if (targetElement && targetElement.id === 'target3') {
+                targetIndex = 2;
+                console.log('Detected target3 element, forcing IN3');
+              } else if (targetElement && targetElement.id === 'target4') {
+                targetIndex = 3;
+                console.log('Detected target4 element, forcing IN4');
               }
               
               console.log('Final processing targetIndex:', targetIndex, 'as Key #' + (targetIndex + 1));
@@ -669,8 +826,15 @@
           // Keep individual listeners as backup with more debugging
           const target1 = document.getElementById('target1');
           const target2 = document.getElementById('target2');
-          
-          console.log('Target elements found:', { target1: !!target1, target2: !!target2 });
+          const target3 = document.getElementById('target3');
+          const target4 = document.getElementById('target4');
+
+          console.log('Target elements found:', {
+            target1: !!target1,
+            target2: !!target2,
+            target3: !!target3,
+            target4: !!target4
+          });
           
           if (target1) {
             target1.addEventListener('targetfound', (event) => {
@@ -691,6 +855,28 @@
             });
             target2.addEventListener('targetlost', (event) => {
               console.log('Target 2 lost');
+            });
+          }
+
+          if (target3) {
+            target3.addEventListener('targetfound', (event) => {
+              console.log('Individual Target 3 listener fired - Innovation IN3');
+              event.stopPropagation(); // Prevent scene listener from firing
+              handleTargetFound(2); // Always IN3
+            });
+            target3.addEventListener('targetlost', (event) => {
+              console.log('Target 3 lost');
+            });
+          }
+
+          if (target4) {
+            target4.addEventListener('targetfound', (event) => {
+              console.log('Individual Target 4 listener fired - Innovation IN4');
+              event.stopPropagation(); // Prevent scene listener from firing
+              handleTargetFound(3); // Always IN4
+            });
+            target4.addEventListener('targetlost', (event) => {
+              console.log('Target 4 lost');
             });
           }
         });

@@ -390,7 +390,7 @@ async function findUserByEmail(email) {
             // Get all data from the sheet
             const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:I', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key, H=Redeem Key, I=CODE
+                range: 'A:M', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key, H=Redeem Key, I=CODE, J=IN1, K=IN2, L=IN3, M=IN4
             });
             
             const rows = response.data.values;
@@ -412,7 +412,11 @@ async function findUserByEmail(email) {
                         projectShowcaseKey: row[5] || '',
                         afternoonSessionKey: row[6] || '',
                         redeemKey: row[7] || 'FALSE',
-                        code: row[8] || ''
+                        code: row[8] || '',
+                        in1: row[9] || '',
+                        in2: row[10] || '',
+                        in3: row[11] || '',
+                        in4: row[12] || ''
                     }];
                 }
             }
@@ -756,10 +760,26 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
                 columnLetter = 'D'; // Check-in (if needed)
                 columnIndex = 3;
                 break;
+            case 'in1 status':
+                columnLetter = 'J'; // Innovation AR 1
+                columnIndex = 9;
+                break;
+            case 'in2 status':
+                columnLetter = 'K'; // Innovation AR 2
+                columnIndex = 10;
+                break;
+            case 'in3 status':
+                columnLetter = 'L'; // Innovation AR 3
+                columnIndex = 11;
+                break;
+            case 'in4 status':
+                columnLetter = 'M'; // Innovation AR 4
+                columnIndex = 12;
+                break;
             default:
-                return res.status(400).json({ 
-                    success: false, 
-                    error: 'Invalid keyField: ' + keyField 
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid keyField: ' + keyField
                 });
         }
         
@@ -919,6 +939,18 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                 key4: 'not_scanned' // Hardcoded to not_scanned by default
             };
 
+            // Innovation Key AR tracking (IN1-IN4 columns J-M)
+            const innovationProgress = {
+                in1: userRecord.in1 === 'scanned' ? 'scanned' : 'not_scanned', // Column J
+                in2: userRecord.in2 === 'scanned' ? 'scanned' : 'not_scanned', // Column K
+                in3: userRecord.in3 === 'scanned' ? 'scanned' : 'not_scanned', // Column L
+                in4: userRecord.in4 === 'scanned' ? 'scanned' : 'not_scanned'  // Column M
+            };
+
+            // Calculate innovation progress percentage (0, 25, 50, 75, 100)
+            const scannedCount = Object.values(innovationProgress).filter(status => status === 'scanned').length;
+            const innovationPercentage = (scannedCount / 4) * 100;
+
             // Check if keys 1, 2, 3 are all scanned but Redeem Key is still FALSE
             let redeemKeyEnabled = userRecord.redeemKey === 'TRUE';
             console.log(`User ${userRecord.email} - Redeem Key: ${userRecord.redeemKey}, Key1: ${keyStatuses.key1}, Key2: ${keyStatuses.key2}, Key3: ${keyStatuses.key3}`);
@@ -954,6 +986,8 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
                     lastName: userRecord.lastName,
                     checkinStatus: userRecord.checkin, // Add check-in status from spreadsheet
                     keyStatuses: keyStatuses,
+                    innovationProgress: innovationProgress,
+                    innovationPercentage: innovationPercentage,
                     redeemKeyEnabled: redeemKeyEnabled
                 }
             });

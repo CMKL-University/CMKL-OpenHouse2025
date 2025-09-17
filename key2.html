@@ -165,6 +165,37 @@
             filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
             pointer-events: none;
             animation: keyGlitch 0.8s ease-in-out infinite;
+            /* Initial grayscale state */
+            filter: grayscale(100%) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            opacity: 0.6;
+            transition: all 1s ease-out;
+        }
+
+        /* Progressive color restoration classes */
+        .key-image.progress-0 {
+            filter: grayscale(100%) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            opacity: 0.6;
+        }
+
+        .key-image.progress-25 {
+            filter: grayscale(75%) drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));
+            opacity: 0.7;
+        }
+
+        .key-image.progress-50 {
+            filter: grayscale(50%) drop-shadow(0 0 17px rgba(255, 215, 0, 0.6));
+            opacity: 0.8;
+        }
+
+        .key-image.progress-75 {
+            filter: grayscale(25%) drop-shadow(0 0 19px rgba(255, 215, 0, 0.7));
+            opacity: 0.9;
+        }
+
+        .key-image.progress-100 {
+            filter: grayscale(0%) drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+            opacity: 1;
+            animation: keyGlitch 0.8s ease-in-out infinite;
         }
 
         .progress-text {
@@ -249,6 +280,65 @@
                 text-shadow: 0 0 25px rgba(0, 250, 150, 0.6);
                 opacity: 0.8;
             }
+        }
+
+        /* Data update glitch animation */
+        @keyframes dataGlitch {
+            0%, 100% {
+                transform: translate(0);
+                filter: hue-rotate(0deg);
+                opacity: 1;
+            }
+            10% {
+                transform: translate(-2px, 1px);
+                filter: hue-rotate(90deg);
+                opacity: 0.8;
+            }
+            20% {
+                transform: translate(2px, -1px);
+                filter: hue-rotate(180deg);
+                opacity: 0.9;
+            }
+            30% {
+                transform: translate(-1px, 2px);
+                filter: hue-rotate(270deg);
+                opacity: 0.7;
+            }
+            40% {
+                transform: translate(1px, -2px);
+                filter: hue-rotate(360deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-2px, -1px);
+                filter: hue-rotate(45deg);
+                text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
+            }
+            60% {
+                transform: translate(2px, 1px);
+                filter: hue-rotate(135deg);
+                text-shadow: -1px 0 #ff00ff, 1px 0 #00ffff;
+            }
+            70% {
+                transform: translate(-1px, -2px);
+                filter: hue-rotate(225deg);
+                text-shadow: 1px 0 #ff00ff, -1px 0 #00ffff;
+            }
+            80% {
+                transform: translate(1px, 2px);
+                filter: hue-rotate(315deg);
+                opacity: 0.9;
+            }
+        }
+
+        /* Glitch animation class */
+        .glitch-animation {
+            animation: dataGlitch 0.6s ease-in-out infinite;
+        }
+
+        /* Single glitch animation for final update */
+        .glitch-animation-once {
+            animation: dataGlitch 0.6s ease-in-out;
         }
 
         /* Responsive design */
@@ -376,7 +466,7 @@
                 <img src="svg/key2/keypic.svg" alt="Innovation Key" class="key-image" style="margin-left: 25px ; margin-bottom: 20px;">
             </div>
             <p class="progress-text glow-text">Click the key to scan!</p>
-            <p class="percentage-text">20%</p>
+            <p class="percentage-text" id="innovationPercentage">0%</p>
         </div>
     </div>
     </div>
@@ -394,8 +484,185 @@
             }, 200);
         }
 
+        // Fetch user data with real-time Innovation progress
+        async function fetchUserData(showLoadingState = true) {
+            const progressText = document.querySelector('.progress-text');
+            const percentageText = document.getElementById('innovationPercentage');
+
+            try {
+                // Show loading state only on initial load
+                if (showLoadingState) {
+                    progressText.textContent = 'Loading AR progress...';
+                    percentageText.textContent = '???';
+                    percentageText.classList.add('glitch-animation');
+                    progressText.classList.add('glitch-animation');
+                }
+
+                // Get user email from URL params or stored data
+                const urlParams = new URLSearchParams(window.location.search);
+                const userEmail = urlParams.get('email') || localStorage.getItem('userEmail');
+
+                if (!userEmail) {
+                    console.warn('No user email found, using default progress');
+                    if (showLoadingState) {
+                        setTimeout(() => {
+                            percentageText.classList.remove('glitch-animation');
+                            progressText.classList.remove('glitch-animation');
+                            updateKeyProgress(0);
+                        }, 800);
+                    } else {
+                        updateKeyProgress(0);
+                    }
+                    return;
+                }
+
+                console.log('Fetching real-time user data for:', userEmail);
+
+                // Fetch fresh user data including Innovation progress
+                const response = await fetch(`/api/harty/user/${encodeURIComponent(userEmail)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    if (userData.success && userData.data) {
+                        // Extract Innovation progress data
+                        const innovationPercentage = userData.data.innovationPercentage || 0;
+                        const innovationProgress = userData.data.innovationProgress || {};
+
+                        console.log('Real-time Innovation progress:', {
+                            percentage: innovationPercentage,
+                            progress: innovationProgress
+                        });
+
+                        // Update localStorage with fresh Innovation data
+                        localStorage.setItem('innovationProgress', JSON.stringify(innovationProgress));
+                        localStorage.setItem('innovationPercentage', innovationPercentage.toString());
+
+                        // Update progress with or without loading animation
+                        if (showLoadingState) {
+                            setTimeout(() => {
+                                percentageText.classList.remove('glitch-animation');
+                                progressText.classList.remove('glitch-animation');
+                                updateKeyProgress(innovationPercentage);
+                            }, 600);
+                        } else {
+                            // Quick update for real-time polling
+                            updateKeyProgress(innovationPercentage);
+                        }
+
+                        return userData.data;
+                    } else {
+                        console.warn('Failed to get user data:', userData.message);
+                        if (showLoadingState) {
+                            setTimeout(() => {
+                                percentageText.classList.remove('glitch-animation');
+                                progressText.classList.remove('glitch-animation');
+                                updateKeyProgress(0);
+                            }, 800);
+                        } else {
+                            updateKeyProgress(0);
+                        }
+                    }
+                } else {
+                    console.error('Error fetching user data:', response.status);
+                    if (showLoadingState) {
+                        setTimeout(() => {
+                            percentageText.classList.remove('glitch-animation');
+                            progressText.classList.remove('glitch-animation');
+                            updateKeyProgress(0);
+                        }, 800);
+                    } else {
+                        updateKeyProgress(0);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                if (showLoadingState) {
+                    setTimeout(() => {
+                        percentageText.classList.remove('glitch-animation');
+                        progressText.classList.remove('glitch-animation');
+                        updateKeyProgress(0);
+                    }, 800);
+                } else {
+                    updateKeyProgress(0);
+                }
+            }
+        }
+
+        // Set up real-time data polling for Innovation progress
+        function startRealTimeUpdates() {
+            // Initial load with loading animation
+            fetchUserData(true);
+
+            // Poll for updates every 3 seconds to catch AR scan progress (without loading animation)
+            setInterval(() => {
+                fetchUserData(false);
+            }, 3000);
+        }
+
+        // Update key appearance based on progress percentage
+        function updateKeyProgress(percentage) {
+            const keyImage = document.querySelector('.key-image');
+            const percentageText = document.getElementById('innovationPercentage');
+            const progressText = document.querySelector('.progress-text');
+
+            // Trigger final glitch animation on both text elements before updating
+            percentageText.classList.remove('glitch-animation');
+            progressText.classList.remove('glitch-animation');
+            percentageText.classList.add('glitch-animation-once');
+            progressText.classList.add('glitch-animation-once');
+
+            // Update percentage display with slight delay for dramatic effect
+            setTimeout(() => {
+                percentageText.textContent = `${percentage}%`;
+
+                // Calculate remaining keys to scan
+                const scannedCount = Math.floor(percentage / 25);
+                const remainingKeys = 4 - scannedCount;
+
+                // Update progress text
+                if (remainingKeys > 0) {
+                    progressText.textContent = `Click to scan ${remainingKeys} more keys`;
+                } else {
+                    progressText.textContent = 'All keys scanned! Click to continue';
+                }
+            }, 200);
+
+            // Remove glitch animation after it completes
+            setTimeout(() => {
+                percentageText.classList.remove('glitch-animation-once');
+                progressText.classList.remove('glitch-animation-once');
+            }, 800);
+
+            // Update key appearance with slight delay for smoother transition
+            setTimeout(() => {
+                // Remove all progress classes
+                keyImage.classList.remove('progress-0', 'progress-25', 'progress-50', 'progress-75', 'progress-100');
+
+                // Add appropriate progress class
+                if (percentage >= 100) {
+                    keyImage.classList.add('progress-100');
+                } else if (percentage >= 75) {
+                    keyImage.classList.add('progress-75');
+                } else if (percentage >= 50) {
+                    keyImage.classList.add('progress-50');
+                } else if (percentage >= 25) {
+                    keyImage.classList.add('progress-25');
+                } else {
+                    keyImage.classList.add('progress-0');
+                }
+            }, 300);
+        }
+
         // Add some interactive effects
         document.addEventListener('DOMContentLoaded', function() {
+            // Start real-time Innovation progress updates
+            startRealTimeUpdates();
+
             // Animate the key image on load
             const keyImage = document.querySelector('.key-image');
             keyImage.style.opacity = '0';
@@ -403,7 +670,7 @@
 
             setTimeout(() => {
                 keyImage.style.transition = 'all 1s ease-out';
-                keyImage.style.opacity = '1';
+                keyImage.style.opacity = '0.6'; // Start with reduced opacity
                 keyImage.style.transform = 'scale(1)';
             }, 300);
 
