@@ -1932,6 +1932,520 @@
             background: #22B2B9;
         }
 
+        /* New Visual Rules Modal Styles */
+        .mission-overview {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(34, 178, 185, 0.1) 0%, rgba(0, 148, 109, 0.1) 100%);
+            border-radius: 10px;
+            border: 1px solid rgba(107, 228, 240, 0.2);
+        }
+
+        .mission-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .mission-icon {
+            font-size: 24px;
+            animation: missionPulse 2s ease-in-out infinite;
+        }
+
+        .mission-title h3 {
+            margin: 0;
+            color: #22B2B9;
+            font-size: 20px;
+            font-weight: 700;
+            text-shadow: 0 0 5px rgba(34, 178, 185, 0.5);
+        }
+
+        .mission-desc {
+            color: #6be4f0;
+            font-size: 14px;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        @keyframes missionPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Progress Flow */
+        .progress-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(0, 6, 22, 0.6);
+            border-radius: 15px;
+            border: 2px solid rgba(107, 228, 240, 0.3);
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #22B2B9, #00946D);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(34, 178, 185, 0.6);
+        }
+
+        .step-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            color: #6be4f0;
+            font-weight: 700;
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px rgba(107, 228, 240, 0.7);
+        }
+
+        .step-desc {
+            color: #6be4f0;
+            font-size: 24px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .flow-arrow {
+            color: #22B2B9;
+            font-size: 36px;
+            font-weight: bold;
+            margin: 0 20px;
+        }
+
+        @keyframes stepGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(34, 178, 185, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(34, 178, 185, 0.8); }
+        }
+
+        @keyframes stepFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes arrowPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* New Enhanced Animations */
+        @keyframes flowPulse {
+            0%, 100% {
+                border-color: rgba(107, 228, 240, 0.3);
+                box-shadow: 0 0 10px rgba(34, 178, 185, 0.2);
+            }
+            50% {
+                border-color: rgba(107, 228, 240, 0.6);
+                box-shadow: 0 0 20px rgba(34, 178, 185, 0.4);
+            }
+        }
+
+        @keyframes stepBounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes stepRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes iconGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(107, 228, 240, 0.5)); }
+            50% { filter: drop-shadow(0 0 15px rgba(107, 228, 240, 0.8)); }
+        }
+
+        @keyframes textShimmer {
+            0%, 100% { color: #6be4f0; text-shadow: 0 0 5px rgba(107, 228, 240, 0.7); }
+            50% { color: #22B2B9; text-shadow: 0 0 10px rgba(34, 178, 185, 0.9); }
+        }
+
+        @keyframes textFade {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes arrowSlide {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(3px); }
+        }
+
+        @keyframes keyCollectionSlide {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(2px); }
+        }
+
+        @keyframes titlePulse {
+            0%, 100% {
+                color: #22B2B9;
+                text-shadow: 0 0 8px rgba(34, 178, 185, 0.7);
+                transform: scale(1);
+            }
+            50% {
+                color: #6be4f0;
+                text-shadow: 0 0 15px rgba(107, 228, 240, 0.9);
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes keyItemFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-2px); }
+        }
+
+        @keyframes keyItemHover {
+            0% { transform: translateY(-5px) scale(1.05); }
+            50% { transform: translateY(-7px) scale(1.08); }
+            100% { transform: translateY(-5px) scale(1.05); }
+        }
+
+        @keyframes keySparkle {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 5px rgba(107, 228, 240, 0.5)); }
+            25% { filter: brightness(1.2) drop-shadow(0 0 10px rgba(107, 228, 240, 0.7)); }
+            50% { filter: brightness(1.4) drop-shadow(0 0 15px rgba(107, 228, 240, 0.9)); }
+            75% { filter: brightness(1.2) drop-shadow(0 0 10px rgba(107, 228, 240, 0.7)); }
+        }
+
+        @keyframes keyGlowPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.7; }
+        }
+
+        @keyframes keyNameGlow {
+            0%, 100% {
+                color: #6be4f0;
+                text-shadow: 0 0 5px rgba(107, 228, 240, 0.7);
+            }
+            50% {
+                color: #4ECDC4;
+                text-shadow: 0 0 10px rgba(78, 205, 196, 0.8);
+            }
+        }
+
+        @keyframes statusGlow {
+            0%, 100% {
+                background: rgba(78, 205, 196, 0.3);
+                box-shadow: 0 0 5px rgba(78, 205, 196, 0.3);
+            }
+            50% {
+                background: rgba(78, 205, 196, 0.5);
+                box-shadow: 0 0 10px rgba(78, 205, 196, 0.6);
+            }
+        }
+
+        @keyframes collectedPulse {
+            0%, 100% {
+                transform: scale(1);
+                background: rgba(78, 205, 196, 0.4);
+                box-shadow: 0 0 8px rgba(78, 205, 196, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                background: rgba(78, 205, 196, 0.6);
+                box-shadow: 0 0 15px rgba(78, 205, 196, 0.8);
+            }
+        }
+
+        /* Key Collection Grid */
+        .key-collection {
+            margin-bottom: 40px;
+        }
+
+        .collection-title {
+            color: #22B2B9;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(34, 178, 185, 0.7);
+        }
+
+        .keys-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .key-item {
+            background: linear-gradient(135deg, rgba(0, 6, 22, 0.8) 0%, rgba(34, 178, 185, 0.1) 100%);
+            border: 2px solid rgba(107, 228, 240, 0.4);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .key-item:hover {
+            transform: translateY(-3px);
+            border-color: rgba(107, 228, 240, 0.8);
+            box-shadow: 0 8px 25px rgba(34, 178, 185, 0.5);
+        }
+
+        .key-visual {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .key-icon {
+            font-size: 64px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .key-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(107, 228, 240, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .key-name {
+            color: #6be4f0;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px rgba(107, 228, 240, 0.7);
+        }
+
+        .key-status {
+            color: #4ECDC4;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 8px 15px;
+            background: rgba(78, 205, 196, 0.3);
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .key-status.collected {
+            color: #4ECDC4;
+            background: rgba(78, 205, 196, 0.4);
+        }
+
+        @keyframes keyFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-2px) rotate(2deg); }
+            66% { transform: translateY(1px) rotate(-1deg); }
+        }
+
+        @keyframes keyGlow {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        /* Quick Instructions */
+        .quick-instructions {
+            margin-bottom: 20px;
+        }
+
+        .quick-instructions h4 {
+            color: #22B2B9;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            text-shadow: 0 0 5px rgba(34, 178, 185, 0.5);
+        }
+
+        .instruction-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: rgba(0, 6, 22, 0.6);
+            border: 1px solid rgba(107, 228, 240, 0.2);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .instruction-item:hover {
+            border-color: rgba(107, 228, 240, 0.5);
+            background: rgba(34, 178, 185, 0.1);
+            transform: translateX(3px);
+        }
+
+        .instruction-icon {
+            font-size: 16px;
+            animation: instructionBounce 2s ease-in-out infinite;
+        }
+
+        .instruction-text {
+            color: #6be4f0;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        @keyframes instructionBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Start Button */
+        .start-section {
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(107, 228, 240, 0.2);
+        }
+
+        .start-ar-btn {
+            position: relative;
+            background: linear-gradient(135deg, #22B2B9 0%, #00946D 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            color: #000;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(34, 178, 185, 0.4);
+        }
+
+        .start-ar-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 25px rgba(34, 178, 185, 0.6);
+        }
+
+        .start-ar-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .btn-icon {
+            font-size: 16px;
+            animation: rocketPulse 1.5s ease-in-out infinite;
+        }
+
+        .btn-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn-glow {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .start-ar-btn:hover .btn-glow {
+            left: 100%;
+        }
+
+        @keyframes rocketPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            .progress-flow {
+                flex-direction: column;
+                gap: 25px;
+                padding: 25px 15px;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+                margin: 15px 0;
+                font-size: 30px;
+            }
+
+            .keys-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .rules-modal-content {
+                width: 95vw;
+                margin: 10px;
+            }
+
+            .step-desc {
+                font-size: 16px;
+            }
+
+            .step-title {
+                font-size: 20px;
+            }
+
+            .step-icon {
+                font-size: 40px;
+            }
+
+            .step-number {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
+            .collection-title {
+                font-size: 28px;
+            }
+
+            .key-icon {
+                font-size: 56px;
+            }
+
+            .key-name {
+                font-size: 18px;
+            }
+
+            .key-status {
+                font-size: 14px;
+            }
+
+            .key-item {
+                padding: 20px;
+            }
+        }
+
         /* Program Details Modal Styles */
         .program-modal {
             display: none;
@@ -3003,39 +3517,71 @@
     <div id="rulesModal" class="rules-modal">
         <div class="rules-modal-content">
             <div class="rules-header">
-                <h2>🎯 MISSION BRIEFING</h2>
+                <h2>🎮 HOW TO PLAY</h2>
                 <span class="close-button" onclick="hideRules()">&times;</span>
             </div>
             <div class="rules-body">
-                <div class="mission-section">
-                    <h3>📋 YOUR MISSION</h3>
-                    <p>Welcome to CMKL University's AR Experience! Your mission is to explore our campus through augmented reality and collect all the hidden keys.</p>
+                <!-- Visual Progress Flow -->
+                <div class="progress-flow">
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-icon">📱</div>
+                        <div class="step-title">SCAN</div>
+                        <div class="step-desc">Point camera at AR markers</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-icon">🔍</div>
+                        <div class="step-title">DISCOVER</div>
+                        <div class="step-desc">Find hidden objects</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-icon">🔑</div>
+                        <div class="step-title">COLLECT</div>
+                        <div class="step-desc">Gather all 3 keys</div>
+                    </div>
                 </div>
-                
-                <div class="mission-section">
-                    <h3>🔑 OBJECTIVES</h3>
-                    <ul>
-                        <li>Navigate through different AR targets</li>
-                        <li>Collect 3 hidden keys during your journey</li>
-                        <li>Learn about CMKL University programs</li>
-                        <li>Complete the full AR experience</li>
-                    </ul>
+
+                <!-- Key Collection Grid -->
+                <div class="key-collection">
+                    <h4 class="collection-title">🎯 TARGET KEYS</h4>
+                    <div class="keys-grid">
+                        <div class="key-item" data-key="1">
+                            <div class="key-visual">
+                                <div class="key-icon">🗝️</div>
+                                <div class="key-glow"></div>
+                            </div>
+                            <div class="key-info">
+                                <div class="key-name">REGISTER KEY</div>
+                                <div class="key-status" id="keyStatus1">PENDING</div>
+                            </div>
+                        </div>
+                        <div class="key-item" data-key="2">
+                            <div class="key-visual">
+                                <div class="key-icon">🔐</div>
+                                <div class="key-glow"></div>
+                            </div>
+                            <div class="key-info">
+                                <div class="key-name">PROJECT KEY</div>
+                                <div class="key-status" id="keyStatus2">PENDING</div>
+                            </div>
+                        </div>
+                        <div class="key-item" data-key="3">
+                            <div class="key-visual">
+                                <div class="key-icon">🔑</div>
+                                <div class="key-glow"></div>
+                            </div>
+                            <div class="key-info">
+                                <div class="key-name">SESSION KEY</div>
+                                <div class="key-status" id="keyStatus3">PENDING</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="mission-section">
-                    <h3>🎮 HOW TO PLAY</h3>
-                    <ul>
-                        <li>Allow camera permissions when prompted</li>
-                        <li>Point your camera at AR markers</li>
-                        <li>Tap on discovered objects to interact</li>
-                        <li>Look for glowing indicators and key symbols</li>
-                    </ul>
-                </div>
-                
-                <div class="mission-section">
-                    <h3>🏆 SUCCESS CRITERIA</h3>
-                    <p>Successfully collect all 3 keys to unlock the final reward and complete your CMKL University AR adventure!</p>
-                </div>
+
             </div>
         </div>
     </div>
@@ -3867,6 +4413,11 @@
             // Add glitchy entrance animation
             modal.style.animation = 'modalGlitchIn 0.4s ease-out';
             modal.style.opacity = '1';
+
+            // Update key status after modal is shown
+            setTimeout(() => {
+                updateKeyStatus();
+            }, 100);
         }
         
         function logout() {
@@ -3891,6 +4442,78 @@
             setTimeout(() => {
                 modal.style.display = 'none';
             }, 300);
+        }
+
+        function startARExperience() {
+            // Close rules modal first
+            hideRules();
+
+            // Show loading message
+            showVRMessage('Initializing AR Experience...');
+
+            // Navigate to scanner after short delay
+            setTimeout(() => {
+                window.location.href = 'scanner.html';
+            }, 1500);
+        }
+
+        function updateKeyStatus() {
+            // Get user data from localStorage
+            const userEmail = localStorage.getItem('userEmail');
+            if (!userEmail) return;
+
+            // Get key statuses from localStorage
+            const registerKey = localStorage.getItem('userRegisterKeyStatus');
+            const projectKey = localStorage.getItem('userProjectKeyStatus');
+            const sessionKey = localStorage.getItem('userAfternoonKeyStatus');
+
+            // Update key status displays
+            updateKeyDisplay('keyStatus1', registerKey);
+            updateKeyDisplay('keyStatus2', projectKey);
+            updateKeyDisplay('keyStatus3', sessionKey);
+        }
+
+        function updateKeyDisplay(elementId, keyStatus) {
+            const statusElement = document.getElementById(elementId);
+            if (!statusElement) return;
+
+            const keyItem = statusElement.closest('.key-item');
+
+            if (keyStatus === 'collected' || keyStatus === 'scanned') {
+                statusElement.textContent = 'COLLECTED';
+                statusElement.className = 'key-status collected';
+                keyItem.style.background = 'linear-gradient(135deg, rgba(78, 205, 196, 0.2) 0%, rgba(34, 178, 185, 0.3) 100%)';
+                keyItem.style.borderColor = 'rgba(78, 205, 196, 0.6)';
+
+                // Add special collected animation
+                const keyIcon = keyItem.querySelector('.key-icon');
+                if (keyIcon) {
+                    keyIcon.style.animation = 'keyFloat 1s ease-in-out infinite, keyCollectedGlow 2s ease-in-out infinite';
+                }
+            } else {
+                // Hide status for non-collected keys
+                statusElement.style.display = 'none';
+            }
+        }
+
+        // Add CSS for collected key animation
+        function addCollectedKeyAnimation() {
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes keyCollectedGlow {
+                    0%, 100% { filter: drop-shadow(0 0 5px rgba(78, 205, 196, 0.5)); }
+                    50% { filter: drop-shadow(0 0 15px rgba(78, 205, 196, 0.8)); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Initialize key status when rules modal is shown
+        function showRulesWithKeyStatus() {
+            showRules();
+            setTimeout(() => {
+                updateKeyStatus();
+            }, 100);
         }
         
         // Close modal when clicking outside of it
@@ -4036,10 +4659,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Add page glitch animation
             document.body.classList.add('page-glitch-in');
-            
+
             // Display the user's last name from localStorage
             displayUserLastName();
-            
+
+            // Initialize visual features for new rules modal
+            addCollectedKeyAnimation();
+            updateKeyStatus();
+
             // Auto-show rules modal is now handled after fresh data is loaded in checkUserSession
             
             document.querySelectorAll('.nav-card').forEach((card, index) => {
