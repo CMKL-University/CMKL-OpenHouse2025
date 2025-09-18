@@ -280,7 +280,7 @@
     
     <a-scene
       id="ar-scene"
-      mindar-image="imageTargetSrc: /model/registration.mind; maxTrack: 4; uiScanning: #custom-scanning-overlay"
+      mindar-image="imageTargetSrc: model/registration.mind; maxTrack: 4; uiScanning: #custom-scanning-overlay"
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
@@ -288,23 +288,23 @@
       
       <a-assets>
         <!-- Registration Model -->
-        <a-asset-item id="registerModel" src="/model/register.gltf"></a-asset-item>
+        <a-asset-item id="registerModel" src="model/register.gltf"></a-asset-item>
 
         <!-- Innovation Key Models -->
-        <a-asset-item id="innovationModel1" src="/model/Innovation_key/in1.gltf"></a-asset-item>
-        <a-asset-item id="innovationModel2" src="/model/Innovation_key/in2.gltf"></a-asset-item>
-        <a-asset-item id="innovationModel3" src="/model/Innovation_key/in3.gltf"></a-asset-item>
-        <a-asset-item id="innovationModel4" src="/model/Innovation_key/in4.gltf"></a-asset-item>
+        <a-asset-item id="innovationModel1" src="model/Innovation_key/in1.gltf"></a-asset-item>
+        <a-asset-item id="innovationModel2" src="model/Innovation_key/in2.gltf"></a-asset-item>
+        <a-asset-item id="innovationModel3" src="model/Innovation_key/in3.gltf"></a-asset-item>
+        <a-asset-item id="innovationModel4" src="model/Innovation_key/in4.gltf"></a-asset-item>
 
         <!-- Wonder Key Models -->
-        <a-asset-item id="wonderModel1" src="/model/Wonder_key/wd1.gltf"></a-asset-item>
-        <a-asset-item id="wonderModel2" src="/model/Wonder_key/wd2.gltf"></a-asset-item>
-        <a-asset-item id="wonderModel3" src="/model/Wonder_key/wd3.gltf"></a-asset-item>
-        <a-asset-item id="wonderModel4" src="/model/magic_key/scene.gltf"></a-asset-item> <!-- Dummy for missing wd4 -->
-        <a-asset-item id="wonderModel5" src="/model/Wonder_key/wd5.gltf"></a-asset-item>
+        <a-asset-item id="wonderModel1" src="model/Wonder_key/wd1.gltf"></a-asset-item>
+        <a-asset-item id="wonderModel2" src="model/Wonder_key/wd2.gltf"></a-asset-item>
+        <a-asset-item id="wonderModel3" src="model/Wonder_key/wd3.gltf"></a-asset-item>
+        <a-asset-item id="wonderModel4" src="model/magic_key/scene.gltf"></a-asset-item> <!-- Dummy for missing wd4 -->
+        <a-asset-item id="wonderModel5" src="model/Wonder_key/wd5.gltf"></a-asset-item>
 
         <!-- Legacy models for fallback -->
-        <a-asset-item id="bearModel" src="/model/magic_key/scene.gltf"></a-asset-item>
+        <a-asset-item id="bearModel" src="model/magic_key/scene.gltf"></a-asset-item>
         <a-asset-item id="raccoonModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf"></a-asset-item>
       </a-assets>
 
@@ -401,7 +401,7 @@
         const targetIndex = parseInt(targetParam) - 1; // Convert to 0-based index
 
         // Use the specific Innovation Key target
-        const innovationMindFile = `/model/Innovation_key/${targetParam}.mind`;
+        const innovationMindFile = `model/Innovation_key/${targetParam}.mind`;
         sceneElement.setAttribute('mindar-image', `imageTargetSrc: ${innovationMindFile}; maxTrack: 1; uiScanning: #custom-scanning-overlay`);
         console.log('🎯 Using Innovation Key file:', innovationMindFile);
         console.log(`🎯 Current target: IN${targetParam}`);
@@ -422,7 +422,7 @@
         const targetIndex = parseInt(targetParam) - 1; // Convert to 0-based index
 
         // Use the specific Wonder Key target
-        const wonderMindFile = `/model/Wonder_key/${targetParam}.mind`;
+        const wonderMindFile = `model/Wonder_key/${targetParam}.mind`;
         sceneElement.setAttribute('mindar-image', `imageTargetSrc: ${wonderMindFile}; maxTrack: 1; uiScanning: #custom-scanning-overlay`);
         console.log('🎯 Using Wonder Key file:', wonderMindFile);
         console.log(`🎯 Current target: WD${targetParam}`);
@@ -504,7 +504,7 @@
       }
 
       // Test if model files are accessible
-      fetch('/model/registration.mind')
+      fetch('model/registration.mind')
         .then(response => {
           console.log('📄 Mind file status:', response.status, response.ok ? '✅' : '❌');
           if (!response.ok) {
@@ -513,7 +513,7 @@
         })
         .catch(err => console.error('❌ Mind file fetch error:', err));
 
-      fetch('/model/magic_key/scene.gltf')
+      fetch('model/magic_key/scene.gltf')
         .then(response => {
           console.log('🎭 GLTF model status:', response.status, response.ok ? '✅' : '❌');
           if (!response.ok) {
@@ -523,7 +523,7 @@
         .catch(err => console.error('❌ GLTF model fetch error:', err));
 
       // Test binary file (.bin) accessibility
-      fetch('/model/magic_key/scene.bin')
+      fetch('model/magic_key/scene.bin')
         .then(response => {
           console.log('🔧 GLTF binary status:', response.status, response.ok ? '✅' : '❌');
           if (!response.ok) {
@@ -533,7 +533,7 @@
         .catch(err => console.error('❌ GLTF binary fetch error:', err));
 
       // Test texture file accessibility
-      fetch('/model/magic_key/textures/Material.001_baseColor.jpeg')
+      fetch('model/magic_key/textures/Material.001_baseColor.jpeg')
         .then(response => {
           console.log('🖼️ Texture file status:', response.status, response.ok ? '✅' : '❌');
           if (!response.ok) {
