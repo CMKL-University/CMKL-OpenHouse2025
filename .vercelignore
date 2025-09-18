@@ -1,16 +1,20 @@
-# Exclude large model files from Vercel deployment
-# These should be served from external CDN or uploaded separately
+# Exclude backup and original large model files from Vercel deployment
+# All models have been compressed and are now within size limits
 
-# Large Innovation Key models
-model/Innovation_key/in1.gltf
-model/Innovation_key/in4.gltf
-model/register.gltf
+# Backup original files (not needed for deployment)
+model_backup/
+model/*_original.gltf
+model/*/*_original.gltf
+model/*_compressed.*
+model/*/*_compressed.*
 
-# Keep smaller models that are already working:
-# model/Innovation_key/in2.gltf (4MB - OK)
-# model/Innovation_key/in3.gltf (28MB - OK)
-# model/Wonder_key/*.gltf (all small - OK)
-# model/magic_key/scene.gltf (small - OK)
+# All compressed models are now small enough for Vercel:
+# model/Innovation_key/in1.gltf (530KB - compressed)
+# model/Innovation_key/in2.gltf (4MB - already small)
+# model/Innovation_key/in3.gltf (26MB - compressed)
+# model/Innovation_key/in4.gltf (1.3MB - compressed)
+# model/register.gltf (56MB - compressed)
+# model/key_1_3.gltf (10MB - compressed)
 
 # You can also exclude entire directories if needed:
 # model/Innovation_key/
