@@ -287,20 +287,37 @@
       device-orientation-permission-ui="enabled: false">
       
       <a-assets>
+        <!-- Registration Model -->
+        <a-asset-item id="registerModel" src="model/register.gltf"></a-asset-item>
+
+        <!-- Innovation Key Models -->
+        <a-asset-item id="innovationModel1" src="model/Innovation_key/in1.gltf"></a-asset-item>
+        <a-asset-item id="innovationModel2" src="model/Innovation_key/in2.gltf"></a-asset-item>
+        <a-asset-item id="innovationModel3" src="model/Innovation_key/in3.gltf"></a-asset-item>
+        <a-asset-item id="innovationModel4" src="model/Innovation_key/in4.gltf"></a-asset-item>
+
+        <!-- Wonder Key Models -->
+        <a-asset-item id="wonderModel1" src="model/Wonder_key/wd1.gltf"></a-asset-item>
+        <a-asset-item id="wonderModel2" src="model/Wonder_key/wd2.gltf"></a-asset-item>
+        <a-asset-item id="wonderModel3" src="model/Wonder_key/wd3.gltf"></a-asset-item>
+        <a-asset-item id="wonderModel4" src="model/magic_key/scene.gltf"></a-asset-item> <!-- Dummy for missing wd4 -->
+        <a-asset-item id="wonderModel5" src="model/Wonder_key/wd5.gltf"></a-asset-item>
+
+        <!-- Legacy models for fallback -->
         <a-asset-item id="bearModel" src="model/magic_key/scene.gltf"></a-asset-item>
         <a-asset-item id="raccoonModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- Target 1 - Bear Model -->
+      <!-- Target 1 - Registration Model -->
       <a-entity id="target1" mindar-image-target="targetIndex: 0">
-        <a-gltf-model 
+        <a-gltf-model
           id="model1"
-          rotation="0 0 0" 
-          position="0 0 0" 
+          rotation="0 0 0"
+          position="0 0 0"
           scale="0.5 0.5 0.5"
-          src="#bearModel"
+          src="#registerModel"
           animation__scale="property: scale; to: 1.0 1.0 1.0; startEvents: targetfound; dur: 1000; easing: easeOutBack"
           animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
         </a-gltf-model>
@@ -319,28 +336,28 @@
         </a-gltf-model>
       </a-entity>
 
-      <!-- Target 3 - For Innovation Key (IN3) -->
+      <!-- Target 3 - Innovation Key (IN3) -->
       <a-entity id="target3" mindar-image-target="targetIndex: 2">
         <a-gltf-model
           id="model3"
           rotation="0 0 0"
           position="0 0 0"
           scale="0.5 0.5 0.5"
-          src="#bearModel"
+          src="#innovationModel3"
           animation__scale="property: scale; to: 1.0 1.0 1.0; startEvents: targetfound; dur: 1000; easing: easeOutBack"
           animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
         </a-gltf-model>
       </a-entity>
 
-      <!-- Target 4 - For Innovation Key (IN4) -->
+      <!-- Target 4 - Innovation Key (IN4) -->
       <a-entity id="target4" mindar-image-target="targetIndex: 3">
         <a-gltf-model
           id="model4"
           rotation="0 0 0"
           position="0 0 0"
-          scale="0.05 0.05 0.05"
-          src="#raccoonModel"
-          animation__scale="property: scale; to: 0.1 0.1 0.1; startEvents: targetfound; dur: 1000; easing: easeOutBack"
+          scale="0.5 0.5 0.5"
+          src="#innovationModel4"
+          animation__scale="property: scale; to: 1.0 1.0 1.0; startEvents: targetfound; dur: 1000; easing: easeOutBack"
           animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
         </a-gltf-model>
       </a-entity>
@@ -421,6 +438,43 @@
         console.log('🎯 Using default registration.mind file');
       }
 
+      // Dynamic Model Assignment based on key type and target
+      function assignCorrectModels() {
+        console.log('🎨 Assigning correct models based on current mode...');
+
+        if (isInnovationKey) {
+          const currentTarget = window.currentInnovationTarget;
+          const targetNumber = currentTarget.number;
+          const modelId = `#innovationModel${targetNumber}`;
+
+          // Update the model source for target1 (which is used in Innovation Key mode)
+          const model1 = document.getElementById('model1');
+          if (model1) {
+            model1.setAttribute('src', modelId);
+            console.log(`✅ Set target1 model to: ${modelId} (IN${targetNumber})`);
+          }
+
+        } else if (isWonderKey) {
+          const currentTarget = window.currentWonderTarget;
+          const targetNumber = currentTarget.number;
+          const modelId = `#wonderModel${targetNumber}`;
+
+          // Update the model source for target1 (which is used in Wonder Key mode)
+          const model1 = document.getElementById('model1');
+          if (model1) {
+            model1.setAttribute('src', modelId);
+            console.log(`✅ Set target1 model to: ${modelId} (WD${targetNumber})`);
+          }
+
+        } else {
+          // Default registration mode - already set to #registerModel
+          console.log('✅ Using default registration model for target1');
+        }
+      }
+
+      // Apply model assignments after DOM is ready
+      setTimeout(assignCorrectModels, 100);
+
       // Debug logging for production troubleshooting
       console.log('🔍 AR Scanner Debug Info:');
       console.log('📍 Current URL:', window.location.href);
@@ -487,6 +541,34 @@
           }
         })
         .catch(err => console.error('❌ Texture file fetch error:', err));
+
+      // Comprehensive Model File Validation
+      const modelsToTest = [
+        { name: 'Registration Model', path: 'model/register.gltf' },
+        { name: 'Innovation Model 1', path: 'model/Innovation_key/in1.gltf' },
+        { name: 'Innovation Model 2', path: 'model/Innovation_key/in2.gltf' },
+        { name: 'Innovation Model 3', path: 'model/Innovation_key/in3.gltf' },
+        { name: 'Innovation Model 4', path: 'model/Innovation_key/in4.gltf' },
+        { name: 'Wonder Model 1', path: 'model/Wonder_key/wd1.gltf' },
+        { name: 'Wonder Model 2', path: 'model/Wonder_key/wd2.gltf' },
+        { name: 'Wonder Model 3', path: 'model/Wonder_key/wd3.gltf' },
+        { name: 'Wonder Model 5', path: 'model/Wonder_key/wd5.gltf' }
+      ];
+
+      console.log('🧪 Testing model file accessibility...');
+      modelsToTest.forEach(model => {
+        fetch(model.path)
+          .then(response => {
+            const status = response.ok ? '✅' : '❌';
+            console.log(`🎯 ${model.name}: ${status} (${response.status})`);
+            if (!response.ok) {
+              console.warn(`⚠️ ${model.name} not accessible: ${response.statusText}`);
+            }
+          })
+          .catch(err => {
+            console.error(`❌ ${model.name} fetch error:`, err);
+          });
+      });
       
       if (!userEmail || !recordId) {
         showStatus('ERROR: User not logged in. Redirecting to registration...', true);
