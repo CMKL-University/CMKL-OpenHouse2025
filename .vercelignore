@@ -5,8 +5,14 @@
 model_backup/
 model/*_original.gltf
 model/*/*_original.gltf
+
+# Exclude compressed files by default, but allow specific ones needed by scanner.html
 model/*_compressed.*
 model/*/*_compressed.*
+
+# Allow these specific compressed files that are needed by scanner.html
+!model/Innovation_key/in1_compressed.gltf
+!model/Innovation_key/in4_compressed.gltf
 
 # All compressed models are now small enough for Vercel:
 # model/Innovation_key/in1.gltf (530KB - compressed)
