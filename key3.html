@@ -319,10 +319,10 @@
         }
 
         /* Action button */
-        .action-button {
-            position: relative;
+        /* .action-button { */
+            /* position: relative; */
             /* margin: 30px auto 0 auto; */
-            display: block;
+            /* display: block;
             padding: 12px 24px;
             background: linear-gradient(135deg, #B2A600, #FFD700);
             border: none;
@@ -336,19 +336,19 @@
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
             box-shadow: 0 0 15px rgba(178, 166, 0, 0.3);
             z-index: 10;
-        }
+        } */
 
-        .action-button:hover {
+        /* .action-button:hover {
             background: linear-gradient(135deg, #FFD700, #FFA500);
             box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
             transform: translateY(-2px);
-        }
+        } */
 
-        .action-button:disabled {
+        /* .action-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
-        }
+        } */
 
         /* Animations */
         @keyframes percentageGlow {
@@ -719,8 +719,8 @@
             </div>
 
             <!-- Action button (moved outside roadmap container) -->
-            <button class="action-button" id="actionButton" onclick="navigateToNextKey()">
-                START SCANNING
+            <button class="action-button" id="actionButton" >
+                <!-- START SCANNING -->
             </button>
         </div>
     </div>
@@ -959,7 +959,7 @@
                     console.log('🎉 All 5 Wonder Keys scanned! Hiding action button.');
                 } else if (scannedCount >= 3) {
                     progressText.textContent = 'Wonder Key unlocked!';
-                    actionButton.textContent = 'CONTINUE SCANNING';
+                    actionButton.textContent = '';
                     actionButton.style.display = 'block'; // Ensure button is visible
 
                     // Check if we should update the Afternoon session Key
