@@ -249,9 +249,293 @@
         transition: all 0.5s ease;
       }
 
+      /* Futuristic Loading Screen - Register.html Style */
+      #futuristic-loading-overlay {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(ellipse at center, #001122 0%, #000616 70%);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Arial', sans-serif;
+        color: #6be4f0;
+        opacity: 1;
+        transition: opacity 1s ease-out;
+      }
+
+      #futuristic-loading-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .loading-container {
+        text-align: center;
+        color: #6be4f0;
+        max-width: 400px;
+        padding: 20px;
+      }
+
+      .loading-header h1 {
+        font-family: 'Arial', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px #6be4f0;
+        animation: textGlow 2s ease-in-out infinite alternate;
+      }
+
+      .loading-header p {
+        font-family: 'Arial', sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        color: #22B2B9;
+        margin-bottom: 40px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      @keyframes textGlow {
+        from { text-shadow: 0 0 10px #6be4f0; }
+        to { text-shadow: 0 0 20px #6be4f0, 0 0 30px #22B2B9; }
+      }
+
+      /* Loading Animation */
+      .loading-animation {
+        margin: 40px 0;
+      }
+
+      .loading-circle {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin: 0 auto;
+      }
+
+      .loading-ring {
+        position: absolute;
+        border: 2px solid transparent;
+        border-radius: 50%;
+        animation: rotate 3s linear infinite;
+      }
+
+      .loading-ring:nth-child(1) {
+        width: 150px;
+        height: 150px;
+        border-top: 2px solid #6be4f0;
+        border-right: 2px solid #6be4f0;
+        animation-duration: 3s;
+      }
+
+      .loading-ring:nth-child(2) {
+        width: 120px;
+        height: 120px;
+        top: 15px;
+        left: 15px;
+        border-bottom: 2px solid #22B2B9;
+        border-left: 2px solid #22B2B9;
+        animation-duration: 2s;
+        animation-direction: reverse;
+      }
+
+      .loading-ring:nth-child(3) {
+        width: 90px;
+        height: 90px;
+        top: 30px;
+        left: 30px;
+        border-top: 2px solid #00946D;
+        border-right: 2px solid #00946D;
+        animation-duration: 1.5s;
+      }
+
+      .loading-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle, #001122, #000616);
+        border: 1px solid #6be4f0;
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 15px #6be4f0;
+      }
+
+      .loading-percentage {
+        font-family: 'Arial', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: #6be4f0;
+        text-shadow: 0 0 5px #6be4f0;
+      }
+
+      @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Progress Bar */
+      .progress-container {
+        margin: 30px 0 20px 0;
+        width: 100%;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 4px;
+        background: rgba(107, 228, 240, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 10px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #6be4f0, #22B2B9);
+        border-radius: 2px;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      .progress-text {
+        font-family: 'Arial', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: #22B2B9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Debug Console */
+      .debug-console {
+        background: rgba(0, 0, 0, 0.7);
+        border: 1px solid #22B2B9;
+        border-radius: 4px;
+        margin-top: 30px;
+        font-family: 'Courier New', monospace;
+        text-align: left;
+      }
+
+      .debug-header {
+        background: linear-gradient(90deg, #22B2B9, #00946D);
+        padding: 8px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 3px 3px 0 0;
+      }
+
+      .debug-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+      }
+
+      .debug-indicator {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10px;
+        color: #fff;
+      }
+
+      .debug-dot {
+        width: 6px;
+        height: 6px;
+        background: #00ff41;
+        border-radius: 50%;
+        animation: pulse 1s ease-in-out infinite;
+      }
+
+      .debug-content {
+        padding: 12px;
+        max-height: 120px;
+        overflow-y: auto;
+        font-size: 10px;
+        line-height: 1.4;
+        color: #6be4f0;
+      }
+
+      .debug-line {
+        margin-bottom: 2px;
+        opacity: 0;
+        animation: fadeInUp 0.3s ease forwards;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+
     </style>
   </head>
   <body>
+    <!-- Futuristic Loading Overlay -->
+    <div id="futuristic-loading-overlay">
+        <div class="loading-container">
+            <!-- Header -->
+            <div class="loading-header">
+                <p>INITIALIZING AR SCANNER...</p>
+            </div>
+            
+            <!-- Main Loading Animation -->
+            <div class="loading-animation">
+                <div class="loading-circle">
+                    <div class="loading-ring"></div>
+                    <div class="loading-ring"></div>
+                    <div class="loading-ring"></div>
+                    <div class="loading-center">
+                        <div class="loading-percentage">0%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-text">LOADING...</div>
+            </div>
+            
+            <!-- Debug Console -->
+            <div class="debug-console">
+                <div class="debug-header">
+                    <span class="debug-title">&gt; AR_SYSTEM.exe</span>
+                    <div class="debug-indicator">
+                        <span class="debug-dot"></span>
+                        <span>ACTIVE</span>
+                    </div>
+                </div>
+                <div class="debug-content" id="debugLog">
+                    <div class="debug-line">[00:00] Initializing AR Matrix...</div>
+                    <div class="debug-line">[00:01] Loading Neural Networks...</div>
+                    <div class="debug-line">[00:02] Calibrating Sensors...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom Scanning Overlay -->
     <div id="custom-scanning-overlay">
       <div class="scanning-content">
@@ -367,6 +651,84 @@
     <script>
       let isProcessing = false;
       const statusEl = document.getElementById('status');
+
+      // Futuristic Loading Controller
+      const futuristicLoading = document.getElementById('futuristic-loading-overlay');
+      const loadingPercentage = futuristicLoading.querySelector('.loading-percentage');
+      const progressFill = futuristicLoading.querySelector('.progress-fill');
+      const progressText = futuristicLoading.querySelector('.progress-text');
+      const debugLog = futuristicLoading.querySelector('#debugLog');
+      
+      // Loading sequence messages
+      const loadingSteps = [
+        { percent: 0, text: "INITIALIZING...", debug: "[00:00] Starting AR initialization..." },
+        { percent: 20, text: "LOADING MODELS...", debug: "[00:01] Loading 3D model assets..." },
+        { percent: 40, text: "CALIBRATING...", debug: "[00:02] Calibrating AR tracking system..." },
+        { percent: 60, text: "PROCESSING...", debug: "[00:03] Processing mind files..." },
+        { percent: 80, text: "FINALIZING...", debug: "[00:04] Establishing AR connection..." },
+        { percent: 100, text: "COMPLETE!", debug: "[00:05] AR system ready!" }
+      ];
+      
+      let currentStep = 0;
+      
+      // Add debug line to console
+      function addDebugLine(message) {
+        const debugLine = document.createElement('div');
+        debugLine.className = 'debug-line';
+        debugLine.textContent = message;
+        debugLine.style.animationDelay = '0.1s';
+        debugLog.appendChild(debugLine);
+        
+        // Auto-scroll to bottom
+        debugLog.scrollTop = debugLog.scrollHeight;
+        
+        // Keep only last 8 lines
+        const lines = debugLog.querySelectorAll('.debug-line');
+        if (lines.length > 8) {
+          lines[0].remove();
+        }
+      }
+      
+      // Update loading progress
+      function updateLoadingProgress() {
+        if (currentStep < loadingSteps.length) {
+          const step = loadingSteps[currentStep];
+          
+          // Update percentage and progress bar
+          loadingPercentage.textContent = step.percent + '%';
+          progressFill.style.width = step.percent + '%';
+          progressText.textContent = step.text;
+          
+          // Add debug message
+          addDebugLine(step.debug);
+          
+          currentStep++;
+          
+          // Continue to next step
+          if (currentStep < loadingSteps.length) {
+            setTimeout(updateLoadingProgress, 800);
+          }
+        }
+      }
+      
+      // Start loading animation
+      setTimeout(updateLoadingProgress, 500);
+      
+      // Hide futuristic loading when AR is ready
+      function hideFuturisticLoading() {
+        console.log('🚀 Hiding futuristic loading overlay');
+        
+        // Add final debug message
+        addDebugLine('[00:06] Transitioning to AR scanner...');
+        
+        // Wait a bit then hide
+        setTimeout(() => {
+          futuristicLoading.classList.add('hidden');
+          setTimeout(() => {
+            futuristicLoading.style.display = 'none';
+          }, 1000);
+        }, 500);
+      }
 
       // Get user data from localStorage
       const userEmail = localStorage.getItem('userEmail');
@@ -920,12 +1282,12 @@
 
           console.log(`🎯 Wonder Key Target detected!`);
           console.log(`🎯 Mind file: ${currentTarget.mindFile}`);
-          console.log(`🎯 Mapping to ${wonderKey.toUpperCase()} (actualTargetIndex: ${actualTargetIndex})`);
+          console.log(`🎯 Scanned from ${keyNumber}.mind file (${wonderKey.toUpperCase()})`);
 
           // Check if already scanned using the actual Wonder Key number
           if (checkIfAlreadyScanned(actualTargetIndex, keyNumber)) {
-            console.log(`Wonder Target ${wonderKey.toUpperCase()} already scanned - showing status only`);
-            statusEl.textContent = `✅ WONDER TARGET ${wonderKey.toUpperCase()} ALREADY SCANNED`;
+            console.log(`Wonder Target from ${keyNumber}.mind already scanned - showing status only`);
+            statusEl.textContent = `✅ WONDER TARGET FROM ${keyNumber}.MIND ALREADY SCANNED`;
             statusEl.className = 'status-overlay collected-message';
           }
         } else {
@@ -961,8 +1323,9 @@
         } else if (isWonderKey) {
           const currentTarget = window.currentWonderTarget;
           const wonderKey = currentTarget.key;
-          showStatus(`🔄 SCANNING WONDER TARGET ${wonderKey.toUpperCase()}...`);
-          console.log(`🔄 Processing Wonder Target ${wonderKey.toUpperCase()}`);
+          const mindFileNumber = currentTarget.number;
+          showStatus(`🔄 SCANNING WONDER TARGET FROM ${mindFileNumber}.MIND...`);
+          console.log(`🔄 Processing Wonder Target from ${mindFileNumber}.mind file`);
         } else {
           showStatus(`🔄 COLLECTING KEY #${keyNumber}...`);
         }
@@ -991,9 +1354,10 @@
             } else if (isWonderKey) {
               const currentTarget = window.currentWonderTarget;
               const wonderKey = currentTarget.key;
-              statusEl.textContent = `✅ WONDER TARGET ${wonderKey.toUpperCase()} SCANNED!`;
+              const mindFileNumber = currentTarget.number;
+              statusEl.textContent = `✅ WONDER TARGET FROM ${mindFileNumber}.MIND SCANNED!`;
               statusEl.className = 'status-overlay collected-message';
-              console.log(`Wonder Target ${wonderKey.toUpperCase()} auto-scanned successfully!`);
+              console.log(`Wonder Target from ${mindFileNumber}.mind auto-scanned successfully!`);
 
               // Transform button to "Done" with futuristic animation
               transformButtonToDone();
@@ -1018,9 +1382,10 @@
             } else if (isWonderKey) {
               const currentTarget = window.currentWonderTarget;
               const wonderKey = currentTarget.key;
-              statusEl.textContent = `✅ WONDER TARGET ${wonderKey.toUpperCase()} ALREADY SCANNED`;
+              const mindFileNumber = currentTarget.number;
+              statusEl.textContent = `✅ WONDER TARGET FROM ${mindFileNumber}.MIND ALREADY SCANNED`;
               statusEl.className = 'status-overlay collected-message';
-              console.log(`Wonder Target ${wonderKey.toUpperCase()} already scanned - duplicate prevented`);
+              console.log(`Wonder Target from ${mindFileNumber}.mind already scanned - duplicate prevented`);
             } else {
               statusEl.textContent = `✅ KEY #${keyNumber} ALREADY COLLECTED`;
               statusEl.className = 'status-overlay collected-message';
@@ -1041,7 +1406,8 @@
             } else if (isWonderKey) {
               const currentTarget = window.currentWonderTarget;
               const wonderKey = currentTarget.key;
-              showStatus(`❌ FAILED TO SAVE TARGET ${wonderKey.toUpperCase()}`, true);
+              const mindFileNumber = currentTarget.number;
+              showStatus(`❌ FAILED TO SAVE TARGET FROM ${mindFileNumber}.MIND`, true);
             } else {
               showStatus(`❌ FAILED TO SAVE KEY #${keyNumber}`, true);
             }
@@ -1062,6 +1428,12 @@
         
         sceneEl.addEventListener('renderstart', () => {
           console.log('Auto-collect AR scanner ready');
+          
+          // Hide futuristic loading overlay
+          setTimeout(() => {
+            hideFuturisticLoading();
+          }, 1500); // Small delay to let the last loading message show
+          
           showStatus('SCANNING FOR KEYS...');
           
           // Scene listener with target ID mapping
