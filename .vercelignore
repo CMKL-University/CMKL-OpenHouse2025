@@ -1,0 +1,17 @@
+# Exclude large model files from Vercel deployment
+# These should be served from external CDN or uploaded separately
+
+# Large Innovation Key models
+model/Innovation_key/in1.gltf
+model/Innovation_key/in4.gltf
+model/register.gltf
+
+# Keep smaller models that are already working:
+# model/Innovation_key/in2.gltf (4MB - OK)
+# model/Innovation_key/in3.gltf (28MB - OK)
+# model/Wonder_key/*.gltf (all small - OK)
+# model/magic_key/scene.gltf (small - OK)
+
+# You can also exclude entire directories if needed:
+# model/Innovation_key/
+# model/Wonder_key/
