@@ -291,10 +291,10 @@
         <a-asset-item id="registerModel" src="model/register.gltf"></a-asset-item>
 
         <!-- Innovation Key Models -->
-        <a-asset-item id="innovationModel1" src="model/Innovation_key/in1.gltf"></a-asset-item>
+        <a-asset-item id="innovationModel1" src="model/Innovation_key/in1_compressed.gltf"></a-asset-item>
         <a-asset-item id="innovationModel2" src="model/Innovation_key/in2.gltf"></a-asset-item>
         <a-asset-item id="innovationModel3" src="model/Innovation_key/in3.gltf"></a-asset-item>
-        <a-asset-item id="innovationModel4" src="model/Innovation_key/in4.gltf"></a-asset-item>
+        <a-asset-item id="innovationModel4" src="model/Innovation_key/in4_compressed.gltf"></a-asset-item>
 
         <!-- Wonder Key Models -->
         <a-asset-item id="wonderModel1" src="model/Wonder_key/wd1.gltf"></a-asset-item>
@@ -447,11 +447,20 @@
           const targetNumber = currentTarget.number;
           const modelId = `#innovationModel${targetNumber}`;
 
-          // Update the model source for target1 (which is used in Innovation Key mode)
+          // In Innovation Key mode, always use target1 regardless of which mind file is loaded
           const model1 = document.getElementById('model1');
           if (model1) {
             model1.setAttribute('src', modelId);
             console.log(`✅ Set target1 model to: ${modelId} (IN${targetNumber})`);
+          }
+
+          // Also update other targets to use the same model to prevent wrong model display
+          for (let i = 2; i <= 4; i++) {
+            const modelElement = document.getElementById(`model${i}`);
+            if (modelElement) {
+              modelElement.setAttribute('src', modelId);
+              console.log(`✅ Set target${i} model to: ${modelId} (IN${targetNumber}) for consistency`);
+            }
           }
 
         } else if (isWonderKey) {
@@ -459,11 +468,20 @@
           const targetNumber = currentTarget.number;
           const modelId = `#wonderModel${targetNumber}`;
 
-          // Update the model source for target1 (which is used in Wonder Key mode)
+          // In Wonder Key mode, always use target1 regardless of which mind file is loaded
           const model1 = document.getElementById('model1');
           if (model1) {
             model1.setAttribute('src', modelId);
             console.log(`✅ Set target1 model to: ${modelId} (WD${targetNumber})`);
+          }
+
+          // Also update other targets to use the same model to prevent wrong model display
+          for (let i = 2; i <= 4; i++) {
+            const modelElement = document.getElementById(`model${i}`);
+            if (modelElement) {
+              modelElement.setAttribute('src', modelId);
+              console.log(`✅ Set target${i} model to: ${modelId} (WD${targetNumber}) for consistency`);
+            }
           }
 
         } else {
@@ -545,10 +563,10 @@
       // Comprehensive Model File Validation
       const modelsToTest = [
         { name: 'Registration Model', path: 'model/register.gltf' },
-        { name: 'Innovation Model 1', path: 'model/Innovation_key/in1.gltf' },
+        { name: 'Innovation Model 1', path: 'model/Innovation_key/in1_compressed.gltf' },
         { name: 'Innovation Model 2', path: 'model/Innovation_key/in2.gltf' },
         { name: 'Innovation Model 3', path: 'model/Innovation_key/in3.gltf' },
-        { name: 'Innovation Model 4', path: 'model/Innovation_key/in4.gltf' },
+        { name: 'Innovation Model 4', path: 'model/Innovation_key/in4_compressed.gltf' },
         { name: 'Wonder Model 1', path: 'model/Wonder_key/wd1.gltf' },
         { name: 'Wonder Model 2', path: 'model/Wonder_key/wd2.gltf' },
         { name: 'Wonder Model 3', path: 'model/Wonder_key/wd3.gltf' },
