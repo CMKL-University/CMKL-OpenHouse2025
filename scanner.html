@@ -280,7 +280,7 @@
     
     <a-scene
       id="ar-scene"
-      mindar-image="imageTargetSrc: https://openharty.cmkl.ac.th/model/registration.mind; maxTrack: 4; uiScanning: #custom-scanning-overlay"
+      mindar-image="imageTargetSrc: model/registration.mind; maxTrack: 4; uiScanning: #custom-scanning-overlay"
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
@@ -400,8 +400,8 @@
         const targetParam = urlParams.get('target') || '2'; // Default to target 2 for Innovation Key
         const targetIndex = parseInt(targetParam) - 1; // Convert to 0-based index
 
-        // Use the specific Innovation Key target from VM CDN
-        const innovationMindFile = getModelPath(`Innovation_key/${targetParam}.mind`);
+        // Use the specific Innovation Key target
+        const innovationMindFile = `model/Innovation_key/${targetParam}.mind`;
         sceneElement.setAttribute('mindar-image', `imageTargetSrc: ${innovationMindFile}; maxTrack: 1; uiScanning: #custom-scanning-overlay`);
         console.log('🎯 Using Innovation Key file:', innovationMindFile);
         console.log(`🎯 Current target: IN${targetParam}`);
@@ -421,8 +421,8 @@
         const targetParam = urlParams.get('target') || '1'; // Default to target 1 for Wonder Key
         const targetIndex = parseInt(targetParam) - 1; // Convert to 0-based index
 
-        // Use the specific Wonder Key target from VM CDN
-        const wonderMindFile = getModelPath(`Wonder_key/${targetParam}.mind`);
+        // Use the specific Wonder Key target
+        const wonderMindFile = `model/Wonder_key/${targetParam}.mind`;
         sceneElement.setAttribute('mindar-image', `imageTargetSrc: ${wonderMindFile}; maxTrack: 1; uiScanning: #custom-scanning-overlay`);
         console.log('🎯 Using Wonder Key file:', wonderMindFile);
         console.log(`🎯 Current target: WD${targetParam}`);
@@ -438,159 +438,37 @@
         console.log('🎯 Using default registration.mind file');
       }
 
-      // Model source configuration for hybrid CDN + Vercel loading
-      const MODEL_SOURCES = {
-        // Large files from VM + CloudFlare CDN
-        vm: window.location.hostname === 'localhost' ? '' : 'https://openharty.cmkl.ac.th',
-        // Small files from Vercel (current domain)
-        vercel: ''
-      };
+      // Dynamic Model Assignment based on key type and target
+      function assignCorrectModels() {
+        console.log('🎨 Assigning correct models based on current mode...');
 
-      // Model source mapping based on file sizes and deployment
-      const MODEL_CONFIG = {
-        'register.gltf': MODEL_SOURCES.vm,              // 57MB - VM CDN
-        'Innovation_key/in1.gltf': MODEL_SOURCES.vm,    // 43MB - VM CDN
-        'Innovation_key/in4.gltf': MODEL_SOURCES.vm,    // 77MB - VM CDN
-        'Innovation_key/in2.gltf': MODEL_SOURCES.vercel, // 4MB - Vercel
-        'Innovation_key/in3.gltf': MODEL_SOURCES.vercel, // 28MB - Vercel
-        'registration.mind': MODEL_SOURCES.vm,          // Required - VM CDN
-      };
+        if (isInnovationKey) {
+          const currentTarget = window.currentInnovationTarget;
+          const targetNumber = currentTarget.number;
+          const modelId = `#innovationModel${targetNumber}`;
 
-      // Dynamic path resolution for hybrid model loading
-      function getModelPath(modelPath) {
-        const source = MODEL_CONFIG[modelPath] || MODEL_SOURCES.vercel;
-        const fullPath = source ? `${source}/model/${modelPath}` : `model/${modelPath}`;
-        console.log(`🔗 Model path for ${modelPath}: ${fullPath}`);
-        return fullPath;
-      }
-
-      // Progressive Model Loading with CDN fallback
-      function loadModelProgressively(modelPath, modelId, targetModelElement) {
-        return new Promise((resolve, reject) => {
-          console.log(`🚀 Starting progressive load for ${modelId} (${modelPath})`);
-
-          // Show loading status
-          showStatus(`⏳ LOADING AR MODEL...`);
-
-          // Check if already loaded in assets
-          let assetElement = document.getElementById(modelId);
-          if (!assetElement) {
-            // Create new asset element dynamically
-            assetElement = document.createElement('a-asset-item');
-            assetElement.id = modelId;
-            assetElement.src = modelPath;
-            assetElement.crossOrigin = 'anonymous';
-
-            // Add to assets
-            const assetsElement = document.querySelector('a-assets');
-            assetsElement.appendChild(assetElement);
-            console.log(`📦 Created new asset: ${modelId}`);
+          // Update the model source for target1 (which is used in Innovation Key mode)
+          const model1 = document.getElementById('model1');
+          if (model1) {
+            model1.setAttribute('src', modelId);
+            console.log(`✅ Set target1 model to: ${modelId} (IN${targetNumber})`);
           }
 
-          // Wait for asset to load
-          if (assetElement.hasLoaded) {
-            console.log(`✅ Asset ${modelId} already loaded`);
-            targetModelElement.setAttribute('src', `#${modelId}`);
-            showStatus('SCANNING FOR KEYS...');
-            resolve();
-          } else {
-            // Listen for load events
-            assetElement.addEventListener('loaded', () => {
-              console.log(`✅ Asset ${modelId} loaded successfully`);
-              targetModelElement.setAttribute('src', `#${modelId}`);
-              showStatus('SCANNING FOR KEYS...');
-              resolve();
-            });
+        } else if (isWonderKey) {
+          const currentTarget = window.currentWonderTarget;
+          const targetNumber = currentTarget.number;
+          const modelId = `#wonderModel${targetNumber}`;
 
-            assetElement.addEventListener('error', async (error) => {
-              console.error(`❌ Failed to load ${modelId}:`, error);
-
-              // Try fallback strategies
-              if (modelPath.includes('openharty.cmkl.ac.th')) {
-                // Try Vercel fallback for VM files
-                const localPath = modelPath.replace('https://openharty.cmkl.ac.th/', '');
-                console.log(`🔄 Trying Vercel fallback: ${localPath}`);
-                assetElement.src = localPath;
-                showStatus('⚠️ CDN FAILED - TRYING VERCEL...');
-
-                setTimeout(() => {
-                  if (!assetElement.hasLoaded) {
-                    // Final fallback to bear model
-                    targetModelElement.setAttribute('src', '#bearModel');
-                    showStatus('⚠️ USING FALLBACK MODEL');
-                    setTimeout(() => showStatus('SCANNING FOR KEYS...'), 2000);
-                    resolve();
-                  }
-                }, 5000);
-              } else {
-                // Already local, use bear model fallback
-                targetModelElement.setAttribute('src', '#bearModel');
-                showStatus('⚠️ MODEL LOAD FAILED - USING FALLBACK');
-                setTimeout(() => showStatus('SCANNING FOR KEYS...'), 2000);
-                resolve();
-              }
-            });
-
-            // Timeout fallback
-            setTimeout(() => {
-              if (!assetElement.hasLoaded) {
-                console.warn(`⏰ Load timeout for ${modelId}, using fallback`);
-                targetModelElement.setAttribute('src', '#bearModel');
-                showStatus('⚠️ SLOW CONNECTION - USING FALLBACK');
-                setTimeout(() => showStatus('SCANNING FOR KEYS...'), 2000);
-                resolve();
-              }
-            }, 20000);
+          // Update the model source for target1 (which is used in Wonder Key mode)
+          const model1 = document.getElementById('model1');
+          if (model1) {
+            model1.setAttribute('src', modelId);
+            console.log(`✅ Set target1 model to: ${modelId} (WD${targetNumber})`);
           }
-        });
-      }
 
-      // Dynamic Model Assignment with Hybrid CDN Loading
-      async function assignCorrectModels() {
-        console.log('🎨 Assigning correct models with hybrid CDN loading...');
-        const model1 = document.getElementById('model1');
-
-        if (!model1) {
-          console.error('❌ Model1 element not found');
-          return;
-        }
-
-        try {
-          if (isInnovationKey) {
-            const currentTarget = window.currentInnovationTarget;
-            const targetNumber = currentTarget.number;
-            const modelPath = getModelPath(`Innovation_key/in${targetNumber}.gltf`);
-            const modelId = `innovationModel${targetNumber}`;
-
-            console.log(`📱 Loading Innovation Model IN${targetNumber} from hybrid CDN`);
-            await loadModelProgressively(modelPath, modelId, model1);
-            console.log(`✅ Innovation Model IN${targetNumber} ready`);
-
-          } else if (isWonderKey) {
-            const currentTarget = window.currentWonderTarget;
-            const targetNumber = currentTarget.number;
-            const modelPath = targetNumber === 4
-              ? getModelPath('magic_key/scene.gltf') // Dummy for missing wd4
-              : getModelPath(`Wonder_key/wd${targetNumber}.gltf`);
-            const modelId = `wonderModel${targetNumber}`;
-
-            console.log(`🌟 Loading Wonder Model WD${targetNumber} from hybrid CDN`);
-            await loadModelProgressively(modelPath, modelId, model1);
-            console.log(`✅ Wonder Model WD${targetNumber} ready`);
-
-          } else {
-            // Default registration mode
-            const modelPath = getModelPath('register.gltf');
-            const modelId = 'registerModel';
-
-            console.log(`📝 Loading Registration Model from hybrid CDN`);
-            await loadModelProgressively(modelPath, modelId, model1);
-            console.log(`✅ Registration Model ready`);
-          }
-        } catch (error) {
-          console.error('❌ Model assignment failed:', error);
-          showStatus('❌ MODEL LOAD FAILED', true);
-          setTimeout(() => showStatus('SCANNING FOR KEYS...'), 3000);
+        } else {
+          // Default registration mode - already set to #registerModel
+          console.log('✅ Using default registration model for target1');
         }
       }
 
