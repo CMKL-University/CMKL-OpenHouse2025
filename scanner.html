@@ -442,51 +442,44 @@
       function assignCorrectModels() {
         console.log('🎨 Assigning correct models based on current mode...');
 
+        // Use magic_key/scene.gltf for all modes (registration, innovation, wonder)
+        const universalModelId = '#bearModel'; // This points to model/magic_key/scene.gltf
+
         if (isInnovationKey) {
           const currentTarget = window.currentInnovationTarget;
           const targetNumber = currentTarget.number;
-          const modelId = `#innovationModel${targetNumber}`;
 
-          // In Innovation Key mode, always use target1 regardless of which mind file is loaded
-          const model1 = document.getElementById('model1');
-          if (model1) {
-            model1.setAttribute('src', modelId);
-            console.log(`✅ Set target1 model to: ${modelId} (IN${targetNumber})`);
-          }
-
-          // Also update other targets to use the same model to prevent wrong model display
-          for (let i = 2; i <= 4; i++) {
+          // Update all targets to use the universal magic_key model
+          for (let i = 1; i <= 4; i++) {
             const modelElement = document.getElementById(`model${i}`);
             if (modelElement) {
-              modelElement.setAttribute('src', modelId);
-              console.log(`✅ Set target${i} model to: ${modelId} (IN${targetNumber}) for consistency`);
+              modelElement.setAttribute('src', universalModelId);
+              console.log(`✅ Set target${i} model to: ${universalModelId} (magic_key for IN${targetNumber})`);
             }
           }
 
         } else if (isWonderKey) {
           const currentTarget = window.currentWonderTarget;
           const targetNumber = currentTarget.number;
-          const modelId = `#wonderModel${targetNumber}`;
 
-          // In Wonder Key mode, always use target1 regardless of which mind file is loaded
-          const model1 = document.getElementById('model1');
-          if (model1) {
-            model1.setAttribute('src', modelId);
-            console.log(`✅ Set target1 model to: ${modelId} (WD${targetNumber})`);
-          }
-
-          // Also update other targets to use the same model to prevent wrong model display
-          for (let i = 2; i <= 4; i++) {
+          // Update all targets to use the universal magic_key model
+          for (let i = 1; i <= 4; i++) {
             const modelElement = document.getElementById(`model${i}`);
             if (modelElement) {
-              modelElement.setAttribute('src', modelId);
-              console.log(`✅ Set target${i} model to: ${modelId} (WD${targetNumber}) for consistency`);
+              modelElement.setAttribute('src', universalModelId);
+              console.log(`✅ Set target${i} model to: ${universalModelId} (magic_key for WD${targetNumber})`);
             }
           }
 
         } else {
-          // Default registration mode - already set to #registerModel
-          console.log('✅ Using default registration model for target1');
+          // Default registration mode - also use magic_key model
+          for (let i = 1; i <= 4; i++) {
+            const modelElement = document.getElementById(`model${i}`);
+            if (modelElement) {
+              modelElement.setAttribute('src', universalModelId);
+              console.log(`✅ Set target${i} model to: ${universalModelId} (magic_key for registration)`);
+            }
+          }
         }
       }
 
