@@ -304,34 +304,34 @@
         <a-asset-item id="wonderModel5" src="model/Wonder_key/wd5.gltf"></a-asset-item>
 
         <!-- Legacy models for fallback -->
-        <a-asset-item id="bearModel" src="model/magic_key/scene.gltf"></a-asset-item>
+        <a-asset-item id="magicKeyModel" src="model/magic_key/scene.gltf"></a-asset-item>
         <a-asset-item id="raccoonModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- Target 1 - Registration Model -->
+      <!-- Target 1 - Magic Key Model -->
       <a-entity id="target1" mindar-image-target="targetIndex: 0">
         <a-gltf-model
           id="model1"
           rotation="0 0 0"
           position="0 0 0"
           scale="0.5 0.5 0.5"
-          src="#registerModel"
+          src="#magicKeyModel"
           animation__scale="property: scale; to: 1.0 1.0 1.0; startEvents: targetfound; dur: 1000; easing: easeOutBack"
           animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
         </a-gltf-model>
       </a-entity>
 
-      <!-- Target 2 - Raccoon Model -->
+      <!-- Target 2 - Magic Key Model -->
       <a-entity id="target2" mindar-image-target="targetIndex: 1">
         <a-gltf-model
           id="model2"
           rotation="0 0 0"
           position="0 0 0"
-          scale="0.05 0.05 0.05"
-          src="#raccoonModel"
-          animation__scale="property: scale; to: 0.1 0.1 0.1; startEvents: targetfound; dur: 1000; easing: easeOutBack"
+          scale="0.5 0.5 0.5"
+          src="#magicKeyModel"
+          animation__scale="property: scale; to: 1.0 1.0 1.0; startEvents: targetfound; dur: 1000; easing: easeOutBack"
           animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
         </a-gltf-model>
       </a-entity>
@@ -443,7 +443,7 @@
         console.log('🎨 Assigning correct models based on current mode...');
 
         // Use magic_key/scene.gltf for all modes (registration, innovation, wonder)
-        const universalModelId = '#bearModel'; // This points to model/magic_key/scene.gltf
+        const universalModelId = '#magicKeyModel'; // Points to model/magic_key/scene.gltf
 
         if (isInnovationKey) {
           const currentTarget = window.currentInnovationTarget;
