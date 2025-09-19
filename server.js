@@ -421,7 +421,8 @@ async function findUserByEmail(email) {
                         wd2: row[14] || '',
                         wd3: row[15] || '',
                         wd4: row[16] || '',
-                        wd5: row[17] || ''
+                        wd5: row[17] || '',
+                        wd6: row[18] || ''
                     }];
                 }
             }
@@ -808,6 +809,10 @@ app.post('/api/harty/update-key', securityMiddleware, async (req, res) => {
                 columnLetter = 'R'; // Wonder Key 5
                 columnIndex = 17;
                 break;
+            case 'wd6 status':
+                columnLetter = 'S'; // Wonder Key 6
+                columnIndex = 18;
+                break;
             default:
                 return res.status(400).json({
                     success: false,
@@ -1003,18 +1008,19 @@ app.get('/api/harty/user/:email', securityMiddleware, async (req, res) => {
             const scannedCount = Object.values(innovationProgress).filter(status => status === 'scanned').length;
             const innovationPercentage = (scannedCount / 4) * 100;
 
-            // Wonder Key AR tracking (WD1-WD5 columns N-R)
+            // Wonder Key AR tracking (WD1-WD6 columns N-S)
             const wonderProgress = {
                 wd1: userRecord.wd1 === 'scanned' ? 'scanned' : 'not_scanned', // Column N
                 wd2: userRecord.wd2 === 'scanned' ? 'scanned' : 'not_scanned', // Column O
                 wd3: userRecord.wd3 === 'scanned' ? 'scanned' : 'not_scanned', // Column P
                 wd4: userRecord.wd4 === 'scanned' ? 'scanned' : 'not_scanned', // Column Q
-                wd5: userRecord.wd5 === 'scanned' ? 'scanned' : 'not_scanned'  // Column R
+                wd5: userRecord.wd5 === 'scanned' ? 'scanned' : 'not_scanned', // Column R
+                wd6: userRecord.wd6 === 'scanned' ? 'scanned' : 'not_scanned'  // Column S
             };
 
-            // Calculate wonder progress percentage (0, 20, 40, 60, 80, 100)
+            // Calculate wonder progress percentage (0, 16.67, 33.33, 50, 66.67, 83.33, 100)
             const wonderScannedCount = Object.values(wonderProgress).filter(status => status === 'scanned').length;
-            const wonderPercentage = (wonderScannedCount / 5) * 100;
+            const wonderPercentage = Math.round((wonderScannedCount / 6) * 100);
 
             // Check if keys 1, 2, 3 are all scanned but Redeem Key is still FALSE
             let redeemKeyEnabled = userRecord.redeemKey === 'TRUE';

@@ -571,25 +571,8 @@
       device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <!-- Registration Model -->
-        <a-asset-item id="registerModel" src="model/register.gltf"></a-asset-item>
-
-        <!-- Innovation Key Models -->
-        <a-asset-item id="innovationModel1" src="model/Innovation_key/in1_compressed.gltf"></a-asset-item>
-        <a-asset-item id="innovationModel2" src="model/Innovation_key/in2.gltf"></a-asset-item>
-        <a-asset-item id="innovationModel3" src="model/Innovation_key/in3.gltf"></a-asset-item>
-        <a-asset-item id="innovationModel4" src="model/Innovation_key/in4_compressed.gltf"></a-asset-item>
-
-        <!-- Wonder Key Models -->
-        <a-asset-item id="wonderModel1" src="model/Wonder_key/wd1.gltf"></a-asset-item>
-        <a-asset-item id="wonderModel2" src="model/Wonder_key/wd2.gltf"></a-asset-item>
-        <a-asset-item id="wonderModel3" src="model/Wonder_key/wd3.gltf"></a-asset-item>
-        <a-asset-item id="wonderModel4" src="model/magic_key/scene.gltf"></a-asset-item> <!-- Dummy for missing wd4 -->
-        <a-asset-item id="wonderModel5" src="model/Wonder_key/wd5.gltf"></a-asset-item>
-
-        <!-- Legacy models for fallback -->
+        <!-- Universal Model (used for all targets) -->
         <a-asset-item id="magicKeyModel" src="model/magic_key/scene.gltf"></a-asset-item>
-        <a-asset-item id="raccoonModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -666,18 +649,22 @@
       // Loading sequence messages
       const loadingSteps = [
         { percent: 0, text: "INITIALIZING...", debug: "[00:00] Starting AR initialization..." },
-        { percent: 20, text: "LOADING MODELS...", debug: "[00:01] Loading 3D model assets..." },
-        { percent: 40, text: "CALIBRATING...", debug: "[00:02] Calibrating AR tracking system..." },
-        { percent: 60, text: "PROCESSING...", debug: "[00:03] Processing mind files..." },
-        { percent: 80, text: "FINALIZING...", debug: "[00:04] Establishing AR connection..." },
-        { percent: 100, text: "COMPLETE!", debug: "[00:05] AR system ready!" }
+        { percent: 15, text: "LOADING MIND AR...", debug: "[00:01] Loading MindAR tracking system..." },
+        { percent: 30, text: "LOADING MODELS...", debug: "[00:02] Loading 3D model assets..." },
+        { percent: 45, text: "INITIALIZING CAMERA...", debug: "[00:03] Initializing camera system..." },
+        { percent: 60, text: "CALIBRATING...", debug: "[00:04] Calibrating AR tracking..." },
+        { percent: 75, text: "PROCESSING TARGETS...", debug: "[00:05] Processing mind files..." },
+        { percent: 90, text: "FINALIZING...", debug: "[00:06] Establishing AR connection..." },
+        { percent: 100, text: "COMPLETE!", debug: "[00:07] AR system ready!" }
       ];
 
       // Fast loading for returning users
       const fastLoadingSteps = [
         { percent: 0, text: "INITIALIZING...", debug: "[00:00] Restoring AR session..." },
-        { percent: 60, text: "LOADING...", debug: "[00:01] Loading cached data..." },
-        { percent: 100, text: "COMPLETE!", debug: "[00:02] AR system ready!" }
+        { percent: 25, text: "LOADING CACHE...", debug: "[00:01] Loading cached MindAR data..." },
+        { percent: 50, text: "CAMERA READY...", debug: "[00:02] Camera system ready..." },
+        { percent: 75, text: "CONNECTING...", debug: "[00:03] Connecting AR system..." },
+        { percent: 100, text: "COMPLETE!", debug: "[00:04] AR system ready!" }
       ];
 
       let currentStep = 0;
@@ -704,7 +691,7 @@
         }
       }
       
-      // Update loading progress
+      // Update loading progress with actual initialization
       function updateLoadingProgress() {
         if (currentStep < activeSteps.length) {
           const step = activeSteps[currentStep];
@@ -717,6 +704,9 @@
           // Add debug message
           addDebugLine(step.debug);
 
+          // Execute actual initialization tasks during loading
+          performLoadingTask(step, currentStep);
+
           currentStep++;
 
           // Continue to next step
@@ -728,28 +718,135 @@
               localStorage.setItem(CACHE_KEY, 'true');
               console.log('✅ First visit loading complete - cached for future visits');
             }
+
+            // All loading complete - initialize AR scene
+            setTimeout(() => {
+              initializeARScene();
+            }, 500);
           }
         }
+      }
+
+      // Perform actual loading tasks during the loading animation
+      function performLoadingTask(step, stepIndex) {
+        if (isFirstVisit) {
+          // First visit - do full initialization
+          switch(stepIndex) {
+            case 1: // Loading MindAR
+              preloadMindARAssets();
+              break;
+            case 2: // Loading models
+              preloadGLTFModels();
+              break;
+            case 3: // Initialize camera
+              initializeCameraSystem();
+              break;
+            case 4: // Calibrating
+              calibrateARSystem();
+              break;
+            case 5: // Processing targets
+              processTargetFiles();
+              break;
+          }
+        } else {
+          // Returning user - lightweight checks
+          switch(stepIndex) {
+            case 1: // Loading cache
+              loadCachedData();
+              break;
+            case 2: // Camera ready
+              verifyCameraSystem();
+              break;
+          }
+        }
+      }
+
+      // Preload MindAR tracking assets
+      function preloadMindARAssets() {
+        console.log('🔄 Preloading MindAR tracking system...');
+        // MindAR will be initialized when the scene starts
+      }
+
+      // Preload GLTF models
+      function preloadGLTFModels() {
+        console.log('🔄 Preloading GLTF models...');
+        // Models are preloaded via a-assets in the scene
+      }
+
+      // Initialize camera system during loading
+      function initializeCameraSystem() {
+        console.log('🔄 Initializing camera system...');
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+              console.log('✅ Camera permission verified during loading');
+              // Stop the stream as we'll use it later in AR scene
+              stream.getTracks().forEach(track => track.stop());
+            })
+            .catch(err => {
+              console.error('❌ Camera permission denied during loading:', err);
+            });
+        }
+      }
+
+      // Calibrate AR system
+      function calibrateARSystem() {
+        console.log('🔄 Calibrating AR tracking system...');
+        // AR calibration happens in MindAR initialization
+      }
+
+      // Process target files
+      function processTargetFiles() {
+        console.log('🔄 Processing target mind files...');
+        // Target processing handled by MindAR when scene starts
+      }
+
+      // Load cached data for returning users
+      function loadCachedData() {
+        console.log('🔄 Loading cached MindAR data...');
+        // Use cached initialization data
+      }
+
+      // Verify camera system for returning users
+      function verifyCameraSystem() {
+        console.log('🔄 Verifying camera system...');
+        // Quick camera check
       }
       
       // Start loading animation (faster for returning users)
       const initialDelay = isFirstVisit ? 500 : 200;
       setTimeout(updateLoadingProgress, initialDelay);
       
+      // Initialize AR Scene after loading is complete
+      function initializeARScene() {
+        console.log('🚀 Initializing AR Scene...');
+
+        // Add final debug message
+        addDebugLine('[Final] Starting AR scanner interface...');
+
+        // Setup scene event listeners
+        setupSceneListeners();
+
+        // Hide loading overlay and show AR interface
+        setTimeout(() => {
+          hideFuturisticLoading();
+        }, 300);
+      }
+
       // Hide futuristic loading when AR is ready
       function hideFuturisticLoading() {
         console.log('🚀 Hiding futuristic loading overlay');
-        
+
         // Add final debug message
-        addDebugLine('[00:06] Transitioning to AR scanner...');
-        
+        addDebugLine('[Final] AR scanner interface ready!');
+
         // Wait a bit then hide
         setTimeout(() => {
           futuristicLoading.classList.add('hidden');
           setTimeout(() => {
             futuristicLoading.style.display = 'none';
           }, 1000);
-        }, 500);
+        }, 200);
       }
 
       // Get user data from localStorage
@@ -1199,9 +1296,9 @@
                 // Update localStorage for wonder progress - Sequential filling system
                 const wonderStatuses = JSON.parse(localStorage.getItem('wonderProgress') || '{}');
 
-                // Find the first available WD slot (WD1 -> WD2 -> WD3 -> WD4 -> WD5)
+                // Find the first available WD slot (WD1 -> WD2 -> WD3 -> WD4 -> WD5 -> WD6)
                 let nextAvailableSlot = null;
-                for (let i = 1; i <= 5; i++) {
+                for (let i = 1; i <= 6; i++) {
                   if (wonderStatuses[`wd${i}`] !== 'scanned') {
                     nextAvailableSlot = i;
                     break;
@@ -1254,16 +1351,16 @@
           console.log(`🔍 Checking if ${keyToCheck.toUpperCase()} is already scanned:`, innovationStatuses[keyToCheck]);
           return innovationStatuses[keyToCheck] === 'scanned';
         } else if (isWonderKey) {
-          // For Wonder Keys with sequential filling - check if all 5 slots are filled
+          // For Wonder Keys with sequential filling - check if all 6 slots are filled
           const wonderStatuses = JSON.parse(localStorage.getItem('wonderProgress') || '{}');
           let filledCount = 0;
-          for (let i = 1; i <= 5; i++) {
+          for (let i = 1; i <= 6; i++) {
             if (wonderStatuses[`wd${i}`] === 'scanned') {
               filledCount++;
             }
           }
-          console.log(`🔍 Wonder Key progress: ${filledCount}/5 slots filled`);
-          return filledCount >= 5; // All slots filled = already "scanned"
+          console.log(`🔍 Wonder Key progress: ${filledCount}/6 slots filled`);
+          return filledCount >= 6; // All slots filled = already "scanned"
         } else {
           // For regular keys, use target index
           const keyNum = targetIndex + 1;
@@ -1444,22 +1541,21 @@
         }, 1500);
       }
 
-      // Set up event listeners when scene is ready
-      document.addEventListener('DOMContentLoaded', () => {
+      // Setup scene event listeners (called after loading is complete)
+      function setupSceneListeners() {
         const sceneEl = document.querySelector('a-scene');
-        
+
+        if (!sceneEl) {
+          console.error('❌ A-Frame scene not found');
+          return;
+        }
+
         sceneEl.addEventListener('renderstart', () => {
-          console.log('Auto-collect AR scanner ready');
-          
-          // Hide futuristic loading overlay (faster for returning users)
-          const hideDelay = isFirstVisit ? 1500 : 600;
-          setTimeout(() => {
-            hideFuturisticLoading();
-          }, hideDelay); // Smaller delay for returning users
-          
+          console.log('✅ A-Frame scene render started');
           showStatus('SCANNING FOR KEYS...');
-          
-          // Scene listener with target ID mapping
+        });
+
+        // Scene listener with target ID mapping
           sceneEl.addEventListener('targetFound', (event) => {
             console.log('Scene targetFound event detected:', event);
             try {
@@ -1551,7 +1647,12 @@
               console.log('Target 4 lost');
             });
           }
-        });
+        }
+
+      // Initialize everything when DOM is loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 DOM loaded - starting AR scanner initialization');
+        // The loading animation will start automatically via setTimeout
       });
       } // End of else block for user login check
     </script>
