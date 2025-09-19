@@ -674,7 +674,7 @@
 
             <!-- Progress display -->
             <div class="progress-display">
-                <p class="progress-text glow-text" id="progressText">Scan 3 of 5 keys to unlock!</p>
+                <p class="progress-text glow-text" id="progressText">Scan 3 of 6 keys to unlock!</p>
                 <p class="percentage-text" id="wonderPercentage">0%</p>
                 <p class="completion-status" id="completionStatus"></p>
             </div>
@@ -715,6 +715,13 @@
                         <span class="key-number">5</span>
                         <span class="key-label">Wonder Key Slot 5</span>
                     </div>
+                    <div class="connection-line" id="line5"></div>
+
+                    <!-- WD6 -->
+                    <div class="key-station optional" data-key="6" onclick="navigateToScanner(6)">
+                        <span class="key-number">6</span>
+                        <span class="key-label">Wonder Key Slot 6</span>
+                    </div>
                 </div>
             </div>
 
@@ -750,18 +757,18 @@
 
             // Count how many WD slots are filled (sequential filling system)
             let filledSlots = 0;
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 6; i++) {
                 if (wonderProgress[`wd${i}`] === 'scanned') {
                     filledSlots++;
                 }
             }
 
-            if (filledSlots < 5) {
+            if (filledSlots < 6) {
                 // Still have slots available - send to scan any .mind file (default to 1.mind)
-                console.log(`Sequential filling: ${filledSlots}/5 slots filled, sending to scan 1.mind`);
+                console.log(`Sequential filling: ${filledSlots}/6 slots filled, sending to scan 1.mind`);
                 navigateToScanner(1);
             } else {
-                // All 5 slots filled
+                // All 6 slots filled
                 console.log('All Wonder Keys have been scanned!');
             }
         }
@@ -817,7 +824,7 @@
             const wonderProgress = JSON.parse(localStorage.getItem('wonderProgress') || '{}');
             let scannedCount = 0;
 
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 6; i++) {
                 if (wonderProgress[`wd${i}`] === 'scanned') {
                     scannedCount++;
                 }
@@ -940,7 +947,7 @@
 
             // Count scanned keys
             let scannedCount = 0;
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 6; i++) {
                 if (wonderProgress[`wd${i}`] === 'scanned') {
                     scannedCount++;
                 }
@@ -949,14 +956,14 @@
             // Update text displays
             setTimeout(() => {
                 percentageText.textContent = `${percentage}%`;
-                completionStatus.textContent = `${scannedCount}/5 Wonder Keys collected`;
+                completionStatus.textContent = `${scannedCount}/6 Wonder Keys collected`;
 
                 // Update progress text based on completion
-                if (scannedCount === 5) {
-                    // All 5 WD keys are scanned - hide the action button
+                if (scannedCount === 6) {
+                    // All 6 WD keys are scanned - hide the action button
                     progressText.textContent = 'All Wonder Keys collected!';
                     actionButton.style.display = 'none';
-                    console.log('🎉 All 5 Wonder Keys scanned! Hiding action button.');
+                    console.log('🎉 All 6 Wonder Keys scanned! Hiding action button.');
                 } else if (scannedCount >= 3) {
                     progressText.textContent = 'Wonder Key unlocked!';
                     actionButton.textContent = '';
@@ -989,7 +996,7 @@
         function updateRoadmapVisuals(wonderProgress, scannedCount) {
             // Get array of scanned keys in sequence order
             const scannedKeys = [];
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 6; i++) {
                 if (wonderProgress[`wd${i}`] === 'scanned') {
                     scannedKeys.push(i);
                 }
@@ -998,7 +1005,7 @@
             // Sort scanned keys to ensure proper sequence
             scannedKeys.sort((a, b) => a - b);
 
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 6; i++) {
                 const station = document.querySelector(`[data-key="${i}"]`);
                 const line = document.getElementById(`line${i}`);
 
@@ -1077,7 +1084,7 @@
         function triggerSequentialAnimations(wonderProgress) {
             // Get array of scanned keys in sequence order
             const scannedKeys = [];
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 6; i++) {
                 if (wonderProgress[`wd${i}`] === 'scanned') {
                     scannedKeys.push(i);
                 }
@@ -1129,7 +1136,7 @@
                 const oldProgress = JSON.parse(e.oldValue || '{}');
 
                 // Check which key was just scanned
-                for (let i = 1; i <= 5; i++) {
+                for (let i = 1; i <= 6; i++) {
                     const keyField = `wd${i}`;
                     if (oldProgress[keyField] !== 'scanned' && newProgress[keyField] === 'scanned') {
                         console.log(`🎉 Wonder Key ${i} was just scanned! Triggering animation...`);
@@ -1155,17 +1162,5 @@
         });
     </script>
 
-    <!-- Speed Insights (only load in production/Vercel) -->
-    <script>
-      window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
-
-      // Only load Vercel speed insights in production
-      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        const script = document.createElement('script');
-        script.defer = true;
-        script.src = '/_vercel/speed-insights/script.js';
-        document.head.appendChild(script);
-      }
-    </script>
 </body>
 </html>
