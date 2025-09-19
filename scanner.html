@@ -1001,6 +1001,15 @@
         const buttonText = backButton.querySelector('.button-text');
         const doneText = backButton.querySelector('.button-done-text');
 
+        // Set console progress to 100%
+        const loadingPercentage = document.querySelector('.loading-percentage');
+        const progressFill = document.querySelector('.progress-fill');
+        if (loadingPercentage && progressFill) {
+          loadingPercentage.textContent = '100%';
+          progressFill.style.width = '100%';
+          console.log('Console progress set to 100%');
+        }
+
         if (!backButton.classList.contains('done')) {
           console.log('Transforming button to done state'); // Debug
 
