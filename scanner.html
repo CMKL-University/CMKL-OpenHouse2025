@@ -788,7 +788,7 @@
         return ordinals[number] || `${number}TH`;
       }
 
-      // Animate percentage for cached mode 2-second minimum
+      // Animate percentage for cached mode 4-second minimum
       function animatePercentageForCachedMode(duration) {
         const loadingPercentageEl = document.querySelector('.loading-percentage');
         const progressFillEl = document.querySelector('.progress-fill');
@@ -1311,15 +1311,15 @@
         }
       }
 
-      // Track loading start time for minimum 2-second display
+      // Track loading start time for minimum 4-second display
       const loadingStartTime = Date.now();
-      const minimumLoadingTime = 2000; // 2 seconds minimum
+      const minimumLoadingTime = 4000; // 4 seconds minimum
 
       // Handle optimized loading modes with proper AR initialization
       if (loadingMode === 'super_fast') {
         console.log('⚡ Super fast mode activated - using extensive cache');
 
-        // For super fast (cached) mode, enforce minimum 2 seconds with percentage animation
+        // For super fast (cached) mode, enforce minimum 4 seconds with percentage animation
         const elapsed = Date.now() - loadingStartTime;
         const remainingTime = Math.max(0, minimumLoadingTime - elapsed);
 
