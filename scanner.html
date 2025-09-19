@@ -659,6 +659,10 @@
       const progressText = futuristicLoading.querySelector('.progress-text');
       const debugLog = futuristicLoading.querySelector('#debugLog');
       
+      // Check if this is first visit (cache key)
+      const CACHE_KEY = 'scanner_first_load_complete';
+      const isFirstVisit = !localStorage.getItem(CACHE_KEY);
+
       // Loading sequence messages
       const loadingSteps = [
         { percent: 0, text: "INITIALIZING...", debug: "[00:00] Starting AR initialization..." },
@@ -668,8 +672,19 @@
         { percent: 80, text: "FINALIZING...", debug: "[00:04] Establishing AR connection..." },
         { percent: 100, text: "COMPLETE!", debug: "[00:05] AR system ready!" }
       ];
-      
+
+      // Fast loading for returning users
+      const fastLoadingSteps = [
+        { percent: 0, text: "INITIALIZING...", debug: "[00:00] Restoring AR session..." },
+        { percent: 60, text: "LOADING...", debug: "[00:01] Loading cached data..." },
+        { percent: 100, text: "COMPLETE!", debug: "[00:02] AR system ready!" }
+      ];
+
       let currentStep = 0;
+      const activeSteps = isFirstVisit ? loadingSteps : fastLoadingSteps;
+      const stepDelay = isFirstVisit ? 800 : 300; // Faster for returning users
+
+      console.log(`🚀 Loading mode: ${isFirstVisit ? 'First visit (full loading)' : 'Returning user (fast loading)'}`);
       
       // Add debug line to console
       function addDebugLine(message) {
@@ -691,28 +706,35 @@
       
       // Update loading progress
       function updateLoadingProgress() {
-        if (currentStep < loadingSteps.length) {
-          const step = loadingSteps[currentStep];
-          
+        if (currentStep < activeSteps.length) {
+          const step = activeSteps[currentStep];
+
           // Update percentage and progress bar
           loadingPercentage.textContent = step.percent + '%';
           progressFill.style.width = step.percent + '%';
           progressText.textContent = step.text;
-          
+
           // Add debug message
           addDebugLine(step.debug);
-          
+
           currentStep++;
-          
+
           // Continue to next step
-          if (currentStep < loadingSteps.length) {
-            setTimeout(updateLoadingProgress, 800);
+          if (currentStep < activeSteps.length) {
+            setTimeout(updateLoadingProgress, stepDelay);
+          } else {
+            // Mark first load as complete
+            if (isFirstVisit) {
+              localStorage.setItem(CACHE_KEY, 'true');
+              console.log('✅ First visit loading complete - cached for future visits');
+            }
           }
         }
       }
       
-      // Start loading animation
-      setTimeout(updateLoadingProgress, 500);
+      // Start loading animation (faster for returning users)
+      const initialDelay = isFirstVisit ? 500 : 200;
+      setTimeout(updateLoadingProgress, initialDelay);
       
       // Hide futuristic loading when AR is ready
       function hideFuturisticLoading() {
@@ -1429,10 +1451,11 @@
         sceneEl.addEventListener('renderstart', () => {
           console.log('Auto-collect AR scanner ready');
           
-          // Hide futuristic loading overlay
+          // Hide futuristic loading overlay (faster for returning users)
+          const hideDelay = isFirstVisit ? 1500 : 600;
           setTimeout(() => {
             hideFuturisticLoading();
-          }, 1500); // Small delay to let the last loading message show
+          }, hideDelay); // Smaller delay for returning users
           
           showStatus('SCANNING FOR KEYS...');
           
@@ -1533,17 +1556,5 @@
       } // End of else block for user login check
     </script>
 
-    <!-- Speed Insights (only load in production/Vercel) -->
-    <script>
-      window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
-
-      // Only load Vercel speed insights in production
-      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        const script = document.createElement('script');
-        script.defer = true;
-        script.src = '/_vercel/speed-insights/script.js';
-        document.head.appendChild(script);
-      }
-    </script>
   </body>
 </html>
