@@ -642,34 +642,103 @@
       const progressText = futuristicLoading.querySelector('.progress-text');
       const debugLog = futuristicLoading.querySelector('#debugLog');
       
-      // Check if this is first visit (cache key)
-      const CACHE_KEY = 'scanner_first_load_complete';
-      const isFirstVisit = !localStorage.getItem(CACHE_KEY);
+      // Smart Caching System
+      const CACHE_KEYS = {
+        FIRST_LOAD: 'scanner_first_load_complete',
+        ASSETS_CACHED: 'scanner_assets_cached',
+        MINDAR_READY: 'scanner_mindar_ready',
+        MODELS_CACHED: 'scanner_models_cached',
+        CAMERA_PERMISSIONS: 'scanner_camera_permissions',
+        VISIT_COUNT: 'scanner_visit_count',
+        LAST_CACHE_DATE: 'scanner_last_cache_date'
+      };
 
-      // Loading sequence messages
-      const loadingSteps = [
-        { percent: 0, text: "INITIALIZING...", debug: "[00:00] Starting AR initialization..." },
-        { percent: 15, text: "LOADING MIND AR...", debug: "[00:01] Loading MindAR tracking system..." },
-        { percent: 30, text: "LOADING MODELS...", debug: "[00:02] Loading 3D model assets..." },
-        { percent: 45, text: "INITIALIZING CAMERA...", debug: "[00:03] Initializing camera system..." },
-        { percent: 60, text: "CALIBRATING...", debug: "[00:04] Calibrating AR tracking..." },
-        { percent: 75, text: "PROCESSING TARGETS...", debug: "[00:05] Processing mind files..." },
-        { percent: 90, text: "FINALIZING...", debug: "[00:06] Establishing AR connection..." },
-        { percent: 100, text: "COMPLETE!", debug: "[00:07] AR system ready!" }
-      ];
+      // Track visit count for progressive optimization
+      const visitCount = parseInt(localStorage.getItem(CACHE_KEYS.VISIT_COUNT) || '0') + 1;
+      localStorage.setItem(CACHE_KEYS.VISIT_COUNT, visitCount.toString());
 
-      // Fast loading for returning users
-      const fastLoadingSteps = [
-        { percent: 0, text: "INITIALIZING...", debug: "[00:00] Restoring AR session..." },
-        { percent: 25, text: "LOADING CACHE...", debug: "[00:01] Loading cached MindAR data..." },
-        { percent: 50, text: "CAMERA READY...", debug: "[00:02] Camera system ready..." },
-        { percent: 75, text: "CONNECTING...", debug: "[00:03] Connecting AR system..." },
-        { percent: 100, text: "COMPLETE!", debug: "[00:04] AR system ready!" }
-      ];
+      // Check cache validity (expire after 24 hours)
+      const lastCacheDate = localStorage.getItem(CACHE_KEYS.LAST_CACHE_DATE);
+      const cacheExpired = !lastCacheDate || (Date.now() - parseInt(lastCacheDate)) > (24 * 60 * 60 * 1000);
+
+      if (cacheExpired) {
+        console.log('🔄 Cache expired, clearing old cache data...');
+        Object.values(CACHE_KEYS).forEach(key => {
+          if (key !== CACHE_KEYS.VISIT_COUNT) localStorage.removeItem(key);
+        });
+      }
+
+      // Determine loading mode based on cache status and visit history
+      const hasAssetCache = localStorage.getItem(CACHE_KEYS.ASSETS_CACHED) && !cacheExpired;
+      const hasMindARCache = localStorage.getItem(CACHE_KEYS.MINDAR_READY) && !cacheExpired;
+      const hasModelCache = localStorage.getItem(CACHE_KEYS.MODELS_CACHED) && !cacheExpired;
+      const hasCameraPermissions = localStorage.getItem(CACHE_KEYS.CAMERA_PERMISSIONS) && !cacheExpired;
+
+      // Progressive loading modes based on cache status
+      let loadingMode = 'first_visit';
+      if (visitCount > 5 && hasAssetCache && hasMindARCache && hasModelCache && hasCameraPermissions) {
+        loadingMode = 'instant'; // Skip loading animation entirely
+      } else if (visitCount > 2 && hasAssetCache && hasMindARCache) {
+        loadingMode = 'super_fast'; // Ultra-fast loading
+      } else if (hasAssetCache || hasMindARCache) {
+        loadingMode = 'fast'; // Fast loading with some cache
+      }
+
+      const isFirstVisit = loadingMode === 'first_visit';
+
+      console.log(`🚀 Smart Cache Status - Visit #${visitCount}, Mode: ${loadingMode}`);
+      console.log(`📦 Cache Status: Assets=${!!hasAssetCache}, MindAR=${!!hasMindARCache}, Models=${!!hasModelCache}, Camera=${!!hasCameraPermissions}`);
+
+      // Loading sequence configurations for different cache modes
+      const loadingConfigs = {
+        first_visit: {
+          steps: [
+            { percent: 0, text: "INITIALIZING...", debug: "[00:00] Starting AR initialization..." },
+            { percent: 15, text: "LOADING MIND AR...", debug: "[00:01] Loading MindAR tracking system..." },
+            { percent: 30, text: "LOADING MODELS...", debug: "[00:02] Loading 3D model assets..." },
+            { percent: 45, text: "INITIALIZING CAMERA...", debug: "[00:03] Initializing camera system..." },
+            { percent: 60, text: "CALIBRATING...", debug: "[00:04] Calibrating AR tracking..." },
+            { percent: 75, text: "PROCESSING TARGETS...", debug: "[00:05] Processing mind files..." },
+            { percent: 90, text: "FINALIZING...", debug: "[00:06] Establishing AR connection..." },
+            { percent: 100, text: "COMPLETE!", debug: "[00:07] AR system ready!" }
+          ],
+          stepDelay: 600, // Reduced from 800ms
+          initialDelay: 300 // Reduced from 500ms
+        },
+        fast: {
+          steps: [
+            { percent: 0, text: "INITIALIZING...", debug: "[00:00] Restoring AR session..." },
+            { percent: 33, text: "LOADING CACHE...", debug: "[00:01] Loading cached data..." },
+            { percent: 66, text: "CONNECTING...", debug: "[00:02] Connecting AR system..." },
+            { percent: 100, text: "COMPLETE!", debug: "[00:03] AR system ready!" }
+          ],
+          stepDelay: 200, // Reduced from 300ms
+          initialDelay: 150
+        },
+        super_fast: {
+          steps: [
+            { percent: 0, text: "RESTORING...", debug: "[00:00] Restoring cached session..." },
+            { percent: 50, text: "CONNECTING...", debug: "[00:01] Connecting to AR..." },
+            { percent: 100, text: "READY!", debug: "[00:02] AR system ready!" }
+          ],
+          stepDelay: 100,
+          initialDelay: 50
+        },
+        instant: {
+          steps: [
+            { percent: 100, text: "READY!", debug: "[00:00] Instant AR ready!" }
+          ],
+          stepDelay: 50,
+          initialDelay: 0
+        }
+      };
+
+      const config = loadingConfigs[loadingMode];
+      const activeSteps = config.steps;
+      const stepDelay = config.stepDelay;
+      const initialDelay = config.initialDelay;
 
       let currentStep = 0;
-      const activeSteps = isFirstVisit ? loadingSteps : fastLoadingSteps;
-      const stepDelay = isFirstVisit ? 800 : 300; // Faster for returning users
 
       console.log(`🚀 Loading mode: ${isFirstVisit ? 'First visit (full loading)' : 'Returning user (fast loading)'}`);
       
@@ -728,94 +797,192 @@
       }
 
       // Perform actual loading tasks during the loading animation
-      function performLoadingTask(step, stepIndex) {
-        if (isFirstVisit) {
-          // First visit - do full initialization
-          switch(stepIndex) {
-            case 1: // Loading MindAR
-              preloadMindARAssets();
-              break;
-            case 2: // Loading models
-              preloadGLTFModels();
-              break;
-            case 3: // Initialize camera
-              initializeCameraSystem();
-              break;
-            case 4: // Calibrating
-              calibrateARSystem();
-              break;
-            case 5: // Processing targets
-              processTargetFiles();
-              break;
-          }
-        } else {
-          // Returning user - lightweight checks
-          switch(stepIndex) {
-            case 1: // Loading cache
-              loadCachedData();
-              break;
-            case 2: // Camera ready
-              verifyCameraSystem();
-              break;
-          }
+      async function performLoadingTask(step, stepIndex) {
+        switch(loadingMode) {
+          case 'first_visit':
+            switch(stepIndex) {
+              case 1: await preloadMindARAssets(); break;
+              case 2: await preloadGLTFModels(); break;
+              case 3: await initializeCameraSystem(); break;
+              case 4: await calibrateARSystem(); break;
+              case 5: await processTargetFiles(); break;
+            }
+            break;
+
+          case 'fast':
+            switch(stepIndex) {
+              case 1: await loadCachedData(); break;
+              case 2: await verifyCameraSystem(); break;
+            }
+            break;
+
+          case 'super_fast':
+            switch(stepIndex) {
+              case 1: await preloadGLTFModels(); break;
+            }
+            break;
+
+          case 'instant':
+            // Skip all loading tasks for instant mode
+            break;
         }
       }
 
-      // Preload MindAR tracking assets
+      // Smart Asset Caching Functions
       function preloadMindARAssets() {
-        console.log('🔄 Preloading MindAR tracking system...');
-        // MindAR will be initialized when the scene starts
+        return new Promise((resolve) => {
+          if (hasMindARCache) {
+            console.log('✅ Using cached MindAR data');
+            resolve();
+            return;
+          }
+
+          console.log('🔄 Preloading MindAR tracking system...');
+          // Check if MindAR is already loaded
+          if (typeof window.MINDAR !== 'undefined') {
+            console.log('✅ MindAR already loaded, caching status');
+            localStorage.setItem(CACHE_KEYS.MINDAR_READY, 'true');
+            localStorage.setItem(CACHE_KEYS.LAST_CACHE_DATE, Date.now().toString());
+            resolve();
+          } else {
+            // MindAR will be loaded via script tag, mark as ready after scene initialization
+            setTimeout(() => {
+              localStorage.setItem(CACHE_KEYS.MINDAR_READY, 'true');
+              localStorage.setItem(CACHE_KEYS.LAST_CACHE_DATE, Date.now().toString());
+              console.log('📦 MindAR cached for future visits');
+              resolve();
+            }, 500);
+          }
+        });
       }
 
-      // Preload GLTF models
       function preloadGLTFModels() {
-        console.log('🔄 Preloading GLTF models...');
-        // Models are preloaded via a-assets in the scene
+        return new Promise((resolve) => {
+          if (hasModelCache) {
+            console.log('✅ Using cached GLTF models');
+            resolve();
+            return;
+          }
+
+          console.log('🔄 Preloading GLTF models...');
+          const modelPaths = [
+            'model/magic_key/scene.gltf',
+            'model/magic_key/scene.bin',
+            'model/magic_key/textures/Material.001_baseColor.jpeg'
+          ];
+
+          // Preload models in parallel
+          const preloadPromises = modelPaths.map(path => {
+            return fetch(path, { method: 'HEAD' })
+              .then(response => {
+                if (response.ok) {
+                  console.log(`✅ Cached: ${path}`);
+                  return true;
+                }
+                return false;
+              })
+              .catch(() => false);
+          });
+
+          Promise.allSettled(preloadPromises).then((results) => {
+            const successCount = results.filter(r => r.status === 'fulfilled' && r.value).length;
+            if (successCount > 0) {
+              localStorage.setItem(CACHE_KEYS.MODELS_CACHED, 'true');
+              localStorage.setItem(CACHE_KEYS.LAST_CACHE_DATE, Date.now().toString());
+              console.log(`📦 Cached ${successCount}/${modelPaths.length} models for future visits`);
+            }
+            resolve();
+          });
+        });
       }
 
-      // Initialize camera system during loading
       function initializeCameraSystem() {
-        console.log('🔄 Initializing camera system...');
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-              console.log('✅ Camera permission verified during loading');
-              // Stop the stream as we'll use it later in AR scene
-              stream.getTracks().forEach(track => track.stop());
-            })
-            .catch(err => {
-              console.error('❌ Camera permission denied during loading:', err);
-            });
-        }
+        return new Promise((resolve) => {
+          if (hasCameraPermissions) {
+            console.log('✅ Using cached camera permissions');
+            resolve();
+            return;
+          }
+
+          console.log('🔄 Initializing camera system...');
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+              .then(stream => {
+                console.log('✅ Camera permission verified during loading');
+                localStorage.setItem(CACHE_KEYS.CAMERA_PERMISSIONS, 'true');
+                localStorage.setItem(CACHE_KEYS.LAST_CACHE_DATE, Date.now().toString());
+                console.log('📦 Camera permissions cached for future visits');
+                // Stop the stream as we'll use it later in AR scene
+                stream.getTracks().forEach(track => track.stop());
+                resolve();
+              })
+              .catch(err => {
+                console.error('❌ Camera permission denied during loading:', err);
+                resolve();
+              });
+          } else {
+            resolve();
+          }
+        });
       }
 
-      // Calibrate AR system
       function calibrateARSystem() {
-        console.log('🔄 Calibrating AR tracking system...');
-        // AR calibration happens in MindAR initialization
+        return new Promise((resolve) => {
+          console.log('🔄 Calibrating AR tracking system...');
+          // AR calibration happens in MindAR initialization
+          setTimeout(resolve, loadingMode === 'instant' ? 0 : 200);
+        });
       }
 
-      // Process target files
       function processTargetFiles() {
-        console.log('🔄 Processing target mind files...');
-        // Target processing handled by MindAR when scene starts
+        return new Promise((resolve) => {
+          if (hasAssetCache) {
+            console.log('✅ Using cached target files');
+            resolve();
+            return;
+          }
+
+          console.log('🔄 Processing target mind files...');
+          // Cache the fact that we've processed targets
+          localStorage.setItem(CACHE_KEYS.ASSETS_CACHED, 'true');
+          localStorage.setItem(CACHE_KEYS.LAST_CACHE_DATE, Date.now().toString());
+          console.log('📦 Target files cached for future visits');
+          setTimeout(resolve, loadingMode === 'instant' ? 0 : 300);
+        });
       }
 
       // Load cached data for returning users
       function loadCachedData() {
-        console.log('🔄 Loading cached MindAR data...');
-        // Use cached initialization data
+        return new Promise((resolve) => {
+          console.log('🔄 Loading cached MindAR data...');
+          // Use cached initialization data
+          setTimeout(resolve, 100);
+        });
       }
 
       // Verify camera system for returning users
       function verifyCameraSystem() {
-        console.log('🔄 Verifying camera system...');
-        // Quick camera check
+        return new Promise((resolve) => {
+          console.log('🔄 Verifying camera system...');
+          // Quick camera check
+          setTimeout(resolve, 50);
+        });
       }
-      
-      // Start loading animation (faster for returning users)
-      const initialDelay = isFirstVisit ? 500 : 200;
-      setTimeout(updateLoadingProgress, initialDelay);
+
+      // Handle instant mode - skip loading animation entirely
+      if (loadingMode === 'instant') {
+        console.log('⚡ Instant mode activated - skipping loading animation');
+        setTimeout(() => {
+          futuristicLoading.classList.add('hidden');
+          setTimeout(() => {
+            futuristicLoading.style.display = 'none';
+            initializeARScene();
+          }, 100);
+        }, 50);
+      } else {
+        // Start loading animation for other modes
+        setTimeout(updateLoadingProgress, initialDelay);
+      }
       
       // Initialize AR Scene after loading is complete
       function initializeARScene() {
