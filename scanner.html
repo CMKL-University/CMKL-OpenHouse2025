@@ -784,7 +784,7 @@
           } else {
             // Mark first load as complete
             if (isFirstVisit) {
-              localStorage.setItem(CACHE_KEY, 'true');
+              localStorage.setItem(CACHE_KEYS.FIRST_LOAD, 'true');
               console.log('✅ First visit loading complete - cached for future visits');
             }
 
