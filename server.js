@@ -390,7 +390,7 @@ async function findUserByEmail(email) {
             // Get all data from the sheet
             const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: SERVER_CONFIG.GOOGLE_SHEETS_ID,
-                range: 'A:R', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key, H=Redeem Key, I=CODE, J=IN1, K=IN2, L=IN3, M=IN4, N=WD1, O=WD2, P=WD3, Q=WD4, R=WD5
+                range: 'A:S', // A=First Name, B=Last Name, C=Email, D=Check-in, E=Register Key, F=Project showcase Key, G=Afternoon session Key, H=Redeem Key, I=CODE, J=IN1, K=IN2, L=IN3, M=IN4, N=WD1, O=WD2, P=WD3, Q=WD4, R=WD5, S=WD6
             });
             
             const rows = response.data.values;
