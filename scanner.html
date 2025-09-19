@@ -380,6 +380,32 @@
         100% { transform: rotate(360deg); }
       }
 
+      /* Enhanced loading ring animations for different modes */
+      .loading-circle.mode-first_visit .loading-ring:nth-child(1) {
+        animation: rotate 3s linear infinite;
+        border-top-color: #6be4f0;
+        border-right-color: #6be4f0;
+      }
+
+      .loading-circle.mode-fast .loading-ring:nth-child(1) {
+        animation: rotate 2s linear infinite;
+        border-top-color: #00ff41;
+        border-right-color: #00ff41;
+      }
+
+      .loading-circle.mode-super_fast .loading-ring:nth-child(1) {
+        animation: rotate 1s linear infinite;
+        border-top-color: #ff6b6b;
+        border-right-color: #ff6b6b;
+      }
+
+      .loading-circle.mode-instant .loading-ring:nth-child(1) {
+        animation: rotate 0.5s linear infinite;
+        border-top-color: #fff;
+        border-right-color: #fff;
+        box-shadow: 0 0 15px #00ff41;
+      }
+
       /* Progress Bar */
       .progress-container {
         margin: 30px 0 20px 0;
@@ -403,7 +429,48 @@
         background: linear-gradient(90deg, #6be4f0, #22B2B9);
         border-radius: 2px;
         width: 0%;
-        transition: width 0.3s ease;
+        transition: width 0.2s ease-out;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Mode-specific progress bar styles */
+      .progress-fill.mode-first_visit {
+        background: linear-gradient(90deg, #6be4f0, #22B2B9);
+        animation: progressPulse 2s ease-in-out infinite;
+      }
+
+      .progress-fill.mode-fast {
+        background: linear-gradient(90deg, #00ff41, #6be4f0);
+        animation: progressPulse 1.5s ease-in-out infinite;
+      }
+
+      .progress-fill.mode-super_fast {
+        background: linear-gradient(90deg, #ff6b6b, #00ff41, #6be4f0);
+        background-size: 200% 100%;
+        animation: progressRush 0.8s linear infinite;
+      }
+
+      .progress-fill.mode-instant {
+        background: linear-gradient(45deg, #ff6b6b, #00ff41, #6be4f0, #ff6b6b);
+        background-size: 400% 400%;
+        animation: progressInstant 0.4s ease-in-out infinite;
+      }
+
+      @keyframes progressPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+      }
+
+      @keyframes progressRush {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      @keyframes progressInstant {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
       }
 
       .progress-text {
@@ -413,6 +480,33 @@
         color: #22B2B9;
         text-transform: uppercase;
         letter-spacing: 1px;
+        transition: color 0.3s ease;
+      }
+
+      /* Mode-specific text colors */
+      .mode-fast .progress-text {
+        color: #00ff41;
+      }
+
+      .mode-super_fast .progress-text {
+        color: #ff6b6b;
+        animation: textFlash 0.5s ease-in-out infinite;
+      }
+
+      .mode-instant .progress-text {
+        color: #fff;
+        text-shadow: 0 0 10px #00ff41;
+        animation: textGlow 0.3s ease-in-out infinite;
+      }
+
+      @keyframes textFlash {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+
+      @keyframes textGlow {
+        0%, 100% { text-shadow: 0 0 10px #00ff41; }
+        50% { text-shadow: 0 0 20px #00ff41, 0 0 30px #6be4f0; }
       }
 
       /* Debug Console */
@@ -760,21 +854,38 @@
         }
       }
       
-      // Update loading progress with actual initialization
-      function updateLoadingProgress() {
+      // Enhanced loading progress with smooth animations and mode-specific styling
+      async function updateLoadingProgress() {
         if (currentStep < activeSteps.length) {
           const step = activeSteps[currentStep];
 
-          // Update percentage and progress bar
-          loadingPercentage.textContent = step.percent + '%';
-          progressFill.style.width = step.percent + '%';
-          progressText.textContent = step.text;
+          // Apply mode-specific styling to loading circle on first step
+          if (currentStep === 0) {
+            const loadingCircle = document.querySelector('.loading-circle');
+            if (loadingCircle) {
+              loadingCircle.className = `loading-circle mode-${loadingMode}`;
+            }
+          }
 
-          // Add debug message
+          // Add loading mode indicator to progress text
+          const modeIndicator = {
+            'first_visit': '🔧',
+            'fast': '⚡',
+            'super_fast': '🚀',
+            'instant': '⭐'
+          }[loadingMode] || '🔧';
+
+          // Smooth progress bar animation
+          animateProgressBar(step.percent, step.text, modeIndicator);
+
+          // Update loading center percentage with animation
+          animatePercentage(step.percent);
+
+          // Add debug message with mode context
           addDebugLine(step.debug);
 
           // Execute actual initialization tasks during loading
-          performLoadingTask(step, currentStep);
+          await performLoadingTask(step, currentStep);
 
           currentStep++;
 
@@ -783,17 +894,93 @@
             setTimeout(updateLoadingProgress, stepDelay);
           } else {
             // Mark first load as complete
-            if (isFirstVisit) {
+            if (loadingMode === 'first_visit') {
               localStorage.setItem(CACHE_KEYS.FIRST_LOAD, 'true');
               console.log('✅ First visit loading complete - cached for future visits');
             }
 
+            // Show completion animation
+            await showCompletionAnimation();
+
             // All loading complete - initialize AR scene
             setTimeout(() => {
               initializeARScene();
-            }, 500);
+            }, loadingMode === 'instant' ? 0 : 500);
           }
         }
+      }
+
+      // Smooth progress bar animation
+      function animateProgressBar(targetPercent, text, modeIndicator) {
+        const currentWidth = parseInt(progressFill.style.width) || 0;
+        const targetWidth = targetPercent;
+
+        // Update text immediately with mode indicator
+        progressText.textContent = `${modeIndicator} ${text}`;
+
+        // Add mode-specific styling
+        progressFill.className = `progress-fill mode-${loadingMode}`;
+
+        // Smooth width animation
+        if (targetWidth > currentWidth) {
+          let current = currentWidth;
+          const increment = (targetWidth - currentWidth) / 10;
+
+          const animateWidth = () => {
+            current += increment;
+            if (current >= targetWidth) {
+              progressFill.style.width = targetWidth + '%';
+              return;
+            }
+            progressFill.style.width = current + '%';
+            requestAnimationFrame(animateWidth);
+          };
+
+          requestAnimationFrame(animateWidth);
+        } else {
+          progressFill.style.width = targetWidth + '%';
+        }
+      }
+
+      // Animated percentage counter
+      function animatePercentage(targetPercent) {
+        const currentPercent = parseInt(loadingPercentage.textContent) || 0;
+
+        if (targetPercent > currentPercent) {
+          let current = currentPercent;
+          const increment = (targetPercent - currentPercent) / 8;
+
+          const animatePercent = () => {
+            current += increment;
+            if (current >= targetPercent) {
+              loadingPercentage.textContent = targetPercent + '%';
+              return;
+            }
+            loadingPercentage.textContent = Math.round(current) + '%';
+            requestAnimationFrame(animatePercent);
+          };
+
+          requestAnimationFrame(animatePercent);
+        } else {
+          loadingPercentage.textContent = targetPercent + '%';
+        }
+      }
+
+      // Completion animation
+      function showCompletionAnimation() {
+        return new Promise((resolve) => {
+          // Flash effect for completion
+          progressFill.style.background = 'linear-gradient(90deg, #00ff41, #6be4f0)';
+          progressText.textContent = '✅ LOADING COMPLETE!';
+
+          // Pulse effect
+          loadingPercentage.style.animation = 'pulse 0.5s ease-in-out 3';
+
+          setTimeout(() => {
+            loadingPercentage.style.animation = '';
+            resolve();
+          }, 1000);
+        });
       }
 
       // Perform actual loading tasks during the loading animation
