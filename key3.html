@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wonder Key - CMKL Open House 2025</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000616 url('svg/background.svg') no-repeat center center fixed;
+            background-size: cover;
+            color: #B2A600;
+            font-family: 'Darker Grotesque', sans-serif;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            margin: 0 auto;
+            background: transparent;
+            max-width: 393px;
+            max-height: 874px;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 3;
+            gap: 20px;
+        }
+
+        /* Top decorative border */
+        .top-border {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #B2A600 0%, #FFD700 100%);
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            z-index: 5;
+        }
+
+        /* Bottom decorative border */
+        .bottom-border {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #B2A600 0%, #FFD700 100%);
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            z-index: 5;
+        }
+
+        /* Back button styles */
+        .back-button {
+            position: absolute;
+            top: 35px;
+            left: 20px;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #B2A600, #FFD700);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #B2A600;
+            box-shadow: 0 0 15px rgba(178, 166, 0, 0.5);
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+            transform: translateY(-2px);
+            animation: backGlitch 0.3s ease-in-out;
+            opacity: 1;
+        }
+
+        @keyframes backGlitch {
+            0%, 100% {
+                transform: translateY(-2px);
+                filter: brightness(1);
+            }
+            25% {
+                transform: translateY(-2px) translateX(-1px);
+                filter: brightness(1.2) hue-rotate(15deg);
+            }
+            50% {
+                transform: translateY(-2px) translateX(1px);
+                filter: brightness(0.9) hue-rotate(-15deg);
+            }
+            75% {
+                transform: translateY(-2px) translateX(-1px);
+                filter: brightness(1.1) hue-rotate(10deg);
+            }
+        }
+
+        /* Header section */
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .wonder-title {
+            font-size: 26.9px;
+            font-weight: 600;
+            color: #FFD700;
+            letter-spacing: 1.34px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Roadmap container */
+        .roadmap-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            max-width: 350px;
+            position: relative;
+            right: 15%;
+        }
+
+        /* Progress display */
+        .progress-display {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .progress-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFD700;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .percentage-text {
+            font-family: 'Orbitron', 'Roboto Mono', 'Courier New', monospace;
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFD700;
+            opacity: 0.8;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            animation: percentageGlow 1s ease-in-out infinite alternate;
+        }
+
+        .completion-status {
+            font-size: 14px;
+            color: #B2A600;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        /* Roadmap path */
+        .roadmap-path {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        /* Key station in roadmap */
+        .key-station {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #B2A600;
+            background: #000;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .key-station.required {
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .key-station.optional {
+            border-color: #B2A600;
+            box-shadow: 0 0 10px rgba(178, 166, 0, 0.2);
+            opacity: 0.7;
+        }
+
+        .key-station.scanned {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-color: #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            animation: scannedPulse 2s ease-in-out infinite;
+        }
+
+        .key-station.unlocked {
+            border-color: #00FF00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            animation: unlockedGlow 1.5s ease-in-out infinite;
+        }
+
+        .key-station:hover:not(.scanned) {
+            transform: scale(1.1);
+            border-color: #FFD700;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Key station content */
+        .key-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+
+        .key-station.scanned .key-number {
+            color: #FFD700;
+        }
+
+        .key-station.scanned.animation-complete .key-number {
+            color: #000;
+        }
+
+        /* Connection lines between stations */
+        .connection-line {
+            width: 3px;
+            height: 15px;
+            background: linear-gradient(to bottom, #B2A600, #FFD700);
+            opacity: 0.6;
+            border-radius: 2px;
+        }
+
+        .connection-line.active {
+            background: linear-gradient(to bottom, #FFD700, #FFA500);
+            opacity: 1;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            animation: lineGlow 2s ease-in-out infinite;
+        }
+
+        /* Key labels */
+        .key-label {
+            position: absolute;
+            left: 80px;
+            font-size: 12px;
+            color: #B2A600;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0.5;
+        }
+
+        .key-station.required .key-label {
+            color: #FFD700;
+            opacity: 0.5;
+        }
+
+        .key-station.optional .key-label {
+            color: #B2A600;
+            opacity: 0.5;
+        }
+
+        .key-station.scanned .key-label {
+            color: #FFD700;
+            opacity: 1;
+        }
+
+        /* Action button */
+        /* .action-button { */
+            /* position: relative; */
+            /* margin: 30px auto 0 auto; */
+            /* display: block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #B2A600, #FFD700);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(178, 166, 0, 0.3);
+            z-index: 10;
+        } */
+
+        /* .action-button:hover {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+            transform: translateY(-2px);
+        } */
+
+        /* .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        } */
+
+        /* Animations */
+        @keyframes percentageGlow {
+            0% {
+                text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+                opacity: 0.8;
+            }
+            100% {
+                text-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+                opacity: 1;
+            }
+        }
+
+        @keyframes scannedPulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes unlockedGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+            }
+        }
+
+        @keyframes lineGlow {
+            0%, 100% {
+                opacity: 1;
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            }
+            50% {
+                opacity: 0.8;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            }
+        }
+
+        /* Motion animations for scanned keys */
+        @keyframes keyPopOut {
+            0% {
+                transform: scale(1);
+                background: #000;
+                border-color: #B2A600;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            }
+            15% {
+                transform: scale(1.1);
+                background: #000;
+                border-color: #FFD700;
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            }
+            30% {
+                transform: scale(1.4);
+                background: linear-gradient(135deg, #B2A600, #FFD700);
+                border-color: #FFD700;
+                box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+            }
+            60% {
+                transform: scale(1.2);
+                background: linear-gradient(135deg, #FFD700, #FFA500);
+                border-color: #FFD700;
+                box-shadow: 0 0 35px rgba(255, 215, 0, 0.7);
+            }
+            100% {
+                transform: scale(1.1);
+                background: linear-gradient(135deg, #FFD700, #FFA500);
+                border-color: #FFD700;
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            }
+        }
+
+        @keyframes lineConnect {
+            0% {
+                height: 0;
+                opacity: 0;
+                box-shadow: none;
+            }
+            50% {
+                height: 15px;
+                opacity: 0.8;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            }
+            100% {
+                height: 15px;
+                opacity: 1;
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            }
+        }
+
+        @keyframes rippleEffect {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+            }
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+                box-shadow: 0 0 0 20px rgba(255, 215, 0, 0);
+            }
+        }
+
+
+        /* Motion classes */
+        .key-station.animate-scan {
+            animation: keyPopOut 0.8s ease-out forwards;
+        }
+
+        .key-station.animate-scan::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            background: transparent;
+            animation: rippleEffect 1s ease-out;
+            pointer-events: none;
+        }
+
+        /* Key number color transition during animation */
+        .key-station.animate-scan .key-number {
+            animation: numberColorTransition 0.8s ease-out forwards;
+        }
+
+        @keyframes numberColorTransition {
+            0% {
+                color: #FFD700;
+            }
+            15% {
+                color: #FFD700;
+            }
+            30% {
+                color: #000;
+            }
+            100% {
+                color: #000;
+            }
+        }
+
+
+        .connection-line.animate-connect {
+            animation: lineConnect 0.6s ease-out forwards;
+            transform-origin: top;
+        }
+
+        /* Enhanced scanned state - stays black until animation */
+        .key-station.scanned {
+            background: #000;
+            border-color: #FFD700;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            transform: scale(1.1);
+        }
+
+        /* Only show gradient AFTER animation completes */
+        .key-station.scanned.animation-complete {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-color: #FFD700;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            transform: scale(1.1);
+        }
+
+        /* Data update glitch animation */
+        @keyframes dataGlitch {
+            0%, 100% {
+                transform: translate(0);
+                filter: hue-rotate(0deg);
+                opacity: 1;
+            }
+            10% {
+                transform: translate(-2px, 1px);
+                filter: hue-rotate(90deg);
+                opacity: 0.8;
+            }
+            20% {
+                transform: translate(2px, -1px);
+                filter: hue-rotate(180deg);
+                opacity: 0.9;
+            }
+            30% {
+                transform: translate(-1px, 2px);
+                filter: hue-rotate(270deg);
+                opacity: 0.7;
+            }
+            40% {
+                transform: translate(1px, -2px);
+                filter: hue-rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .glitch-animation {
+            animation: dataGlitch 0.6s ease-in-out infinite;
+        }
+
+        .glitch-animation-once {
+            animation: dataGlitch 0.6s ease-in-out;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .main-container {
+                max-width: 100vw;
+                max-height: 100vh;
+            }
+
+            .top-border, .bottom-border {
+                width: 95vw;
+                max-width: 400px;
+                height: 20px;
+            }
+
+            .container {
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .wonder-title {
+                font-size: 22px;
+            }
+
+            .roadmap-container {
+                max-width: 300px;
+                gap: 12px;
+            }
+
+            .key-station {
+                width: 50px;
+                height: 50px;
+            }
+
+            .key-number {
+                font-size: 14px;
+            }
+
+            .percentage-text {
+                font-size: 36px;
+            }
+
+            .key-label {
+                left: 65px;
+                font-size: 11px;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .main-container {
+                max-width: 450px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .main-container {
+                max-width: 393px;
+                max-height: 874px;
+                margin: 0 auto;
+                transform: scale(1);
+            }
+
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        /* Cyberpunk glow effects */
+        .glow-text {
+            text-shadow:
+                0 0 5px #FFD700,
+                0 0 10px #FFD700,
+                0 0 15px #FFD700,
+                0 0 20px #FFD700;
+        }
+
+        .scan-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 215, 0, 0.03) 2px,
+                rgba(255, 215, 0, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Back button -->
+    <a href="page2.html" class="back-button">
+        <span>← BACK</span>
+    </a>
+
+    <div class="main-container">
+        <!-- Top decorative border -->
+        <div class="top-border"></div>
+
+        <!-- Bottom decorative border -->
+        <div class="bottom-border"></div>
+
+        <div class="container">
+            <!-- Decorative elements -->
+            <div class="scan-lines"></div>
+
+            <!-- Header -->
+            <div class="header">
+                <h1 class="wonder-title glow-text">WONDER KEY</h1>
+            </div>
+
+            <!-- Progress display -->
+            <div class="progress-display">
+                <p class="progress-text glow-text" id="progressText">Scan 3 of 5 keys to unlock!</p>
+                <p class="percentage-text" id="wonderPercentage">0%</p>
+                <p class="completion-status" id="completionStatus"></p>
+            </div>
+
+            <!-- Roadmap -->
+            <div class="roadmap-container">
+                <div class="roadmap-path">
+                    <!-- WD1 -->
+                    <div class="key-station required" data-key="1" onclick="navigateToScanner(1)">
+                        <span class="key-number">1</span>
+                        <span class="key-label">Wonder Key Slot 1</span>
+                    </div>
+                    <div class="connection-line" id="line1"></div>
+
+                    <!-- WD2 -->
+                    <div class="key-station required" data-key="2" onclick="navigateToScanner(2)">
+                        <span class="key-number">2</span>
+                        <span class="key-label">Wonder Key Slot 2</span>
+                    </div>
+                    <div class="connection-line" id="line2"></div>
+
+                    <!-- WD3 -->
+                    <div class="key-station required" data-key="3" onclick="navigateToScanner(3)">
+                        <span class="key-number">3</span>
+                        <span class="key-label">Wonder Key Slot 3</span>
+                    </div>
+                    <div class="connection-line" id="line3"></div>
+
+                    <!-- WD4 -->
+                    <div class="key-station optional" data-key="4" onclick="navigateToScanner(4)">
+                        <span class="key-number">4</span>
+                        <span class="key-label">Wonder Key Slot 4</span>
+                    </div>
+                    <div class="connection-line" id="line4"></div>
+
+                    <!-- WD5 -->
+                    <div class="key-station optional" data-key="5" onclick="navigateToScanner(5)">
+                        <span class="key-number">5</span>
+                        <span class="key-label">Wonder Key Slot 5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action button (moved outside roadmap container) -->
+            <button class="action-button" id="actionButton" style="display: none;">
+                <!-- START SCANNING -->
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function navigateToScanner(keyNumber) {
+            // Check if user is logged in before proceeding
+            const userEmail = localStorage.getItem('userEmail');
+            const recordId = localStorage.getItem('userRecordId');
+
+            if (!userEmail || !recordId) {
+                alert('Please register first before accessing the AR scanner.');
+                window.location.href = 'register.html';
+                return;
+            }
+
+            console.log(`🎯 Navigating to Wonder Key ${keyNumber} scanner`);
+
+            // Navigate to scanner for Wonder Key with specific target
+            setTimeout(() => {
+                window.location.href = `scanner.html?key=key3&target=${keyNumber}`;
+            }, 200);
+        }
+
+        function navigateToNextKey() {
+            const wonderProgress = JSON.parse(localStorage.getItem('wonderProgress') || '{}');
+
+            // Count how many WD slots are filled (sequential filling system)
+            let filledSlots = 0;
+            for (let i = 1; i <= 5; i++) {
+                if (wonderProgress[`wd${i}`] === 'scanned') {
+                    filledSlots++;
+                }
+            }
+
+            if (filledSlots < 5) {
+                // Still have slots available - send to scan any .mind file (default to 1.mind)
+                console.log(`Sequential filling: ${filledSlots}/5 slots filled, sending to scan 1.mind`);
+                navigateToScanner(1);
+            } else {
+                // All 5 slots filled
+                console.log('All Wonder Keys have been scanned!');
+            }
+        }
+
+        // Function to update Afternoon session Key when 3+ Wonder Keys are scanned
+        async function updateAfternoonSessionKey() {
+            const userEmail = localStorage.getItem('userEmail');
+            const recordId = localStorage.getItem('userRecordId');
+
+            if (!userEmail || !recordId) {
+                console.error('Missing user credentials for Afternoon session Key update');
+                return false;
+            }
+
+            try {
+                console.log('🎯 Updating Afternoon session Key to scanned...');
+
+                const response = await fetch('/api/harty/update-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        recordId: recordId,
+                        keyField: 'key3 status',
+                        status: 'scanned'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log('✅ Afternoon session Key successfully updated to scanned');
+
+                    // Update localStorage
+                    const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
+                    keyStatuses['key3'] = 'scanned';
+                    localStorage.setItem('userKeyStatuses', JSON.stringify(keyStatuses));
+
+                    return true;
+                } else {
+                    console.error('❌ Failed to update Afternoon session Key:', data.error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Error updating Afternoon session Key:', error);
+                return false;
+            }
+        }
+
+        // Function to check if 3+ Wonder Keys are scanned
+        function areThreeWonderKeysScanned() {
+            const wonderProgress = JSON.parse(localStorage.getItem('wonderProgress') || '{}');
+            let scannedCount = 0;
+
+            for (let i = 1; i <= 5; i++) {
+                if (wonderProgress[`wd${i}`] === 'scanned') {
+                    scannedCount++;
+                }
+            }
+
+            return scannedCount >= 3;
+        }
+
+        // Fetch user data and Wonder progress
+        async function fetchUserData(showLoadingState = true) {
+            const progressText = document.getElementById('progressText');
+            const percentageText = document.getElementById('wonderPercentage');
+
+            try {
+                // Show loading state
+                if (showLoadingState) {
+                    progressText.textContent = 'Loading Wonder progress...';
+                    percentageText.textContent = '???';
+                    percentageText.classList.add('glitch-animation');
+                    progressText.classList.add('glitch-animation');
+                }
+
+                // Get user email from URL params or stored data
+                const urlParams = new URLSearchParams(window.location.search);
+                const userEmail = urlParams.get('email') || localStorage.getItem('userEmail');
+
+                if (!userEmail) {
+                    console.warn('No user email found, redirecting to registration');
+                    if (showLoadingState) {
+                        progressText.textContent = 'Please register first...';
+                        percentageText.textContent = '???';
+                        setTimeout(() => {
+                            window.location.href = 'register.html';
+                        }, 2000);
+                    } else {
+                        window.location.href = 'register.html';
+                    }
+                    return;
+                }
+
+                console.log('Fetching user data for:', userEmail);
+
+                // Fetch user data including Wonder progress
+                const response = await fetch(`/api/harty/user/${encodeURIComponent(userEmail)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    if (userData.success && userData.data) {
+                        // Extract Wonder progress data
+                        const wonderPercentage = userData.data.wonderPercentage || 0;
+                        const wonderProgress = userData.data.wonderProgress || {};
+
+                        console.log('Wonder progress loaded:', {
+                            percentage: wonderPercentage,
+                            progress: wonderProgress
+                        });
+
+                        // Update localStorage with Wonder data
+                        localStorage.setItem('wonderProgress', JSON.stringify(wonderProgress));
+                        localStorage.setItem('wonderPercentage', wonderPercentage.toString());
+
+                        // Update progress with loading animation
+                        if (showLoadingState) {
+                            setTimeout(() => {
+                                percentageText.classList.remove('glitch-animation');
+                                progressText.classList.remove('glitch-animation');
+                                updateWonderProgress(wonderPercentage, wonderProgress);
+
+                                // Trigger sequential animations after data loads
+                                setTimeout(() => {
+                                    triggerSequentialAnimations(wonderProgress);
+                                }, 500);
+                            }, 600);
+                        } else {
+                            updateWonderProgress(wonderPercentage, wonderProgress);
+                        }
+
+                        return userData.data;
+                    } else {
+                        console.warn('Failed to get user data:', userData.message);
+                        setTimeout(() => {
+                            percentageText.classList.remove('glitch-animation');
+                            progressText.classList.remove('glitch-animation');
+                            updateWonderProgress(0, {});
+                        }, 800);
+                    }
+                } else {
+                    console.error('Error fetching user data:', response.status);
+                    setTimeout(() => {
+                        percentageText.classList.remove('glitch-animation');
+                        progressText.classList.remove('glitch-animation');
+                        updateWonderProgress(0, {});
+                    }, 800);
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                setTimeout(() => {
+                    percentageText.classList.remove('glitch-animation');
+                    progressText.classList.remove('glitch-animation');
+                    updateWonderProgress(0, {});
+                }, 800);
+            }
+        }
+
+        // Update Wonder Key progress display
+        function updateWonderProgress(percentage, wonderProgress) {
+            const percentageText = document.getElementById('wonderPercentage');
+            const progressText = document.getElementById('progressText');
+            const completionStatus = document.getElementById('completionStatus');
+            const actionButton = document.getElementById('actionButton');
+
+            // Trigger glitch animation before updating
+            percentageText.classList.add('glitch-animation-once');
+            progressText.classList.add('glitch-animation-once');
+
+            // Count scanned keys
+            let scannedCount = 0;
+            for (let i = 1; i <= 5; i++) {
+                if (wonderProgress[`wd${i}`] === 'scanned') {
+                    scannedCount++;
+                }
+            }
+
+            // Update text displays
+            setTimeout(() => {
+                percentageText.textContent = `${percentage}%`;
+                completionStatus.textContent = `${scannedCount}/5 Wonder Keys collected`;
+
+                // Update progress text based on completion
+                if (scannedCount === 5) {
+                    // All 5 WD keys are scanned - hide the action button
+                    progressText.textContent = 'All Wonder Keys collected!';
+                    actionButton.style.display = 'none';
+                    console.log('🎉 All 5 Wonder Keys scanned! Hiding action button.');
+                } else if (scannedCount >= 3) {
+                    progressText.textContent = 'Wonder Key unlocked!';
+                    actionButton.textContent = '';
+                    actionButton.style.display = 'block'; // Ensure button is visible
+
+                    // Check if we should update the Afternoon session Key
+                    if (areThreeWonderKeysScanned()) {
+                        console.log('🎉 3+ Wonder Keys scanned! Updating Afternoon session Key...');
+                        updateAfternoonSessionKey();
+                    }
+                } else {
+                    const remaining = 3 - scannedCount;
+                    progressText.textContent = `Scan ${remaining} more key${remaining !== 1 ? 's' : ''} to unlock!`;
+                    actionButton.textContent = 'START SCANNING';
+                    actionButton.style.display = 'block'; // Ensure button is visible
+                }
+
+                // Update roadmap visual state
+                updateRoadmapVisuals(wonderProgress, scannedCount);
+            }, 200);
+
+            // Remove glitch animation
+            setTimeout(() => {
+                percentageText.classList.remove('glitch-animation-once');
+                progressText.classList.remove('glitch-animation-once');
+            }, 800);
+        }
+
+        // Update roadmap visual state with sequential motion animations
+        function updateRoadmapVisuals(wonderProgress, scannedCount) {
+            // Get array of scanned keys in sequence order
+            const scannedKeys = [];
+            for (let i = 1; i <= 5; i++) {
+                if (wonderProgress[`wd${i}`] === 'scanned') {
+                    scannedKeys.push(i);
+                }
+            }
+
+            // Sort scanned keys to ensure proper sequence
+            scannedKeys.sort((a, b) => a - b);
+
+            for (let i = 1; i <= 5; i++) {
+                const station = document.querySelector(`[data-key="${i}"]`);
+                const line = document.getElementById(`line${i}`);
+
+                // Check if this key was just scanned (for animation trigger)
+                const wasScanned = station.classList.contains('scanned');
+                const isNowScanned = wonderProgress[`wd${i}`] === 'scanned';
+
+                // Update station appearance
+                station.classList.remove('scanned', 'unlocked', 'animate-scan');
+
+                if (isNowScanned) {
+                    station.classList.add('scanned');
+
+                    // Trigger sequential pop-out animation
+                    if (!wasScanned) {
+                        const sequenceIndex = scannedKeys.indexOf(i);
+                        setTimeout(() => {
+                            station.classList.add('animate-scan');
+                        }, sequenceIndex * 300); // 300ms delay between each key animation
+                    }
+                } else if (scannedCount >= 3 && i > 3) {
+                    // Optional keys become available after 3 required keys
+                    station.classList.add('unlocked');
+                }
+
+                // Update connection lines with sequential animation
+                if (line) {
+                    const wasActive = line.classList.contains('active');
+                    const shouldBeActive = scannedKeys.includes(i);
+
+                    line.classList.remove('active', 'animate-connect');
+
+                    if (shouldBeActive) {
+                        line.classList.add('active');
+
+                        // Trigger sequential line connection animation
+                        if (!wasActive) {
+                            const sequenceIndex = scannedKeys.indexOf(i);
+                            setTimeout(() => {
+                                line.classList.add('animate-connect');
+                            }, (sequenceIndex * 300) + 200); // Line animates 200ms after key pop-out
+                        }
+                    }
+                }
+            }
+        }
+
+        // Function to trigger immediate scan animation for a specific key (for real-time scanning)
+        function triggerKeyScanAnimation(keyNumber) {
+            const station = document.querySelector(`[data-key="${keyNumber}"]`);
+            const line = document.getElementById(`line${keyNumber}`);
+
+            if (station) {
+                // Add immediate scan animation for real-time feedback
+                station.classList.add('animate-scan');
+
+                // Remove animation class and add gradient after it completes
+                setTimeout(() => {
+                    station.classList.remove('animate-scan');
+                    station.classList.add('animation-complete');
+                }, 800);
+
+                // Animate the connection line immediately for real-time feedback
+                if (line) {
+                    setTimeout(() => {
+                        line.classList.add('animate-connect');
+                        setTimeout(() => {
+                            line.classList.remove('animate-connect');
+                        }, 600);
+                    }, 400);
+                }
+            }
+        }
+
+        // Function to trigger sequential animations for all scanned keys (for page load)
+        function triggerSequentialAnimations(wonderProgress) {
+            // Get array of scanned keys in sequence order
+            const scannedKeys = [];
+            for (let i = 1; i <= 5; i++) {
+                if (wonderProgress[`wd${i}`] === 'scanned') {
+                    scannedKeys.push(i);
+                }
+            }
+
+            // Sort scanned keys to ensure proper sequence
+            scannedKeys.sort((a, b) => a - b);
+
+            // Animate each scanned key in sequence
+            scannedKeys.forEach((keyNumber, index) => {
+                const station = document.querySelector(`[data-key="${keyNumber}"]`);
+                const line = document.getElementById(`line${keyNumber}`);
+
+                if (station) {
+                    // Sequential pop-out animation
+                    setTimeout(() => {
+                        station.classList.add('animate-scan');
+                        setTimeout(() => {
+                            station.classList.remove('animate-scan');
+                            station.classList.add('animation-complete');
+                        }, 800);
+                    }, index * 300);
+
+                    // Sequential line connection animation
+                    if (line) {
+                        setTimeout(() => {
+                            line.classList.add('animate-connect');
+                            setTimeout(() => {
+                                line.classList.remove('animate-connect');
+                            }, 600);
+                        }, (index * 300) + 200);
+                    }
+                }
+            });
+        }
+
+        // Load data on page initialization
+        function loadInitialData() {
+            fetchUserData(true);
+        }
+
+        // Listen for real-time scan updates from scanner
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'wonderProgress') {
+                console.log('🎯 Wonder Key progress updated in real-time!');
+
+                // Parse the new progress
+                const newProgress = JSON.parse(e.newValue || '{}');
+                const oldProgress = JSON.parse(e.oldValue || '{}');
+
+                // Check which key was just scanned
+                for (let i = 1; i <= 5; i++) {
+                    const keyField = `wd${i}`;
+                    if (oldProgress[keyField] !== 'scanned' && newProgress[keyField] === 'scanned') {
+                        console.log(`🎉 Wonder Key ${i} was just scanned! Triggering animation...`);
+
+                        // Trigger scan animation for this specific key
+                        setTimeout(() => {
+                            triggerKeyScanAnimation(i);
+                        }, 200);
+
+                        // Refresh the display after a short delay
+                        setTimeout(() => {
+                            fetchUserData(false);
+                        }, 500);
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInitialData();
+        });
+    </script>
+
+    <!-- Speed Insights (only load in production/Vercel) -->
+    <script>
+      window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+
+      // Only load Vercel speed insights in production
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const script = document.createElement('script');
+        script.defer = true;
+        script.src = '/_vercel/speed-insights/script.js';
+        document.head.appendChild(script);
+      }
+    </script>
+</body>
+</html>

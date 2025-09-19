@@ -26,7 +26,7 @@ const configContent = `// Auto-generated configuration from .env
 // DO NOT COMMIT THIS FILE
 
 const config = {
-    MISSION: '${env.MISSION || 'text'}', // ENABLE or DISABLE
+    MISSION: '${env.MISSION || 'ENABLE'}', // From .env file
     AIRTABLE_API_KEY: '${env.AIRTABLE_API_KEY || 'your-api-key-here'}',
     AIRTABLE_BASE_ID: '${env.AIRTABLE_BASE_ID || 'your-base-id-here'}',
     AIRTABLE_TABLE_NAME: '${env.AIRTABLE_TABLE_NAME || 'Table%201'}'

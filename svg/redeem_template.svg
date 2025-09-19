@@ -1,0 +1,59 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Montserrat font import -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;display=swap');
+      .title-text { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 28px; fill: #00FA96; }
+      .user-name { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 24px; fill: #FFFFFF; }
+      .code-text { font-family: 'Montserrat', sans-serif; font-weight: 400; font-size: 20px; fill: #00FA96; }
+      .subtitle { font-family: 'Montserrat', sans-serif; font-weight: 400; font-size: 16px; fill: #CCCCCC; }
+    </style>
+
+    <!-- Gradient definitions -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#000616;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0A1A2A;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#22B2B9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00946D;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="url(#bgGradient)"/>
+
+  <!-- Top border decoration -->
+  <rect x="50" y="30" width="700" height="4" rx="2" fill="url(#borderGradient)"/>
+
+  <!-- Bottom border decoration -->
+  <rect x="50" y="566" width="700" height="4" rx="2" fill="url(#borderGradient)"/>
+
+  <!-- Main content container -->
+  <rect x="100" y="100" width="600" height="400" rx="20" fill="none" stroke="#00FA96" stroke-width="2" opacity="0.3"/>
+
+  <!-- Title -->
+  <text x="400" y="150" text-anchor="middle" class="title-text">CONGRATULATIONS!</text>
+
+  <!-- Subtitle -->
+  <text x="400" y="180" text-anchor="middle" class="subtitle">Your CMKL Open House 2025 Redeem Code</text>
+
+  <!-- User name section -->
+  <text x="400" y="240" text-anchor="middle" class="user-name" id="firstName">FIRST NAME</text>
+  <text x="400" y="270" text-anchor="middle" class="user-name" id="lastName">LAST NAME</text>
+
+  <!-- Redeem code section -->
+  <rect x="250" y="320" width="300" height="60" rx="15" fill="none" stroke="#00FA96" stroke-width="2"/>
+  <text x="400" y="355" text-anchor="middle" class="code-text" id="redeemCode">XXXX-XXXX</text>
+
+  <!-- Footer text -->
+  <text x="400" y="420" text-anchor="middle" class="subtitle">Keep this code for your redemption</text>
+  <text x="400" y="450" text-anchor="middle" class="subtitle">CMKL University Open House 2025</text>
+
+  <!-- Decorative elements -->
+  <circle cx="150" cy="200" r="3" fill="#00FA96" opacity="0.6"/>
+  <circle cx="650" cy="350" r="3" fill="#00FA96" opacity="0.6"/>
+  <circle cx="200" cy="400" r="2" fill="#22B2B9" opacity="0.4"/>
+  <circle cx="600" cy="180" r="2" fill="#22B2B9" opacity="0.4"/>
+</svg>

@@ -1,0 +1,262 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+        background: #000;
+        color: #00ff41;
+      }
+      
+      .status-overlay {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 6, 22, 0.9);
+        border: 2px solid #00ff41;
+        border-radius: 12px;
+        padding: 16px 24px;
+        color: #00ff41;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
+      }
+      
+      .collected-message {
+        animation: pulse 2s ease-in-out infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        50% { transform: translateX(-50%) scale(1.05); opacity: 0.8; }
+      }
+      
+      .error-message {
+        border-color: #ff4444;
+        color: #ff4444;
+        box-shadow: 0 4px 20px rgba(255, 68, 68, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="status" class="status-overlay">SCANNING FOR KEYS...</div>
+    
+    <a-scene 
+      mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/band.mind; maxTrack: 2" 
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <a-asset-item id="bearModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/bear/scene.gltf"></a-asset-item>
+        <a-asset-item id="raccoonModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/raccoon/scene.gltf"></a-asset-item>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- Target 1 - Bear Model -->
+      <a-entity id="target1" mindar-image-target="targetIndex: 0">
+        <a-gltf-model 
+          id="model1"
+          rotation="0 0 0" 
+          position="0 0 0" 
+          scale="0.05 0.05 0.05" 
+          src="#bearModel"
+          animation__scale="property: scale; to: 0.1 0.1 0.1; startEvents: targetfound; dur: 1000; easing: easeOutBack"
+          animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
+        </a-gltf-model>
+      </a-entity>
+
+      <!-- Target 2 - Raccoon Model -->
+      <a-entity id="target2" mindar-image-target="targetIndex: 1">
+        <a-gltf-model 
+          id="model2"
+          rotation="0 0 0" 
+          position="0 0 0" 
+          scale="0.05 0.05 0.05" 
+          src="#raccoonModel"
+          animation__scale="property: scale; to: 0.1 0.1 0.1; startEvents: targetfound; dur: 1000; easing: easeOutBack"
+          animation__rotation="property: rotation; to: 0 360 0; startEvents: targetfound; dur: 4000; loop: true; easing: linear">
+        </a-gltf-model>
+      </a-entity>
+
+    </a-scene>
+
+    <script>
+      let isProcessing = false;
+      const statusEl = document.getElementById('status');
+      
+      // Get user data from localStorage
+      const userEmail = localStorage.getItem('userEmail');
+      const recordId = localStorage.getItem('userRecordId');
+      
+      if (!userEmail || !recordId) {
+        showStatus('ERROR: User not logged in. Please go back and register.', true);
+      }
+
+      function showStatus(message, isError = false) {
+        statusEl.textContent = message;
+        statusEl.className = `status-overlay ${isError ? 'error-message' : ''}`;
+      }
+
+      function showCollectedStatus(keyNumber) {
+        statusEl.textContent = `✅ KEY #${keyNumber} COLLECTED!`;
+        statusEl.className = 'status-overlay collected-message';
+        
+        setTimeout(() => {
+          statusEl.textContent = 'SCANNING FOR KEYS...';
+          statusEl.className = 'status-overlay';
+        }, 3000);
+      }
+
+      async function updateKeyInAirtable(targetIndex) {
+        if (!userEmail || !recordId) return false;
+        
+        const keyNumber = targetIndex + 1;
+        const keyField = `key${keyNumber} status`;
+        
+        try {
+          console.log(`Auto-collecting Key #${keyNumber}...`);
+          
+          const response = await fetch('/api/harty/update-key', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              recordId: recordId,
+              keyField: keyField,
+              status: 'scanned'
+            })
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
+            console.log(`Key #${keyNumber} successfully saved to Airtable`);
+            
+            // Update localStorage
+            const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
+            keyStatuses[`key${keyNumber}`] = 'scanned';
+            localStorage.setItem('userKeyStatuses', JSON.stringify(keyStatuses));
+            
+            return true;
+          } else {
+            console.error('Failed to update Airtable:', data.error);
+            return false;
+          }
+        } catch (error) {
+          console.error('Error updating Airtable:', error);
+          return false;
+        }
+      }
+
+      function checkIfAlreadyScanned(targetIndex) {
+        const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
+        const keyNumber = targetIndex + 1;
+        return keyStatuses[`key${keyNumber}`] === 'scanned';
+      }
+
+      async function handleTargetFound(targetIndex) {
+        if (isProcessing) return;
+        
+        const keyNumber = targetIndex + 1;
+        console.log(`Target ${targetIndex} found - Key #${keyNumber}`);
+        
+        // Check if already scanned
+        if (checkIfAlreadyScanned(targetIndex)) {
+          console.log(`Key #${keyNumber} already scanned - showing status only`);
+          statusEl.textContent = `✅ KEY #${keyNumber} ALREADY COLLECTED`;
+          statusEl.className = 'status-overlay collected-message';
+          
+          setTimeout(() => {
+            statusEl.textContent = 'SCANNING FOR KEYS...';
+            statusEl.className = 'status-overlay';
+          }, 3000);
+          return;
+        }
+        
+        isProcessing = true;
+        showStatus(`🔄 COLLECTING KEY #${keyNumber}...`);
+        
+        // Auto-collect after a short delay (let animation play)
+        setTimeout(async () => {
+          const success = await updateKeyInAirtable(targetIndex);
+          
+          if (success) {
+            showCollectedStatus(keyNumber);
+            console.log(`Key #${keyNumber} auto-collected successfully!`);
+          } else {
+            showStatus(`❌ FAILED TO SAVE KEY #${keyNumber}`, true);
+            setTimeout(() => {
+              showStatus('SCANNING FOR KEYS...');
+            }, 3000);
+          }
+          
+          setTimeout(() => {
+            isProcessing = false;
+          }, 2000);
+        }, 1500);
+      }
+
+      // Set up event listeners when scene is ready
+      document.addEventListener('DOMContentLoaded', () => {
+        const sceneEl = document.querySelector('a-scene');
+        
+        sceneEl.addEventListener('renderstart', () => {
+          console.log('Auto-collect AR scanner ready');
+          showStatus('SCANNING FOR KEYS...');
+          
+          // Listen for target found events
+          sceneEl.addEventListener('targetFound', (event) => {
+            try {
+              let targetIndex = 0;
+              if (event.detail) {
+                targetIndex = event.detail.targetIndex ?? 
+                             event.detail.target?.targetIndex ?? 
+                             event.detail.index ?? 0;
+              }
+              console.log('Scene targetFound event:', targetIndex);
+              handleTargetFound(targetIndex);
+            } catch (error) {
+              console.error('Error in targetFound handler:', error);
+            }
+          });
+          
+          // Also listen on individual targets as backup
+          const target1 = document.getElementById('target1');
+          const target2 = document.getElementById('target2');
+          
+          if (target1) {
+            target1.addEventListener('targetfound', (event) => {
+              console.log('Target 1 found (individual listener)');
+              handleTargetFound(0);
+            });
+          }
+          
+          if (target2) {
+            target2.addEventListener('targetfound', (event) => {
+              console.log('Target 2 found (individual listener)');
+              handleTargetFound(1);
+            });
+          }
+        });
+      });
+    </script>
+
+    <!-- Speed Insights -->
+    <script>
+      window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+    </script>
+    <!-- Speed Insights script conditionally loaded in production via JavaScript -->
+  </body>
+</html>

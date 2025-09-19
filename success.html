@@ -9,7 +9,7 @@
     <title>CMKL Openhouse 2025 - Key Found!</title>
     <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.iife.js"></script>
     <!-- Configuration -->
-    <script src="config.js"></script>
+    <script src="config.js?v=20250904"></script>
     <style>
         * {
             margin: 0;
@@ -551,11 +551,10 @@
                 
                 const keyField = `key${keyNumber} status`;
                 
-                const response = await secureApiRequest('/airtable/update', {
+                const response = await secureApiRequest('/airtable/update-key', {
                     recordId: recordId,
-                    fields: {
-                        [keyField]: 'scanned'
-                    }
+                    keyField: keyField,
+                    status: 'scanned'
                 });
                 
                 if (response.success) {
@@ -758,5 +757,11 @@
             }
         });
     </script>
+
+    <!-- Speed Insights -->
+    <script>
+      window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+    </script>
+    <!-- Speed Insights script conditionally loaded in production via JavaScript -->
 </body>
 </html>

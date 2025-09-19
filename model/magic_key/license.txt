@@ -1,0 +1,11 @@
+Model Information:
+* title:	Magic Key
+* source:	https://sketchfab.com/3d-models/magic-key-bd55b399a34e4c08af84e214959e1dc8
+* author:	unfa (https://sketchfab.com/unfa)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Magic Key" (https://sketchfab.com/3d-models/magic-key-bd55b399a34e4c08af84e214959e1dc8) by unfa (https://sketchfab.com/unfa) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

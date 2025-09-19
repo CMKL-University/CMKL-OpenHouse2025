@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your redeem code - CMKL Open House 2025</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 25%, #2a0a2a 50%, #1a0a1a 75%, #0a0a0a 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #e6b3ff;
+            font-family: 'Darker Grotesque', sans-serif;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.3);
+            backdrop-filter: blur(1px);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            margin: 0 auto;
+            background: transparent;
+            max-width: 393px;
+            max-height: 874px;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            z-index: 3;
+        }
+
+        /* Top decorative border */
+        .top-border {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #8b5cf6 0%, #a855f7 25%, #c084fc 50%, #a855f7 75%, #8b5cf6 100%);
+            background-size: 200% 100%;
+            animation: borderPulse 3s ease-in-out infinite;
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.6));
+            z-index: 5;
+        }
+
+        /* Bottom decorative border */
+        .bottom-border {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #8b5cf6 0%, #a855f7 25%, #c084fc 50%, #a855f7 75%, #8b5cf6 100%);
+            background-size: 200% 100%;
+            animation: borderPulse 3s ease-in-out infinite reverse;
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.6));
+            z-index: 5;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Diagonal decorative element */
+        .diagonal-decoration {
+            position: absolute;
+            top: 50%;
+            right: -50px;
+            transform: translateY(-50%) rotate(45deg);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent 0%, #c084fc 50%, transparent 100%);
+            opacity: 0.8;
+            animation: diagonalGlow 4s ease-in-out infinite;
+            z-index: 4;
+        }
+
+        @keyframes diagonalGlow {
+            0%, 100% { opacity: 0.4; filter: blur(1px); }
+            50% { opacity: 0.9; filter: blur(0px); }
+        }
+
+        /* Congratulations text */
+        .congratulations {
+            font-family: 'Orbitron', monospace;
+            font-size: 28px;
+            font-weight: 900;
+            color: #d946ef;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(217, 70, 239, 0.8), 0 0 40px rgba(139, 92, 246, 0.6);
+            animation: purpleGlow 2s ease-in-out infinite alternate;
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 6;
+        }
+
+        @keyframes purpleGlow {
+            from {
+                text-shadow: 0 0 20px rgba(217, 70, 239, 0.8), 0 0 40px rgba(139, 92, 246, 0.6);
+                color: #d946ef;
+            }
+            to {
+                text-shadow: 0 0 30px rgba(217, 70, 239, 1), 0 0 50px rgba(139, 92, 246, 0.9), 0 0 70px rgba(168, 85, 247, 0.7);
+                color: #e879f9;
+            }
+        }
+
+        /* Key visual container */
+        .key-visual {
+            position: relative;
+            margin: 20px 0;
+            z-index: 4;
+        }
+
+        .key-image {
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 0 30px #c084fc) drop-shadow(0 0 15px #a855f7);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Name and Code containers */
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6;
+        }
+
+        .name-container, .code-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .namebox-svg, .codebox-svg {
+            filter: drop-shadow(0 0 15px rgba(192, 132, 252, 0.7)) drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
+        }
+
+        .name-text, .code-text {
+            position: absolute;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            color: #ffffff;
+            z-index: 6;
+        }
+
+        .name-text {
+            font-size: 16px;
+            top: 50%;
+            left: 35%;
+            transform: translate(-50%, -50%);
+        }
+
+        .code-text {
+            font-size: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            letter-spacing: 2px;
+        }
+
+        /* Back button */
+        .back-button {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #2a0a2a, #3a1a3a, #4a2a4a);
+            border: 2px solid #c084fc;
+            border-radius: 15px;
+            padding: 12px 30px;
+            color: #c084fc;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(192, 132, 252, 0.3);
+            z-index: 6;
+        }
+
+        .back-button:hover {
+            transform: translateX(-50%) translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 25px rgba(192, 132, 252, 0.5);
+            background: linear-gradient(45deg, #3a1a3a, #4a2a4a, #5a3a5a);
+            color: #e879f9;
+            border-color: #e879f9;
+        }
+
+        /* Copy button for redeem code */
+        .copy-button {
+            margin-top: 10px;
+            background: rgba(217, 70, 239, 0.2);
+            border: 1px solid #d946ef;
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #d946ef;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .copy-button:hover {
+            background: rgba(217, 70, 239, 0.4);
+            transform: scale(1.05);
+        }
+
+        .copy-button.copied {
+            background: rgba(192, 132, 252, 0.3);
+            border-color: #c084fc;
+            color: #c084fc;
+        }
+
+        /* Edit name button */
+        .edit-name-btn {
+            position: absolute;
+            top: 50%;
+            right: 8px;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            z-index: 7;
+        }
+
+        .edit-name-btn:hover {
+            background: rgba(192, 132, 252, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Action buttons container */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        /* Copy and save sections */
+        .copy-section, .save-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-icon-btn.copied {
+            background: rgba(192, 132, 252, 0.3);
+            border-color: #c084fc;
+        }
+
+        .copy-icon-btn.copied svg {
+            stroke: #c084fc;
+        }
+
+        .copy-icon-btn, .save-icon-btn {
+            background: transparent;
+            border: 2px solid #c084fc;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-icon-btn:hover, .save-icon-btn:hover {
+            background: rgba(192, 132, 252, 0.2);
+            transform: scale(1.1);
+        }
+
+        .copy-text, .save-text {
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 14px;
+            color: #c084fc;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .main-container {
+                max-width: 100vw;
+                max-height: 100vh;
+            }
+
+            .top-border, .bottom-border {
+                width: 95vw;
+                max-width: 400px;
+                height: 20px;
+            }
+
+            .congratulations {
+                font-size: 24px;
+                top: 60px;
+            }
+
+            .name-text {
+                font-size: 14px;
+                left: 50%;
+            }
+
+            .code-text {
+                font-size: 12px;
+                letter-spacing: 1px;
+            }
+
+            .key-image {
+                width: 100px;
+                height: 100px;
+            }
+
+            .action-buttons {
+                gap: 20px;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .main-container {
+                max-width: 450px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .main-container {
+                max-width: 393px;
+                max-height: 874px;
+                margin: 0 auto;
+                transform: scale(1);
+            }
+
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (orientation: landscape) and (max-height: 600px) {
+            .main-container {
+                height: 100vh;
+                max-height: none;
+                overflow-y: auto;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            color: #c084fc;
+            font-family: 'Orbitron', monospace;
+            text-align: center;
+        }
+
+        .loading::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Decorative borders -->
+        <div class="top-border"></div>
+        <div class="bottom-border"></div>
+        <div class="diagonal-decoration"></div>
+
+        <div class="container">
+            <!-- Congratulations text -->
+            <div class="congratulations">CONGRATULATIONS!</div>
+
+            <!-- Info section -->
+            <div class="info-section">
+                <!-- Name box -->
+                <div class="name-container">
+                    <svg class="namebox-svg" width="280" height="48" viewBox="0 0 280 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Main container with rounded corners -->
+                        <rect x="1" y="1" width="278" height="46" rx="8" ry="8" fill="transparent" stroke="#c084fc" stroke-width="2"/>
+
+                        <!-- Pencil edit icon -->
+                        <g transform="translate(250, 14)">
+                            <path d="M20 3L17 0L1.5 15.5V19H5L20 3Z" fill="#c084fc" stroke="#c084fc" stroke-width="0.5"/>
+                            <path d="M18.5 1.5L21.5 4.5" stroke="#c084fc" stroke-width="1" stroke-linecap="round"/>
+                            <line x1="0" y1="18" x2="22" y2="18" stroke="#c084fc" stroke-width="1" stroke-linecap="round"/>
+                        </g>
+                    </svg>
+                    <div class="name-text" id="nameText">Loading<span class="loading"></span></div>
+                    <button class="edit-name-btn" onclick="editName()" title="Edit Name">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 3L17 0L1.5 15.5V19H5L20 3Z" fill="#c084fc"/>
+                            <path d="M18.5 1.5L21.5 4.5" stroke="#c084fc" stroke-width="1" stroke-linecap="round"/>
+                            <line x1="0" y1="18" x2="22" y2="18" stroke="#c084fc" stroke-width="1" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Code box -->
+                <div class="code-container">
+                    <svg class="codebox-svg" width="221" height="66" viewBox="0 0 221 66" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M67.2523 2H20.0601L2 33.2875L20.0601 64.575H201.523L219.583 33.2875L201.523 2H189.203" stroke="#d946ef" stroke-width="2.1781" stroke-miterlimit="10"/>
+                        <path d="M42.0671 64.575L50.6888 55.9761H121.681L129.917 64.212L42.0671 64.575Z" fill="#d946ef"/>
+                    </svg>
+                    <div class="code-text" id="codeText">Loading<span class="loading"></span></div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="action-buttons">
+                    <!-- Copy section -->
+                    <div class="copy-section">
+                        <button class="copy-icon-btn" id="copyButton" onclick="copyRedeemCode()" title="Copy to clipboard">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="#c084fc" stroke-width="2" fill="none"/>
+                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="#c084fc" stroke-width="2" fill="none"/>
+                            </svg>
+                        </button>
+                        <div class="copy-text">copy to clipboard</div>
+                    </div>
+
+                    <!-- Save section -->
+                    <div class="save-section">
+                        <button class="save-icon-btn" onclick="saveAsImage()" title="Save as Image">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <polyline points="7,10 12,15 17,10" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="12" y1="15" x2="12" y2="3" stroke="#c084fc" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <div class="save-text">Save as image</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back button -->
+            <a href="page2.html" class="back-button">← Back to Portal</a>
+        </div>
+    </div>
+
+    <script>
+        // CRC32 implementation
+        function crc32(str) {
+            const crcTable = [];
+            for (let i = 0; i < 256; i++) {
+                let crc = i;
+                for (let j = 0; j < 8; j++) {
+                    crc = (crc & 1) ? (0xEDB88320 ^ (crc >>> 1)) : (crc >>> 1);
+                }
+                crcTable[i] = crc;
+            }
+
+            let crc = 0 ^ (-1);
+            for (let i = 0; i < str.length; i++) {
+                crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+            }
+            return ((crc ^ (-1)) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+        }
+
+        // Generate redeem code from lastname
+        function generateRedeemCode(lastname) {
+            if (!lastname) return 'INVALID';
+
+            // Generate CRC32 hash of lastname
+            const hash = crc32(lastname.toUpperCase());
+
+            // Format as XXXX-XXXX for better readability
+            return `${hash.substring(0, 4)}-${hash.substring(4, 8)}`;
+        }
+
+        // Save redeem code to spreadsheet
+        function saveRedeemCodeToSpreadsheet(userEmail, redeemCode) {
+            fetch('/api/harty/save-redeem-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: userEmail,
+                    redeemCode: redeemCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Redeem code saved to spreadsheet successfully');
+                } else {
+                    console.error('Failed to save redeem code:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving redeem code:', error);
+            });
+        }
+
+        // Copy redeem code to clipboard
+        function copyRedeemCode() {
+            const codeText = document.getElementById('codeText').textContent;
+            if (codeText && codeText !== 'Loading...') {
+                navigator.clipboard.writeText(codeText).then(() => {
+                    const copyButton = document.getElementById('copyButton');
+                    copyButton.classList.add('copied');
+
+                    setTimeout(() => {
+                        copyButton.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy code to clipboard');
+                });
+            }
+        }
+
+        // Edit name function
+        function editName() {
+            const nameElement = document.getElementById('nameText');
+            const currentName = nameElement.textContent;
+
+            const newName = prompt('Enter new name:', currentName);
+            if (newName && newName.trim() !== '') {
+                nameElement.textContent = newName.trim().toUpperCase();
+
+                // Update localStorage if needed
+                const userEmail = localStorage.getItem('userEmail');
+                if (userEmail) {
+                    // You could add API call here to update the name in the database
+                    console.log('Name updated to:', newName);
+                }
+            }
+        }
+
+        // Save as image function
+        function saveAsImage() {
+            // Get current displayed name and code from the UI (not from API)
+            const nameText = document.getElementById('nameText').textContent;
+            const codeText = document.getElementById('codeText').textContent;
+
+            // Parse the displayed name - handle single name or multiple names
+            const nameParts = nameText.trim().split(/\s+/); // Split by any whitespace
+            let firstName, lastName;
+
+            if (nameParts.length === 1) {
+                // Single name - use it as first name, empty last name
+                firstName = nameParts[0];
+                lastName = '';
+            } else if (nameParts.length >= 2) {
+                // Multiple names - first word is first name, rest is last name
+                firstName = nameParts[0];
+                lastName = nameParts.slice(1).join(' ');
+            } else {
+                // Fallback
+                firstName = 'FIRST';
+                lastName = 'NAME';
+            }
+
+            console.log('Parsed names:', { nameText, firstName, lastName });
+
+            // Load your original SVG template
+            fetch('/svg/redeem_image_name.svg')
+                .then(response => {
+                    if (!response.ok) throw new Error('SVG not found');
+                    return response.text();
+                })
+                .then(svgTemplate => {
+                    createRedeemImageFromTemplate(svgTemplate, firstName.toUpperCase(), lastName.toUpperCase(), codeText);
+                })
+                .catch(error => {
+                    console.error('Error loading your SVG template:', error);
+                    alert('Could not load your SVG template. Please ensure the file exists at /svg/redeem_image_name.svg');
+                });
+        }
+
+        // Create redeem image from template
+        function createRedeemImageFromTemplate(svgTemplate, firstName, lastName, redeemCode) {
+            // Replace placeholder text in the SVG template
+            let modifiedSVG = svgTemplate;
+
+            // Replace the actual placeholder text in the SVG based on the pattern we found
+            // First name (appears in a tspan with shorter text)
+            modifiedSVG = modifiedSVG.replace(/>AAAAAAA<\/tspan>/g, `>${firstName}</tspan>`);
+
+            // Last name (appears in a tspan with longer text)
+            modifiedSVG = modifiedSVG.replace(/>AAAAAAAAAAAAA<\/tspan>/g, `>${lastName}</tspan>`);
+
+            // Code (appears in a tspan with CODE prefix)
+            modifiedSVG = modifiedSVG.replace(/>CODEAAAAAAAAAAAAAAAAAAAAAAA<\/tspan>/g, `>${redeemCode}</tspan>`);
+
+            // Also replace common placeholder patterns as fallback
+            modifiedSVG = modifiedSVG.replace(/PIRIYA/g, firstName);
+            modifiedSVG = modifiedSVG.replace(/IPSUM/g, lastName);
+            modifiedSVG = modifiedSVG.replace(/FIRST NAME/g, firstName);
+            modifiedSVG = modifiedSVG.replace(/LAST NAME/g, lastName);
+            modifiedSVG = modifiedSVG.replace(/XXXX-XXXX/g, redeemCode);
+            modifiedSVG = modifiedSVG.replace(/First Name/g, firstName);
+            modifiedSVG = modifiedSVG.replace(/Last Name/g, lastName);
+            modifiedSVG = modifiedSVG.replace(/First_name/g, firstName);
+            modifiedSVG = modifiedSVG.replace(/Last_name/g, lastName);
+            modifiedSVG = modifiedSVG.replace(/first_name/g, firstName);
+            modifiedSVG = modifiedSVG.replace(/last_name/g, lastName);
+
+            console.log('Replacing SVG content:', {
+                originalFirstName: 'PIRIYA',
+                newFirstName: firstName,
+                originalLastName: 'IPSUM',
+                newLastName: lastName,
+                redeemCode
+            });
+
+            // Add Montserrat font import in the SVG defs section
+            const fontImport = `<style type="text/css"><![CDATA[@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');]]></style>`;
+
+            // Insert the font import in the defs section
+            if (modifiedSVG.includes('<defs>')) {
+                modifiedSVG = modifiedSVG.replace('<defs>', `<defs>${fontImport}`);
+            } else {
+                modifiedSVG = modifiedSVG.replace('<svg', `<svg><defs>${fontImport}</defs>`);
+            }
+
+            // Apply Montserrat font to ALL text elements more aggressively
+            modifiedSVG = modifiedSVG.replace(/<text([^>]*)>/gi, (match, attributes) => {
+                // Remove any existing font-family first
+                attributes = attributes.replace(/font-family="[^"]*"/gi, '');
+                attributes = attributes.replace(/font-family='[^']*'/gi, '');
+                // Add Montserrat font-family
+                attributes += ' font-family="Montserrat, sans-serif"';
+                return `<text${attributes}>`;
+            });
+
+            // Also apply Montserrat to tspan elements more aggressively
+            modifiedSVG = modifiedSVG.replace(/<tspan([^>]*)>/gi, (match, attributes) => {
+                // Remove any existing font-family first
+                attributes = attributes.replace(/font-family="[^"]*"/gi, '');
+                attributes = attributes.replace(/font-family='[^']*'/gi, '');
+                // Add Montserrat font-family
+                attributes += ' font-family="Montserrat, sans-serif"';
+                return `<tspan${attributes}>`;
+            });
+
+            // Function to calculate appropriate font size based on text length
+            function calculateFontSize(text, baseSize, maxLength, reductionRate = 0.08) {
+                if (!text || text.length <= maxLength) return baseSize;
+                const reduction = (text.length - maxLength) * (baseSize * reductionRate);
+                return Math.max(baseSize * 0.4, baseSize - reduction); // Min 40% of base size
+            }
+
+            // Apply dynamic font sizing to text elements with tspan content
+            modifiedSVG = modifiedSVG.replace(/<text([^>]*?)>.*?<tspan([^>]*?)>([^<]*?)<\/tspan>.*?<\/text>/gi, (match, textAttributes, tspanAttributes, textContent) => {
+                let fontSize = null;
+                let letterSpacing = '';
+
+                // Determine appropriate font size based on content type
+                if (textContent && textContent === firstName) {
+                    // First name - base size 100, max comfortable length 8 chars
+                    fontSize = calculateFontSize(firstName, 85, 8);
+                    if (firstName.length > 12) {
+                        letterSpacing = '-2px';
+                    } else if (firstName.length > 10) {
+                        letterSpacing = '-1px';
+                    }
+                    console.log('First name font adjustment:', { name: firstName, fontSize, letterSpacing });
+                } else if (textContent && textContent === lastName) {
+                    // Last name - base size 54, max comfortable length 8 chars, 3% reduction per extra char
+                    fontSize = calculateFontSize(lastName, 54, 8, 0.03);
+                    if (lastName.length > 12) {
+                        letterSpacing = '-2px';
+                    } else if (lastName.length > 10) {
+                        letterSpacing = '-1px';
+                    }
+                    console.log('Last name font adjustment:', { name: lastName, fontSize, letterSpacing });
+                } else if (textContent && textContent === redeemCode) {
+                    // Code - base size 26.69, max comfortable length 8 chars
+                    fontSize = calculateFontSize(redeemCode, 26.69, 8);
+                    if (redeemCode.length > 10) {
+                        letterSpacing = '-0.5px';
+                    }
+                    console.log('Code font adjustment:', { code: redeemCode, fontSize, letterSpacing });
+                }
+
+                // Apply calculated font size to text element
+                if (fontSize !== null) {
+                    if (textAttributes.includes('font-size')) {
+                        textAttributes = textAttributes.replace(/font-size="[^"]*"/gi, `font-size="${fontSize}"`);
+                        textAttributes = textAttributes.replace(/font-size='[^']*'/gi, `font-size='${fontSize}'`);
+                    } else {
+                        textAttributes += ` font-size="${fontSize}"`;
+                    }
+                }
+
+                // Apply letter spacing to text element
+                if (letterSpacing) {
+                    if (textAttributes.includes('letter-spacing')) {
+                        textAttributes = textAttributes.replace(/letter-spacing="[^"]*"/gi, `letter-spacing="${letterSpacing}"`);
+                        textAttributes = textAttributes.replace(/letter-spacing='[^']*'/gi, `letter-spacing='${letterSpacing}'`);
+                    } else {
+                        textAttributes += ` letter-spacing="${letterSpacing}"`;
+                    }
+                }
+
+                // Add line spacing
+                if (!textAttributes.includes('line-height')) {
+                    textAttributes += ' style="line-height: 0.84"';
+                } else {
+                    if (textAttributes.includes('style=')) {
+                        textAttributes = textAttributes.replace(/style="([^"]*)"/gi, (styleMatch, styleContent) => {
+                            if (styleContent.includes('line-height')) {
+                                return styleMatch.replace(/line-height:\s*[^;]*;?/gi, 'line-height: 0.84;');
+                            } else {
+                                return `style="${styleContent}; line-height: 0.84"`;
+                            }
+                        });
+                    } else {
+                        textAttributes += ' style="line-height: 0.84"';
+                    }
+                }
+
+                return `<text${textAttributes}><tspan${tspanAttributes}>${textContent}</tspan></text>`;
+            });
+
+            // For long names, remove filters entirely to prevent truncation
+            if (firstName.length > 8 || lastName.length > 8 || redeemCode.length > 8) {
+                console.log('Removing filters for long text to prevent truncation');
+
+                // Remove filter attributes from text groups for long names
+                if (firstName.length > 8) {
+                    modifiedSVG = modifiedSVG.replace(/<g id="First_name" filter="url\(#filter0_i_156_1133\)">/gi, '<g id="First_name">');
+                }
+                if (lastName.length > 8) {
+                    modifiedSVG = modifiedSVG.replace(/<g id="Last_name" filter="url\(#filter2_i_156_1133\)">/gi, '<g id="Last_name">');
+                }
+                if (redeemCode.length > 8) {
+                    modifiedSVG = modifiedSVG.replace(/<g id="CODE" filter="url\(#filter1_i_156_1133\)">/gi, '<g id="CODE">');
+                }
+            } else {
+                // For shorter text, expand filters as before
+                // First name filter (filter0_i_156_1133)
+                modifiedSVG = modifiedSVG.replace(/<filter id="filter0_i_156_1133"([^>]*)>/gi, (match, attributes) => {
+                    const estimatedWidth = Math.max(367.267, firstName.length * 35 + 150); // Even more generous
+                    attributes = attributes.replace(/width="[^"]*"/gi, `width="${estimatedWidth}"`);
+                    return `<filter id="filter0_i_156_1133"${attributes}>`;
+                });
+
+                // CODE filter (filter1_i_156_1133)
+                modifiedSVG = modifiedSVG.replace(/<filter id="filter1_i_156_1133"([^>]*)>/gi, (match, attributes) => {
+                    const estimatedWidth = Math.max(79.1268, redeemCode.length * 18 + 80); // Even more generous
+                    attributes = attributes.replace(/width="[^"]*"/gi, `width="${estimatedWidth}"`);
+                    return `<filter id="filter1_i_156_1133"${attributes}>`;
+                });
+
+                // Last name filter (filter2_i_156_1133)
+                modifiedSVG = modifiedSVG.replace(/<filter id="filter2_i_156_1133"([^>]*)>/gi, (match, attributes) => {
+                    const estimatedWidth = Math.max(349.005, lastName.length * 35 + 150); // Even more generous
+                    attributes = attributes.replace(/width="[^"]*"/gi, `width="${estimatedWidth}"`);
+                    return `<filter id="filter2_i_156_1133"${attributes}>`;
+                });
+            }
+
+            // Targeted fix: Only remove filters and masks from text elements for long names
+            const maxNameLength = Math.max(firstName.length, lastName.length);
+
+            // For long names, use a more conservative approach
+            if (maxNameLength > 7) {
+                console.log(`Applying targeted text fixes for name length: ${maxNameLength}`);
+
+                // Only remove masks from the specific text groups, not the entire SVG
+                if (firstName.length > 7) {
+                    // Remove filter and mask only from First_name group
+                    modifiedSVG = modifiedSVG.replace(
+                        /<g id="First_name" filter="url\(#filter0_i_156_1133\)">/gi,
+                        '<g id="First_name">'
+                    );
+                }
+
+                if (lastName.length > 7) {
+                    // Remove filter and mask only from Last_name group
+                    modifiedSVG = modifiedSVG.replace(
+                        /<g id="Last_name" filter="url\(#filter2_i_156_1133\)">/gi,
+                        '<g id="Last_name">'
+                    );
+                }
+
+                if (redeemCode.length > 7) {
+                    // Remove filter and mask only from CODE group
+                    modifiedSVG = modifiedSVG.replace(
+                        /<g id="CODE" filter="url\(#filter1_i_156_1133\)">/gi,
+                        '<g id="CODE">'
+                    );
+                }
+
+                // Expand only the SVG canvas slightly, keeping other elements intact
+                const extraWidth = Math.min(100, (maxNameLength - 7) * 10); // Conservative expansion
+                modifiedSVG = modifiedSVG.replace(/viewBox="0 0 719 832"/gi, `viewBox="0 0 ${719 + extraWidth} 832"`);
+                modifiedSVG = modifiedSVG.replace(/width="719"/gi, `width="${719 + extraWidth}"`);
+
+                console.log(`Applied conservative text fixes, expanded width by ${extraWidth}px`);
+            }
+
+            // Show preview popup
+            showSVGPreview(modifiedSVG, firstName, lastName, redeemCode);
+        }
+
+        // Create redeem image SVG
+        function createRedeemImageSVG(firstName, lastName, redeemCode) {
+            // Enhanced SVG template with better styling
+            const svgTemplate = `
+                <svg width="719" height="832" viewBox="0 0 719 832" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <style>
+                      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&amp;display=swap');
+                      .first-name { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 100px; fill: white; }
+                      .last-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 54px; fill: white; }
+                      .code-text { font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 26.69px; fill: white; }
+                      .title-text { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 32px; fill: #00FA96; }
+                      .subtitle { font-family: 'Montserrat', sans-serif; font-weight: 400; font-size: 18px; fill: #00D17D; }
+                    </style>
+
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#000616;stop-opacity:1" />
+                      <stop offset="30%" style="stop-color:#0A1A2A;stop-opacity:1" />
+                      <stop offset="70%" style="stop-color:#0F2627;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#000616;stop-opacity:1" />
+                    </linearGradient>
+
+                    <linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#22B2B9;stop-opacity:1" />
+                      <stop offset="50%" style="stop-color:#00FA96;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#00946D;stop-opacity:1" />
+                    </linearGradient>
+
+                    <linearGradient id="codeBoxGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#00D17D;stop-opacity:0.3" />
+                      <stop offset="100%" style="stop-color:#00FA96;stop-opacity:0.3" />
+                    </linearGradient>
+
+                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#00FA96" flood-opacity="0.8"/>
+                    </filter>
+                  </defs>
+
+                  <!-- Background -->
+                  <rect width="719" height="832" fill="url(#bgGradient)"/>
+
+                  <!-- Top decorative border -->
+                  <rect x="50" y="40" width="619" height="6" rx="3" fill="url(#borderGradient)" filter="url(#glow)"/>
+
+                  <!-- Bottom decorative border -->
+                  <rect x="50" y="786" width="619" height="6" rx="3" fill="url(#borderGradient)" filter="url(#glow)"/>
+
+                  <!-- Main content frame -->
+                  <rect x="80" y="120" width="559" height="592" rx="25" fill="none" stroke="#00FA96" stroke-width="2" opacity="0.4"/>
+
+                  <!-- Title -->
+                  <text x="359" y="180" text-anchor="middle" class="title-text">CONGRATULATIONS!</text>
+
+                  <!-- Subtitle -->
+                  <text x="359" y="220" text-anchor="middle" class="subtitle">Your CMKL Open House 2025 Redeem Certificate</text>
+
+                  <!-- Name section background -->
+                  <rect x="120" y="280" width="479" height="120" rx="15" fill="none" stroke="#00FA96" stroke-width="1" opacity="0.3"/>
+
+                  <!-- First Name -->
+                  <text x="359" y="340" text-anchor="middle" class="first-name">${firstName}</text>
+
+                  <!-- Last Name -->
+                  <text x="359" y="390" text-anchor="middle" class="last-name">${lastName}</text>
+
+                  <!-- Code section background -->
+                  <rect x="160" y="450" width="399" height="80" rx="20" fill="url(#codeBoxGrad)" stroke="#00D17D" stroke-width="2"/>
+
+                  <!-- Code text -->
+                  <text x="359" y="500" text-anchor="middle" class="code-text">${redeemCode}</text>
+
+                  <!-- Footer instructions -->
+                  <text x="359" y="580" text-anchor="middle" class="subtitle">Keep this code for your redemption</text>
+                  <text x="359" y="620" text-anchor="middle" class="subtitle">Present at CMKL University booth</text>
+                  <text x="359" y="660" text-anchor="middle" class="subtitle">CMKL University Open House 2025</text>
+
+                  <!-- Decorative corner elements -->
+                  <circle cx="120" cy="150" r="4" fill="#00FA96" opacity="0.7"/>
+                  <circle cx="599" cy="150" r="4" fill="#00FA96" opacity="0.7"/>
+                  <circle cx="120" cy="682" r="4" fill="#00FA96" opacity="0.7"/>
+                  <circle cx="599" cy="682" r="4" fill="#00FA96" opacity="0.7"/>
+
+                  <!-- Tech pattern decoration -->
+                  <rect x="100" y="730" width="60" height="2" fill="#22B2B9" opacity="0.6"/>
+                  <rect x="180" y="730" width="40" height="2" fill="#00FA96" opacity="0.6"/>
+                  <rect x="240" y="730" width="80" height="2" fill="#00946D" opacity="0.6"/>
+                  <rect x="399" y="730" width="40" height="2" fill="#00946D" opacity="0.6"/>
+                  <rect x="459" y="730" width="80" height="2" fill="#00FA96" opacity="0.6"/>
+                  <rect x="559" y="730" width="60" height="2" fill="#22B2B9" opacity="0.6"/>
+                </svg>
+            `;
+
+            // Show preview popup
+            showSVGPreview(svgTemplate, firstName, lastName, redeemCode);
+        }
+
+        // Show SVG preview popup
+        function showSVGPreview(svgTemplate, firstName, lastName, redeemCode) {
+            // Create popup overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                backdrop-filter: blur(5px);
+            `;
+
+            // Create popup container
+            const popup = document.createElement('div');
+            popup.style.cssText = `
+                background: #000616;
+                border: 2px solid #00FA96;
+                border-radius: 15px;
+                padding: 20px;
+                max-width: 90vw;
+                max-height: 90vh;
+                overflow: auto;
+                position: relative;
+                margin: auto;
+            `;
+
+            // Create preview title
+            const title = document.createElement('h3');
+            title.textContent = 'Preview Your Redeem Certificate';
+            title.style.cssText = `
+                color: #00FA96;
+                font-family: 'Orbitron', monospace;
+                text-align: center;
+                margin: 0 0 20px 0;
+                font-size: 18px;
+            `;
+
+            // Create SVG preview
+            const svgContainer = document.createElement('div');
+            svgContainer.innerHTML = svgTemplate;
+            svgContainer.style.cssText = `
+                display: flex;
+                justify-content: center;
+                margin-bottom: 20px;
+                border: 1px solid #00FA96;
+                padding: 10px;
+                border-radius: 8px;
+                overflow: hidden;
+            `;
+
+            // Scale down the SVG for preview
+            const svgElement = svgContainer.querySelector('svg');
+            if (svgElement) {
+                svgElement.style.cssText = `
+                    max-width: 600px;
+                    max-height: 450px;
+                    width: 100%;
+                    height: auto;
+                `;
+            }
+
+            // Create buttons container
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.style.cssText = `
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+                margin-top: 20px;
+            `;
+
+            // Create download button
+            const downloadBtn = document.createElement('button');
+            downloadBtn.textContent = '💾 Download PNG';
+            downloadBtn.style.cssText = `
+                background: linear-gradient(45deg, #0F2627, #203A43, #2C5530);
+                border: 2px solid #00FA96;
+                border-radius: 10px;
+                padding: 10px 20px;
+                color: #00FA96;
+                font-family: 'Orbitron', monospace;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            `;
+
+            downloadBtn.onmouseover = () => {
+                downloadBtn.style.transform = 'scale(1.05)';
+                downloadBtn.style.boxShadow = '0 4px 15px rgba(0, 250, 150, 0.4)';
+            };
+
+            downloadBtn.onmouseout = () => {
+                downloadBtn.style.transform = 'scale(1)';
+                downloadBtn.style.boxShadow = 'none';
+            };
+
+            downloadBtn.onclick = () => {
+                // Disable button and show loading state
+                downloadBtn.disabled = true;
+                downloadBtn.textContent = '⏳ Preparing...';
+                downloadBtn.style.opacity = '0.7';
+
+                // Prevent overlay click from closing popup during download
+                overlay.style.pointerEvents = 'none';
+                popup.style.pointerEvents = 'auto';
+
+                // Get the already displayed SVG from the popup
+                const displayedSVG = svgContainer.querySelector('svg');
+                if (displayedSVG) {
+                    // Convert the displayed SVG directly to download
+                    downloadDisplayedSVG(displayedSVG, firstName, lastName, redeemCode, () => {
+                        // Callback function - close popup after download is complete
+                        if (document.body.contains(overlay)) {
+                            document.body.removeChild(overlay);
+                        }
+                    });
+                } else {
+                    alert('Could not find displayed image to download');
+                    downloadBtn.disabled = false;
+                    downloadBtn.textContent = '💾 Download PNG';
+                    downloadBtn.style.opacity = '1';
+                }
+            };
+
+            // Create close button
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = '✕ Close';
+            closeBtn.style.cssText = `
+                background: transparent;
+                border: 2px solid #ff4444;
+                border-radius: 10px;
+                padding: 10px 20px;
+                color: #ff4444;
+                font-family: 'Orbitron', monospace;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            `;
+
+            closeBtn.onmouseover = () => {
+                closeBtn.style.transform = 'scale(1.05)';
+                closeBtn.style.background = 'rgba(255, 68, 68, 0.2)';
+            };
+
+            closeBtn.onmouseout = () => {
+                closeBtn.style.transform = 'scale(1)';
+                closeBtn.style.background = 'transparent';
+            };
+
+            closeBtn.onclick = () => {
+                // Only allow closing if not downloading
+                if (!downloadBtn.disabled) {
+                    document.body.removeChild(overlay);
+                }
+            };
+
+            // Assemble popup
+            buttonsContainer.appendChild(downloadBtn);
+            buttonsContainer.appendChild(closeBtn);
+
+            popup.appendChild(title);
+            popup.appendChild(svgContainer);
+            popup.appendChild(buttonsContainer);
+
+            overlay.appendChild(popup);
+            document.body.appendChild(overlay);
+
+            // Close on overlay click
+            overlay.onclick = (e) => {
+                if (e.target === overlay && !downloadBtn.disabled) {
+                    document.body.removeChild(overlay);
+                }
+            };
+        }
+
+        // Download the already displayed SVG directly
+        function downloadDisplayedSVG(svgElement, firstName, lastName, redeemCode, onComplete) {
+            console.log('Downloading already displayed SVG...');
+
+            // Get the SVG's outer HTML
+            const svgString = new XMLSerializer().serializeToString(svgElement);
+            const svgBlob = new Blob([svgString], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(svgBlob);
+
+            // Create canvas to convert SVG to PNG
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            // Use the SVG's actual dimensions
+            const svgRect = svgElement.getBoundingClientRect();
+            canvas.width = svgElement.viewBox?.baseVal?.width || svgRect.width || 719;
+            canvas.height = svgElement.viewBox?.baseVal?.height || svgRect.height || 832;
+
+            img.onload = function() {
+                console.log('Displayed SVG loaded successfully');
+                ctx.drawImage(img, 0, 0);
+
+                // Convert canvas to blob
+                canvas.toBlob(function(blob) {
+                    console.log('Canvas converted to blob from displayed SVG');
+                    const fileName = `cmkl-redeem-${firstName}-${lastName}-${Date.now()}.png`;
+
+                    // Always use regular download
+                    downloadFallback(blob, fileName, onComplete);
+
+                    // Clean up
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+            };
+
+            img.onerror = function(error) {
+                console.error('Failed to load displayed SVG:', error);
+                alert('Failed to download image. Please try again.');
+                if (onComplete) onComplete();
+            };
+
+            img.src = url;
+        }
+
+        // Download SVG as image
+        function downloadSVGAsImage(svgTemplate, firstName, lastName, redeemCode, onComplete) {
+            console.log('Starting download process...');
+
+            const svgBlob = new Blob([svgTemplate], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(svgBlob);
+
+            // Create canvas to convert SVG to PNG
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            canvas.width = 800;
+            canvas.height = 600;
+
+            img.onload = function() {
+                console.log('SVG image loaded successfully');
+                ctx.drawImage(img, 0, 0);
+
+                // Convert canvas to blob
+                canvas.toBlob(function(blob) {
+                    console.log('Canvas converted to blob');
+                    const fileName = `cmkl-redeem-${firstName}-${lastName}-${Date.now()}.png`;
+
+                    // Always use regular download for now (skip Web Share API)
+                    downloadFallback(blob, fileName, onComplete);
+
+                    // Clean up
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+            };
+
+            img.onerror = function(error) {
+                console.error('Failed to load SVG image:', error);
+                alert('Failed to generate image. Please try again.');
+                if (onComplete) onComplete();
+            };
+
+            img.src = url;
+        }
+
+        // Fallback download function
+        function downloadFallback(blob, fileName, onComplete) {
+            console.log('Starting fallback download for:', fileName);
+
+            const link = document.createElement('a');
+            link.download = fileName;
+            link.href = URL.createObjectURL(blob);
+
+            try {
+                // Create a temporary anchor and click it
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                console.log('Download link clicked successfully');
+
+                // For mobile devices, show instruction
+                if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    setTimeout(() => {
+                        alert('Image ready! Check your Downloads folder or Gallery app.');
+                    }, 500);
+                    // Call completion callback after mobile download
+                    if (onComplete) setTimeout(onComplete, 2000);
+                } else {
+                    // Desktop download - wait a bit longer for browser to process
+                    console.log('Desktop download initiated');
+                    if (onComplete) setTimeout(onComplete, 1500);
+                }
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Download failed. Please try again.');
+                if (onComplete) onComplete();
+            }
+
+            // Clean up
+            setTimeout(() => {
+                URL.revokeObjectURL(link.href);
+            }, 3000);
+        }
+
+        // Load user data and generate redeem code
+        function loadUserData() {
+            // Get user data from localStorage
+            const userEmail = localStorage.getItem('userEmail');
+            const recordId = localStorage.getItem('userRecordId');
+
+            console.log('Loading user data:', { userEmail, recordId });
+
+            if (!userEmail || !recordId) {
+                console.error('User not logged in');
+                document.getElementById('nameText').textContent = 'Not Logged In';
+                document.getElementById('codeText').textContent = 'ERROR';
+                return;
+            }
+
+            // Fetch user data to get both first and last name
+            fetch(`/api/harty/user/${encodeURIComponent(userEmail)}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('User data received:', data);
+
+                    if (data.success && data.data) {
+                        const firstName = data.data.firstName || '';
+                        const lastName = data.data.lastName || '';
+                        const redeemCode = generateRedeemCode(lastName);
+
+                        // Display name with auto-separation (space between first and last name)
+                        const fullName = (firstName + ' ' + lastName).trim().toUpperCase();
+                        document.getElementById('nameText').textContent = fullName;
+                        document.getElementById('codeText').textContent = redeemCode;
+
+                        console.log('Generated redeem code:', redeemCode, 'for names:', { firstName, lastName });
+
+                        // Save redeem code to spreadsheet
+                        saveRedeemCodeToSpreadsheet(userEmail, redeemCode);
+                    } else {
+                        console.error('Invalid user data:', data);
+                        document.getElementById('nameText').textContent = 'Invalid User';
+                        document.getElementById('codeText').textContent = 'ERROR';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                    document.getElementById('nameText').textContent = 'Network Error';
+                    document.getElementById('codeText').textContent = 'ERROR';
+                });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadUserData);
+    </script>
+
+    <!-- Speed Insights (only load in production/Vercel) -->
+    <script>
+      window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+
+      // Only load Vercel speed insights in production
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const script = document.createElement('script');
+        script.defer = true;
+        script.src = '/_vercel/speed-insights/script.js';
+        document.head.appendChild(script);
+      }
+    </script>
+</body>
+</html>

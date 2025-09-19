@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Innovation Key - CMKL Open House 2025</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000616 url('svg/background.svg') no-repeat center center fixed;
+            background-size: cover;
+            color: #6be4f0;
+            font-family: 'Darker Grotesque', sans-serif;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            margin: 0 auto;
+            background: transparent;
+            max-width: 393px;
+            max-height: 874px;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 3;
+            gap: 30px;
+        }
+
+        /* Top decorative border */
+        .top-border {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            z-index: 5;
+        }
+
+        /* Bottom decorative border */
+        .bottom-border {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            height: 25px;
+            background: linear-gradient(90deg, #22B2B9 0%, #00946D 100%);
+            mask: url('svg/Group 1.svg');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            z-index: 5;
+        }
+
+        /* Diagonal decorative element */
+        .diagonal-decoration {
+            position: absolute;
+            top: -563px;
+            left: 50%;
+            transform: translateX(-50%) rotate(315deg);
+            width: 455px;
+            height: 455px;
+            border: 163px dashed rgba(1, 89, 187, 0.08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Header section */
+        .header {
+            text-align: center;
+        }
+
+        .innovation-title {
+            font-size: 26.9px;
+            font-weight: 600;
+            color: #00fa96;
+            letter-spacing: 1.34px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 250, 150, 0.5);
+        }
+
+        .innovation-decoration {
+            width: 280px;
+            height: 64px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Key display area */
+        .key-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+            gap: 5px;
+        }
+
+        .key-frame {
+            width: 550px;
+            height: 560px;
+            background-image: url('svg/key2/Group 7.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            filter: drop-shadow(0 0 20px rgba(0, 250, 150, 0.3));
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+
+        .key-image {
+            width: 400px;
+            height: 500px;
+            object-fit: contain;
+            z-index: 2;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+            pointer-events: none;
+            animation: keyGlitch 0.8s ease-in-out infinite;
+            /* Initial grayscale state */
+            filter: grayscale(100%) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            opacity: 0.6;
+            transition: all 1s ease-out;
+        }
+
+        /* Progressive color restoration classes */
+        .key-image.progress-0 {
+            filter: grayscale(100%) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            opacity: 0.6;
+        }
+
+        .key-image.progress-25 {
+            filter: grayscale(75%) drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));
+            opacity: 0.7;
+        }
+
+        .key-image.progress-50 {
+            filter: grayscale(50%) drop-shadow(0 0 17px rgba(255, 215, 0, 0.6));
+            opacity: 0.8;
+        }
+
+        .key-image.progress-75 {
+            filter: grayscale(25%) drop-shadow(0 0 19px rgba(255, 215, 0, 0.7));
+            opacity: 0.9;
+        }
+
+        .key-image.progress-100 {
+            filter: grayscale(0%) drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+            opacity: 1;
+            animation: keyGlitch 0.8s ease-in-out infinite;
+        }
+
+        .progress-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #00fa96;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 250, 150, 0.5);
+        }
+
+        .percentage-text {
+            font-family: 'Orbitron', 'Roboto Mono', 'Courier New', monospace;
+            font-size: 128px;
+            font-weight: 700;
+            color: #00fa96;
+            opacity: 0.6;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 250, 150, 0.3);
+            animation: percentageGlow 1s ease-in-out infinite alternate;
+        }
+
+        /* Key frame hover effects */
+        .key-frame:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 30px rgba(0, 250, 150, 0.5));
+        }
+
+        .key-frame:active {
+            transform: scale(1.02);
+            filter: drop-shadow(0 0 15px rgba(0, 250, 150, 0.8));
+        }
+
+        /* Floating animation for the entire key display */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        /* Glitch animation for the key image */
+        @keyframes keyGlitch {
+            0%, 90%, 100% {
+                transform: translate(0, 0) scale(1);
+                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+            }
+            91% {
+                transform: translate(-2px, 1px) scale(1.01);
+                filter: drop-shadow(2px -1px 20px rgba(255, 0, 0, 0.8))
+                        drop-shadow(-1px 2px 20px rgba(0, 255, 255, 0.8));
+            }
+            92% {
+                transform: translate(1px, -1px) scale(0.99);
+                filter: drop-shadow(-2px 1px 20px rgba(0, 255, 0, 0.8))
+                        drop-shadow(1px -2px 20px rgba(255, 255, 0, 0.8));
+            }
+            93% {
+                transform: translate(-1px, 2px) scale(1.02);
+                filter: drop-shadow(1px 2px 20px rgba(255, 0, 255, 0.8))
+                        drop-shadow(-2px -1px 20px rgba(0, 255, 255, 0.8));
+            }
+            94% {
+                transform: translate(2px, -2px) scale(0.98);
+                filter: drop-shadow(-1px -2px 20px rgba(255, 255, 0, 0.8))
+                        drop-shadow(2px 1px 20px rgba(255, 0, 0, 0.8));
+            }
+            95% {
+                transform: translate(0, 0) scale(1);
+                filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1));
+            }
+        }
+
+        /* Percentage glow animation */
+        @keyframes percentageGlow {
+            0% {
+                text-shadow: 0 0 15px rgba(0, 250, 150, 0.3);
+                opacity: 0.6;
+            }
+            100% {
+                text-shadow: 0 0 25px rgba(0, 250, 150, 0.6);
+                opacity: 0.8;
+            }
+        }
+
+        /* Data update glitch animation */
+        @keyframes dataGlitch {
+            0%, 100% {
+                transform: translate(0);
+                filter: hue-rotate(0deg);
+                opacity: 1;
+            }
+            10% {
+                transform: translate(-2px, 1px);
+                filter: hue-rotate(90deg);
+                opacity: 0.8;
+            }
+            20% {
+                transform: translate(2px, -1px);
+                filter: hue-rotate(180deg);
+                opacity: 0.9;
+            }
+            30% {
+                transform: translate(-1px, 2px);
+                filter: hue-rotate(270deg);
+                opacity: 0.7;
+            }
+            40% {
+                transform: translate(1px, -2px);
+                filter: hue-rotate(360deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-2px, -1px);
+                filter: hue-rotate(45deg);
+                text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
+            }
+            60% {
+                transform: translate(2px, 1px);
+                filter: hue-rotate(135deg);
+                text-shadow: -1px 0 #ff00ff, 1px 0 #00ffff;
+            }
+            70% {
+                transform: translate(-1px, -2px);
+                filter: hue-rotate(225deg);
+                text-shadow: 1px 0 #ff00ff, -1px 0 #00ffff;
+            }
+            80% {
+                transform: translate(1px, 2px);
+                filter: hue-rotate(315deg);
+                opacity: 0.9;
+            }
+        }
+
+        /* Glitch animation class */
+        .glitch-animation {
+            animation: dataGlitch 0.6s ease-in-out infinite;
+        }
+
+        /* Single glitch animation for final update */
+        .glitch-animation-once {
+            animation: dataGlitch 0.6s ease-in-out;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .main-container {
+                max-width: 100vw;
+                max-height: 100vh;
+            }
+
+            .top-border, .bottom-border {
+                width: 95vw;
+                max-width: 400px;
+                height: 20px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .innovation-title {
+                font-size: 22px;
+            }
+
+            .key-frame {
+                width: 380px;
+                height: 390px;
+            }
+
+            .key-image {
+                width: 280px;
+                height: 380px;
+            }
+
+            .progress-text {
+                font-size: 18px;
+            }
+
+            .percentage-text {
+                font-size: 80px;
+                letter-spacing: 1.5px;
+            }
+
+            .key-display {
+                gap: 20px;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .main-container {
+                max-width: 450px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .main-container {
+                max-width: 393px;
+                max-height: 874px;
+                margin: 0 auto;
+                transform: scale(1);
+            }
+
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (orientation: landscape) and (max-height: 600px) {
+            .main-container {
+                height: 100vh;
+                max-height: none;
+                overflow-y: auto;
+            }
+        }
+
+        /* Cyberpunk glow effects */
+        .glow-text {
+            text-shadow:
+                0 0 5px #00fa96,
+                0 0 10px #00fa96,
+                0 0 15px #00fa96,
+                0 0 20px #00fa96;
+        }
+
+        .scan-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 250, 150, 0.03) 2px,
+                rgba(0, 250, 150, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Back button styles */
+        .back-button {
+            position: absolute;
+            top: 35px;
+            left: 20px;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #00fa96, #00946D);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #00fa96;
+            box-shadow: 0 0 15px rgba(0, 250, 150, 0.5);
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #00ff60, #00a030);
+            box-shadow: 0 0 25px rgba(0, 250, 150, 0.8);
+            transform: translateY(-2px);
+            animation: backGlitch 0.3s ease-in-out;
+            opacity: 1;
+        }
+
+        @keyframes backGlitch {
+            0%, 100% {
+                transform: translateY(-2px);
+                filter: brightness(1);
+            }
+            25% {
+                transform: translateY(-2px) translateX(-1px);
+                filter: brightness(1.2) hue-rotate(15deg);
+            }
+            50% {
+                transform: translateY(-2px) translateX(1px);
+                filter: brightness(0.9) hue-rotate(-15deg);
+            }
+            75% {
+                transform: translateY(-2px) translateX(-1px);
+                filter: brightness(1.1) hue-rotate(10deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back button -->
+    <a href="page2.html" class="back-button">
+        <span>← BACK</span>
+    </a>
+
+    <div class="main-container">
+
+        <!-- Top decorative border -->
+        <div class="top-border"></div>
+
+        <!-- Bottom decorative border -->
+        <div class="bottom-border"></div>
+
+        <div class="container">
+            <!-- Decorative elements -->
+            <div class="diagonal-decoration"></div>
+            <div class="scan-lines"></div>
+
+        <!-- Key display -->
+        <div class="key-display">
+            <div class="innovation-decoration">
+                <img src="svg/key2/innovation.svg" alt="Innovation Key Decoration" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+            <div class="key-frame" onclick="navigateToScanner()">
+                <img src="svg/key2/keypic.svg" alt="Innovation Key" class="key-image" style="margin-left: 25px ; margin-bottom: 20px;">
+            </div>
+            <p class="progress-text glow-text">Click the key to scan!</p>
+            <p class="percentage-text" id="innovationPercentage">0%</p>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        function navigateToScanner() {
+            // Check if user is logged in before proceeding
+            const userEmail = localStorage.getItem('userEmail');
+            const recordId = localStorage.getItem('userRecordId');
+
+            if (!userEmail || !recordId) {
+                alert('Please register first before accessing the AR scanner.');
+                window.location.href = 'register.html';
+                return;
+            }
+
+            // Add click effect to key frame
+            const keyFrame = document.querySelector('.key-frame');
+            keyFrame.style.transform = 'scale(0.98)';
+            keyFrame.style.filter = 'drop-shadow(0 0 40px rgba(0, 250, 150, 0.8))';
+
+            // Determine which Innovation target to scan next
+            const innovationProgress = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
+            let nextTarget = 2; // Default to second target (IN2 with 2.mind)
+
+            // Find the next unscanned target, starting from IN2
+            for (let i = 2; i <= 4; i++) {
+                if (innovationProgress[`in${i}`] !== 'scanned') {
+                    nextTarget = i;
+                    break;
+                }
+            }
+
+            // If all 2-4 are scanned, check IN1
+            if (nextTarget === 2 && innovationProgress['in2'] === 'scanned') {
+                for (let i = 1; i <= 4; i++) {
+                    if (innovationProgress[`in${i}`] !== 'scanned') {
+                        nextTarget = i;
+                        break;
+                    }
+                }
+            }
+            
+            console.log(`🎯 Navigating to Innovation target ${nextTarget}`);
+
+            setTimeout(() => {
+                // Navigate to scanner for key2 with specific target
+                window.location.href = `scanner.html?key=key2&target=${nextTarget}`;
+            }, 200);
+        }
+
+        // Fetch user data once on page load
+        async function fetchUserData(showLoadingState = true) {
+            const progressText = document.querySelector('.progress-text');
+            const percentageText = document.getElementById('innovationPercentage');
+
+            try {
+                // Show loading state
+                if (showLoadingState) {
+                    progressText.textContent = 'Loading AR progress...';
+                    percentageText.textContent = '???';
+                    percentageText.classList.add('glitch-animation');
+                    progressText.classList.add('glitch-animation');
+                }
+
+                // Get user email from URL params or stored data
+                const urlParams = new URLSearchParams(window.location.search);
+                const userEmail = urlParams.get('email') || localStorage.getItem('userEmail');
+
+                if (!userEmail) {
+                    console.warn('No user email found, redirecting to registration');
+                    if (showLoadingState) {
+                        progressText.textContent = 'Please register first...';
+                        percentageText.textContent = '???';
+                        setTimeout(() => {
+                            window.location.href = 'register.html';
+                        }, 2000);
+                    } else {
+                        window.location.href = 'register.html';
+                    }
+                    return;
+                }
+
+                console.log('Fetching user data for:', userEmail);
+
+                // Fetch user data including Innovation progress
+                const response = await fetch(`/api/harty/user/${encodeURIComponent(userEmail)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    if (userData.success && userData.data) {
+                        // Extract Innovation progress data
+                        const innovationPercentage = userData.data.innovationPercentage || 0;
+                        const innovationProgress = userData.data.innovationProgress || {};
+
+                        console.log('Innovation progress loaded:', {
+                            percentage: innovationPercentage,
+                            progress: innovationProgress
+                        });
+
+                        // Update localStorage with Innovation data
+                        localStorage.setItem('innovationProgress', JSON.stringify(innovationProgress));
+                        localStorage.setItem('innovationPercentage', innovationPercentage.toString());
+
+                        // Update progress with loading animation
+                        if (showLoadingState) {
+                            setTimeout(() => {
+                                percentageText.classList.remove('glitch-animation');
+                                progressText.classList.remove('glitch-animation');
+                                updateKeyProgress(innovationPercentage);
+                            }, 600);
+                        } else {
+                            updateKeyProgress(innovationPercentage);
+                        }
+
+                        return userData.data;
+                    } else {
+                        console.warn('Failed to get user data:', userData.message);
+                        setTimeout(() => {
+                            percentageText.classList.remove('glitch-animation');
+                            progressText.classList.remove('glitch-animation');
+                            updateKeyProgress(0);
+                        }, 800);
+                    }
+                } else {
+                    console.error('Error fetching user data:', response.status);
+                    setTimeout(() => {
+                        percentageText.classList.remove('glitch-animation');
+                        progressText.classList.remove('glitch-animation');
+                        updateKeyProgress(0);
+                    }, 800);
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                setTimeout(() => {
+                    percentageText.classList.remove('glitch-animation');
+                    progressText.classList.remove('glitch-animation');
+                    updateKeyProgress(0);
+                }, 800);
+            }
+        }
+
+        // Load data once on page initialization
+        function loadInitialData() {
+            // Initial load with loading animation - only once
+            fetchUserData(true);
+        }
+
+        // Function to update Project showcase Key when all Innovation Keys are scanned
+        async function updateProjectShowcaseKey() {
+            const userEmail = localStorage.getItem('userEmail');
+            const recordId = localStorage.getItem('userRecordId');
+
+            if (!userEmail || !recordId) {
+                console.error('Missing user credentials for Project showcase Key update');
+                return false;
+            }
+
+            try {
+                console.log('🎯 Updating Project showcase Key to scanned...');
+
+                const response = await fetch('/api/harty/update-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        recordId: recordId,
+                        keyField: 'key2 status',
+                        status: 'scanned'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log('✅ Project showcase Key successfully updated to scanned');
+
+                    // Update localStorage
+                    const keyStatuses = JSON.parse(localStorage.getItem('userKeyStatuses') || '{}');
+                    keyStatuses['key2'] = 'scanned';
+                    localStorage.setItem('userKeyStatuses', JSON.stringify(keyStatuses));
+
+                    return true;
+                } else {
+                    console.error('❌ Failed to update Project showcase Key:', data.error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Error updating Project showcase Key:', error);
+                return false;
+            }
+        }
+
+        // Function to check if all Innovation Keys are scanned
+        function areAllInnovationKeysScanned() {
+            const innovationProgress = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
+            const requiredKeys = ['in1', 'in2', 'in3', 'in4'];
+
+            for (const key of requiredKeys) {
+                if (innovationProgress[key] !== 'scanned') {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Update key appearance based on progress percentage
+        function updateKeyProgress(percentage) {
+            const keyImage = document.querySelector('.key-image');
+            const percentageText = document.getElementById('innovationPercentage');
+            const progressText = document.querySelector('.progress-text');
+
+            // Trigger final glitch animation on both text elements before updating
+            percentageText.classList.remove('glitch-animation');
+            progressText.classList.remove('glitch-animation');
+            percentageText.classList.add('glitch-animation-once');
+            progressText.classList.add('glitch-animation-once');
+
+            // Update percentage display with slight delay for dramatic effect
+            setTimeout(() => {
+                percentageText.textContent = `${percentage}%`;
+
+                // Calculate remaining keys to scan
+                const scannedCount = Math.floor(percentage / 25);
+                const remainingKeys = 4 - scannedCount;
+
+                // Update progress text and check if all Innovation Keys are scanned
+                if (remainingKeys > 0) {
+                    progressText.textContent = `Click to scan ${remainingKeys} more keys`;
+                } else {
+                    progressText.textContent = 'All keys scanned! Innovation Key unlocked!';
+
+                    // Check if all Innovation Keys are scanned and update Project showcase Key
+                    if (areAllInnovationKeysScanned()) {
+                        console.log('🎉 All Innovation Keys scanned! Updating Project showcase Key...');
+                        updateProjectShowcaseKey();
+                    }
+                }
+            }, 200);
+
+            // Remove glitch animation after it completes
+            setTimeout(() => {
+                percentageText.classList.remove('glitch-animation-once');
+                progressText.classList.remove('glitch-animation-once');
+            }, 800);
+
+            // Update key appearance with slight delay for smoother transition
+            setTimeout(() => {
+                // Remove all progress classes
+                keyImage.classList.remove('progress-0', 'progress-25', 'progress-50', 'progress-75', 'progress-100');
+
+                // Add appropriate progress class
+                if (percentage >= 100) {
+                    keyImage.classList.add('progress-100');
+                } else if (percentage >= 75) {
+                    keyImage.classList.add('progress-75');
+                } else if (percentage >= 50) {
+                    keyImage.classList.add('progress-50');
+                } else if (percentage >= 25) {
+                    keyImage.classList.add('progress-25');
+                } else {
+                    keyImage.classList.add('progress-0');
+                }
+            }, 300);
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load data only once on page initialization
+            loadInitialData();
+
+            // Animate the key image on load
+            const keyImage = document.querySelector('.key-image');
+            keyImage.style.opacity = '0';
+            keyImage.style.transform = 'scale(0.8)';
+
+            setTimeout(() => {
+                keyImage.style.transition = 'all 1s ease-out';
+                keyImage.style.opacity = '0.6'; // Start with reduced opacity
+                keyImage.style.transform = 'scale(1)';
+            }, 300);
+
+            // Key frame is now handled by CSS hover effects
+        });
+    </script>
+
+    <!-- Speed Insights (only load in production/Vercel) -->
+    <script>
+      window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+
+      // Only load Vercel speed insights in production
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const script = document.createElement('script');
+        script.defer = true;
+        script.src = '/_vercel/speed-insights/script.js';
+        document.head.appendChild(script);
+      }
+    </script>
+</body>
+</html>
