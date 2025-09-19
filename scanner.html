@@ -429,7 +429,7 @@
         background: linear-gradient(90deg, #6be4f0, #22B2B9);
         border-radius: 2px;
         width: 0%;
-        transition: width 0.2s ease-out;
+        transition: width 0.05s linear;
         position: relative;
         overflow: hidden;
       }
@@ -762,7 +762,83 @@
         });
       }
 
+      // Debug: Add function to manually clear cache if AR issues persist
+      window.clearARCache = function() {
+        console.log('🧹 Manually clearing all AR cache...');
+        Object.values(CACHE_KEYS).forEach(key => localStorage.removeItem(key));
+        console.log('✅ AR Cache cleared. Please refresh the page.');
+        alert('AR Cache cleared. Please refresh the page to reset AR scanning.');
+      };
+
+      // Debug: Test target detection manually
+      window.testTargetDetection = function(targetIndex = 0) {
+        console.log(`🧪 Testing target detection for index ${targetIndex}...`);
+        handleTargetFound(targetIndex);
+        console.log('✅ Manual target detection test completed');
+      };
+
+      // Helper function to convert numbers to ordinal format (1st, 2nd, 3rd, 4th)
+      function getOrdinalNumber(number) {
+        const ordinals = {
+          1: '1ST',
+          2: '2ND',
+          3: '3RD',
+          4: '4TH'
+        };
+        return ordinals[number] || `${number}TH`;
+      }
+
+      // Animate percentage for cached mode 2-second minimum
+      function animatePercentageForCachedMode(duration) {
+        const loadingPercentageEl = document.querySelector('.loading-percentage');
+        const progressFillEl = document.querySelector('.progress-fill');
+        const progressTextEl = document.querySelector('.progress-text');
+
+        if (!loadingPercentageEl || !progressFillEl || !progressTextEl) return;
+
+        // Set initial state
+        loadingPercentageEl.textContent = '0%';
+        progressFillEl.style.width = '0%';
+        progressTextEl.textContent = '⚡ LOADING FROM CACHE...';
+
+        // Add cached mode styling
+        progressFillEl.className = 'progress-fill mode-super_fast';
+
+        // Add smooth transition for ultra-smooth animation
+        progressFillEl.style.transition = 'width 0.016s linear'; // 60fps smooth
+
+        const startTime = Date.now();
+        const updateFrequency = 16; // ~60fps for ultra smooth animation
+
+        const animate = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Use easing function for smoother visual progression
+          const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+          const percentage = Math.floor(easeOutCubic * 100);
+          const smoothProgress = easeOutCubic * 100;
+
+          // Update percentage and progress bar with smooth values
+          loadingPercentageEl.textContent = `${percentage}%`;
+          progressFillEl.style.width = `${smoothProgress}%`;
+
+          // Continue animation until complete
+          if (progress < 1) {
+            setTimeout(() => requestAnimationFrame(animate), updateFrequency);
+          } else {
+            loadingPercentageEl.textContent = '100%';
+            progressFillEl.style.width = '100%';
+            progressTextEl.textContent = '✅ CACHE LOADED!';
+          }
+        };
+
+        // Start animation
+        requestAnimationFrame(animate);
+      }
+
       // Determine loading mode based on cache status and visit history
+      // Now we can cache .mind files for better performance
       const hasAssetCache = localStorage.getItem(CACHE_KEYS.ASSETS_CACHED) && !cacheExpired;
       const hasMindARCache = localStorage.getItem(CACHE_KEYS.MINDAR_READY) && !cacheExpired;
       const hasModelCache = localStorage.getItem(CACHE_KEYS.MODELS_CACHED) && !cacheExpired;
@@ -770,12 +846,10 @@
 
       // Progressive loading modes based on cache status
       let loadingMode = 'first_visit';
-      if (visitCount > 5 && hasAssetCache && hasMindARCache && hasModelCache && hasCameraPermissions) {
-        loadingMode = 'instant'; // Skip loading animation entirely
-      } else if (visitCount > 2 && hasAssetCache && hasMindARCache) {
-        loadingMode = 'super_fast'; // Ultra-fast loading
-      } else if (hasAssetCache || hasMindARCache) {
-        loadingMode = 'fast'; // Fast loading with some cache
+      if (visitCount > 3 && hasAssetCache && hasMindARCache && hasModelCache && hasCameraPermissions) {
+        loadingMode = 'super_fast'; // Ultra-fast loading with full cache
+      } else if (hasAssetCache && hasMindARCache && hasModelCache) {
+        loadingMode = 'fast'; // Fast loading with most cache
       }
 
       const isFirstVisit = loadingMode === 'first_visit';
@@ -1130,11 +1204,39 @@
           }
 
           console.log('🔄 Processing target mind files...');
-          // Cache the fact that we've processed targets
-          localStorage.setItem(CACHE_KEYS.ASSETS_CACHED, 'true');
-          localStorage.setItem(CACHE_KEYS.LAST_CACHE_DATE, Date.now().toString());
-          console.log('📦 Target files cached for future visits');
-          setTimeout(resolve, loadingMode === 'instant' ? 0 : 300);
+
+          // Preload the current mind file to cache it
+          const urlParams = new URLSearchParams(window.location.search);
+          const keyType = urlParams.get('key');
+          const targetParam = urlParams.get('target') || '1';
+
+          let mindFileToCache;
+          if (keyType === 'key2') {
+            if (targetParam === 'innovation') {
+              mindFileToCache = 'model/Innovation_key/innovation.mind';
+            } else {
+              mindFileToCache = `model/Innovation_key/${targetParam}.mind`;
+            }
+          } else if (keyType === 'key3') {
+            mindFileToCache = `model/Wonder_key/${targetParam}.mind`;
+          } else {
+            mindFileToCache = 'model/registration.mind';
+          }
+
+          // Cache the mind file by fetching it
+          fetch(mindFileToCache)
+            .then(response => {
+              if (response.ok) {
+                console.log(`📦 Cached mind file: ${mindFileToCache}`);
+                localStorage.setItem(CACHE_KEYS.ASSETS_CACHED, 'true');
+                localStorage.setItem(CACHE_KEYS.LAST_CACHE_DATE, Date.now().toString());
+              }
+              resolve();
+            })
+            .catch(() => {
+              console.log('⚠️ Mind file caching failed, but continuing...');
+              resolve();
+            });
         });
       }
 
@@ -1156,18 +1258,84 @@
         });
       }
 
-      // Handle instant mode - skip loading animation entirely
-      if (loadingMode === 'instant') {
-        console.log('⚡ Instant mode activated - skipping loading animation');
+      // Check camera and MindAR status
+      function checkCameraAndMindAR() {
+        console.log('🔍 Checking camera and MindAR status...');
+
+        // Check camera permissions
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+              console.log('✅ Camera access granted');
+              stream.getTracks().forEach(track => track.stop()); // Stop the test stream
+
+              // Check MindAR initialization
+              setTimeout(() => {
+                const mindarSystem = document.querySelector('[mindar-image]');
+                if (mindarSystem) {
+                  console.log('✅ MindAR component found on scene');
+                  const mindarConfig = mindarSystem.getAttribute('mindar-image');
+                  console.log('🎯 MindAR config:', mindarConfig);
+
+                  // Extract and test the mind file URL
+                  const mindFileMatch = mindarConfig.match(/imageTargetSrc:\s*([^;]+)/);
+                  if (mindFileMatch) {
+                    const mindFileUrl = mindFileMatch[1].trim();
+                    console.log('🎯 Testing mind file URL:', mindFileUrl);
+
+                    // Test if mind file is accessible
+                    fetch(mindFileUrl)
+                      .then(response => {
+                        if (response.ok) {
+                          console.log('✅ Mind file accessible:', response.status);
+                        } else {
+                          console.error('❌ Mind file not accessible:', response.status);
+                        }
+                      })
+                      .catch(error => {
+                        console.error('❌ Mind file fetch error:', error);
+                      });
+                  }
+                } else {
+                  console.error('❌ MindAR component not found');
+                }
+              }, 500);
+            })
+            .catch(error => {
+              console.error('❌ Camera access denied:', error);
+              showStatus('ERROR: Camera access required for AR', true);
+            });
+        } else {
+          console.error('❌ Camera API not available');
+          showStatus('ERROR: Camera not supported', true);
+        }
+      }
+
+      // Track loading start time for minimum 2-second display
+      const loadingStartTime = Date.now();
+      const minimumLoadingTime = 2000; // 2 seconds minimum
+
+      // Handle optimized loading modes with proper AR initialization
+      if (loadingMode === 'super_fast') {
+        console.log('⚡ Super fast mode activated - using extensive cache');
+
+        // For super fast (cached) mode, enforce minimum 2 seconds with percentage animation
+        const elapsed = Date.now() - loadingStartTime;
+        const remainingTime = Math.max(0, minimumLoadingTime - elapsed);
+
+        // Animate percentage from 0% to 100% over the remaining time
+        animatePercentageForCachedMode(remainingTime);
+
         setTimeout(() => {
           futuristicLoading.classList.add('hidden');
           setTimeout(() => {
             futuristicLoading.style.display = 'none';
             initializeARScene();
           }, 100);
-        }, 50);
+        }, remainingTime);
       } else {
-        // Start loading animation for other modes
+        // For regular loading modes, let the loading process complete naturally
+        // (no minimum time enforcement - it will take as long as it needs)
         setTimeout(updateLoadingProgress, initialDelay);
       }
       
@@ -1190,17 +1358,11 @@
       // Hide futuristic loading when AR is ready
       function hideFuturisticLoading() {
         console.log('🚀 Hiding futuristic loading overlay');
+        futuristicLoading.classList.add('hidden');
 
-        // Add final debug message
-        addDebugLine('[Final] AR scanner interface ready!');
-
-        // Wait a bit then hide
         setTimeout(() => {
-          futuristicLoading.classList.add('hidden');
-          setTimeout(() => {
-            futuristicLoading.style.display = 'none';
-          }, 1000);
-        }, 200);
+          futuristicLoading.style.display = 'none';
+        }, 1000);
       }
 
       // Get user data from localStorage
@@ -1235,11 +1397,50 @@
         const targetParam = urlParams.get('target') || '1'; // Default to target 1 for Innovation Key
         const targetIndex = parseInt(targetParam) - 1; // Convert to 0-based index
 
-        // Use the specific Innovation Key target
-        const innovationMindFile = `model/Innovation_key/${targetParam}.mind`;
-        sceneElement.setAttribute('mindar-image', `imageTargetSrc: ${innovationMindFile}; maxTrack: 1; uiScanning: #custom-scanning-overlay`);
-        console.log('🎯 Using Innovation Key file:', innovationMindFile);
-        console.log(`🎯 Current target: IN${targetParam}`);
+        // Use the appropriate Innovation Key target file
+        let innovationMindFile;
+        let maxTargets;
+
+        if (targetParam === 'innovation') {
+          // Use combined innovation.mind file for 100% progress
+          innovationMindFile = 'model/Innovation_key/innovation.mind';
+          maxTargets = 4;
+          console.log('🎯 Using COMBINED Innovation Key file for 100% progress:', innovationMindFile);
+          console.log('🎯 Users can scan ANY Innovation Key target');
+        } else {
+          // Use specific target file
+          innovationMindFile = `model/Innovation_key/${targetParam}.mind`;
+          maxTargets = 1;
+          console.log('🎯 Using Innovation Key file:', innovationMindFile);
+          console.log(`🎯 Current target: IN${targetParam}`);
+        }
+
+        sceneElement.setAttribute('mindar-image', `imageTargetSrc: ${innovationMindFile}; maxTrack: ${maxTargets}; uiScanning: #custom-scanning-overlay`);
+
+        // Set up the correct target for Innovation Key detection
+        const allTargets = sceneElement.querySelectorAll('[mindar-image-target]');
+        if (targetParam === 'innovation') {
+          // Combined file: set up all 4 targets for flexible detection
+          allTargets.forEach((target, index) => {
+            if (index < 4) {
+              target.setAttribute('mindar-image-target', `targetIndex: ${index}`);
+              target.setAttribute('visible', 'true');
+              console.log(`✅ Set target${index + 1} for Innovation Key IN${index + 1} detection (combined file)`);
+            }
+          });
+        } else {
+          // Single file: only use target1
+          allTargets.forEach((target, index) => {
+            if (index === 0) {
+              target.setAttribute('mindar-image-target', 'targetIndex: 0');
+              target.setAttribute('visible', 'true');
+              console.log(`✅ Set target1 for Innovation Key IN${targetParam} detection`);
+            } else {
+              target.setAttribute('visible', 'false');
+              console.log(`🔒 Hidden target${index + 1} (not needed for single Innovation Key)`);
+            }
+          });
+        }
 
         // Store current target info
         window.currentInnovationTarget = {
@@ -1248,6 +1449,17 @@
           mindFile: innovationMindFile,
           key: `in${targetParam}`
         };
+
+        // Set custom status message for Innovation Key
+        setTimeout(() => {
+          if (targetParam === 'innovation') {
+            showStatus(`INNOVATION KEYS UNLOCKED - SCAN ANY KEY!`);
+          } else {
+            const targetNumber = parseInt(targetParam);
+            const ordinalNumber = getOrdinalNumber(targetNumber);
+            showStatus(`FINDING THE ${ordinalNumber} KEY`);
+          }
+        }, 1000);
       } else if (isWonderKey) {
         const sceneElement = document.getElementById('ar-scene');
 
@@ -1262,6 +1474,21 @@
         console.log('🎯 Using Wonder Key file:', wonderMindFile);
         console.log(`🎯 Current target: WD${targetParam}`);
 
+        // Set up the correct target for Wonder Key detection
+        const allTargets = sceneElement.querySelectorAll('[mindar-image-target]');
+        allTargets.forEach((target, index) => {
+          if (index === 0) {
+            // Always use target1 (index 0) for Wonder Key since each .mind file contains 1 target
+            target.setAttribute('mindar-image-target', 'targetIndex: 0');
+            target.setAttribute('visible', 'true');
+            console.log(`✅ Set target1 for Wonder Key WD${targetParam} detection`);
+          } else {
+            // Hide other targets since we're using a single .mind file
+            target.setAttribute('visible', 'false');
+            console.log(`🔒 Hidden target${index + 1} (not needed for single Wonder Key)`);
+          }
+        });
+
         // Store current target info
         window.currentWonderTarget = {
           index: targetIndex,
@@ -1269,6 +1496,13 @@
           mindFile: wonderMindFile,
           key: `wd${targetParam}`
         };
+
+        // Set custom status message for Wonder Key (match the actual target)
+        setTimeout(() => {
+          const targetNumber = parseInt(targetParam);
+          const ordinalNumber = getOrdinalNumber(targetNumber);
+          showStatus(`FINDING THE ${ordinalNumber} WONDER KEY`);
+        }, 1000);
       } else {
         console.log('🎯 Using default registration.mind file');
       }
@@ -1906,16 +2140,67 @@
 
       // Setup scene event listeners (called after loading is complete)
       function setupSceneListeners() {
+        console.log('🎯 Setting up AR scene listeners...');
         const sceneEl = document.querySelector('a-scene');
 
         if (!sceneEl) {
           console.error('❌ A-Frame scene not found');
+          showStatus('ERROR: AR Scene not found', true);
           return;
+        }
+
+        console.log('✅ A-Frame scene found, setting up listeners...');
+
+        // Check if MindAR is available
+        if (typeof window.MINDAR === 'undefined') {
+          console.error('❌ MindAR not loaded!');
+          showStatus('ERROR: MindAR not loaded', true);
+          return;
+        } else {
+          console.log('✅ MindAR is available');
         }
 
         sceneEl.addEventListener('renderstart', () => {
           console.log('✅ A-Frame scene render started');
           showStatus('SCANNING FOR KEYS...');
+
+          // Check camera permissions after render start
+          checkCameraAndMindAR();
+        });
+
+        // Add MindAR specific event listeners
+        sceneEl.addEventListener('arReady', () => {
+          console.log('🎯 MindAR system ready!');
+          showStatus('AR READY - POINT CAMERA AT TARGET');
+        });
+
+        sceneEl.addEventListener('arError', (event) => {
+          console.error('❌ MindAR Error:', event.detail);
+          showStatus('AR ERROR - CHECK CAMERA PERMISSIONS', true);
+        });
+
+        // Add more comprehensive target detection debugging
+        sceneEl.addEventListener('targetFound', (event) => {
+          console.log('🎯 Global targetFound event:', event.detail);
+        });
+
+        sceneEl.addEventListener('targetLost', (event) => {
+          console.log('❌ Global targetLost event:', event.detail);
+        });
+
+        // Test if any mindar events are firing
+        sceneEl.addEventListener('loaded', () => {
+          console.log('✅ A-Frame scene fully loaded');
+
+          // Test MindAR system after scene load
+          setTimeout(() => {
+            const mindarComponent = sceneEl.components['mindar-image'];
+            if (mindarComponent) {
+              console.log('✅ MindAR component active:', mindarComponent);
+            } else {
+              console.error('❌ MindAR component not active');
+            }
+          }, 1000);
         });
 
         // Scene listener with target ID mapping
@@ -1960,22 +2245,25 @@
           const target3 = document.getElementById('target3');
           const target4 = document.getElementById('target4');
 
-          console.log('Target elements found:', {
+          console.log('🎯 Target elements found:', {
             target1: !!target1,
             target2: !!target2,
             target3: !!target3,
             target4: !!target4
           });
-          
+
           if (target1) {
+            console.log('✅ Setting up Target 1 listeners');
             target1.addEventListener('targetfound', (event) => {
-              console.log('Individual Target 1 listener fired - Bear Model - FORCING Key #1');
+              console.log('🔥 TARGET 1 FOUND! - FORCING Key #1');
               event.stopPropagation(); // Prevent scene listener from firing
               handleTargetFound(0); // Always Key #1
             });
             target1.addEventListener('targetlost', (event) => {
-              console.log('Target 1 lost');
+              console.log('❌ Target 1 lost');
             });
+          } else {
+            console.warn('⚠️ Target 1 element not found');
           }
           
           if (target2) {

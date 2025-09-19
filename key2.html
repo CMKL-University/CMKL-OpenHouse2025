@@ -542,20 +542,26 @@
             keyFrame.style.transform = 'scale(0.98)';
             keyFrame.style.filter = 'drop-shadow(0 0 40px rgba(0, 250, 150, 0.8))';
 
-            // Determine which Innovation target to scan next
-            const innovationProgress = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
-            let nextTarget = 2; // Default to second target (IN2 with 2.mind)
+            // Determine target based on progress percentage
+            const innovationPercentage = parseInt(localStorage.getItem('innovationPercentage') || '0');
+            let nextTarget;
+            let useCombinedFile = false;
 
-            // Find the next unscanned target, starting from IN2
-            for (let i = 2; i <= 4; i++) {
-                if (innovationProgress[`in${i}`] !== 'scanned') {
-                    nextTarget = i;
-                    break;
-                }
-            }
-
-            // If all 2-4 are scanned, check IN1
-            if (nextTarget === 2 && innovationProgress['in2'] === 'scanned') {
+            if (innovationPercentage === 0) {
+                nextTarget = 1; // 0% -> 1.mind
+            } else if (innovationPercentage === 25) {
+                nextTarget = 2; // 25% -> 2.mind
+            } else if (innovationPercentage === 50) {
+                nextTarget = 3; // 50% -> 3.mind
+            } else if (innovationPercentage === 75) {
+                nextTarget = 4; // 75% -> 4.mind
+            } else if (innovationPercentage >= 100) {
+                nextTarget = 'innovation'; // 100% -> innovation.mind (combined file)
+                useCombinedFile = true;
+            } else {
+                // Fallback: find next unscanned target
+                const innovationProgress = JSON.parse(localStorage.getItem('innovationProgress') || '{}');
+                nextTarget = 1;
                 for (let i = 1; i <= 4; i++) {
                     if (innovationProgress[`in${i}`] !== 'scanned') {
                         nextTarget = i;
@@ -781,6 +787,11 @@
                 // Add appropriate progress class
                 if (percentage >= 100) {
                     keyImage.classList.add('progress-100');
+
+                    // Show completion popup when 100% is reached
+                    setTimeout(() => {
+                        showCompletionPopup();
+                    }, 300); // Quick delay to show the 100% completion
                 } else if (percentage >= 75) {
                     keyImage.classList.add('progress-75');
                 } else if (percentage >= 50) {
@@ -791,6 +802,148 @@
                     keyImage.classList.add('progress-0');
                 }
             }, 300);
+        }
+
+        // Show completion popup when Innovation Key reaches 100%
+        function showCompletionPopup() {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                backdrop-filter: blur(5px);
+                animation: fadeIn 0.15s ease-out;
+            `;
+
+            // Create dialog
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                background: #000616;
+                border: 2px solid #c084fc;
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 400px;
+                width: 90%;
+                text-align: center;
+                font-family: 'Orbitron', monospace;
+                animation: slideIn 0.2s ease-out;
+            `;
+
+            dialog.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🎉</div>
+                    <h3 style="color: #c084fc; margin-bottom: 10px; font-size: 22px;">Innovation Key Complete!</h3>
+                    <p style="color: #fff; font-size: 16px; margin-bottom: 20px;">
+                        You've unlocked all Innovation Keys! What would you like to do next?
+                    </p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 15px; justify-content: center; align-items: center;">
+                    <button id="backToPortalBtn" style="
+                        background: linear-gradient(45deg, #0a2a0a, #1a3a1a, #2a4a2a);
+                        border: 2px solid #00ff65;
+                        border-radius: 8px;
+                        padding: 12px 20px;
+                        color: #00ff65;
+                        font-family: 'Orbitron', monospace;
+                        font-weight: 700;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        font-size: 14px;
+                        width: 200px;
+                    ">Back to Portal</button>
+                    <button id="continueScanBtn" style="
+                        background: linear-gradient(45deg, #2a0a2a, #3a1a3a, #4a2a4a);
+                        border: 2px solid #c084fc;
+                        border-radius: 8px;
+                        padding: 12px 20px;
+                        color: #c084fc;
+                        font-family: 'Orbitron', monospace;
+                        font-weight: 700;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        font-size: 14px;
+                        width: 200px;
+                    ">Continue Scanning</button>
+                </div>
+            `;
+
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideIn {
+                    from {
+                        opacity: 0;
+                        transform: scale(0.8) translateY(-20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: scale(1) translateY(0);
+                    }
+                }
+                #continueScanBtn:hover {
+                    background: linear-gradient(45deg, #3a1a3a, #4a2a4a, #5a3a5a);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 15px rgba(192, 132, 252, 0.3);
+                }
+                #backToPortalBtn:hover {
+                    background: linear-gradient(45deg, #1a3a1a, #2a4a2a, #3a5a3a);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 15px rgba(0, 255, 101, 0.3);
+                }
+            `;
+            document.head.appendChild(style);
+
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+
+            // Button event handlers
+            document.getElementById('continueScanBtn').onclick = () => {
+                console.log('🎯 User chose to continue scanning');
+                document.body.removeChild(overlay);
+                document.head.removeChild(style);
+
+                // Navigate to scanner with innovation.mind (100% unlocks flexible scanning)
+                window.location.href = 'scanner.html?key=key2&target=innovation';
+            };
+
+            document.getElementById('backToPortalBtn').onclick = () => {
+                console.log('🏠 User chose to go back to portal');
+                document.body.removeChild(overlay);
+                document.head.removeChild(style);
+
+                // Navigate back to portal
+                window.location.href = 'page2.html';
+            };
+
+            // Close on overlay click
+            overlay.onclick = (e) => {
+                if (e.target === overlay) {
+                    document.body.removeChild(overlay);
+                    document.head.removeChild(style);
+                }
+            };
+
+            // Handle Escape key
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    document.body.removeChild(overlay);
+                    document.head.removeChild(style);
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
         }
 
         // Add some interactive effects
