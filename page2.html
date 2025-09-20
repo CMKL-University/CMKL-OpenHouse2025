@@ -3709,14 +3709,10 @@
             // Start main animations
             startMainAnimations();
 
-            // Show lost and found popup automatically on first visit
-            const lostFoundShown = localStorage.getItem('lostFoundPopupShown');
-            if (!lostFoundShown) {
-                setTimeout(() => {
-                    showLostAndFoundPopup();
-                    localStorage.setItem('lostFoundPopupShown', 'true');
-                }, 2000); // Show after 2 seconds to let page load fully
-            }
+            // Show lost and found popup automatically every time
+            setTimeout(() => {
+                showLostAndFoundPopup();
+            }, 2000); // Show after 2 seconds to let page load fully
         });
         
         // Loading screen functions
