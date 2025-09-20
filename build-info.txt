@@ -1,7 +1,7 @@
-Build Number: 1
-Commit Hash: initial
-Commit Message: Initial build number setup
-Commit Author: vercel.cmkl.ac.th
-Commit Date: 2025-09-20 00:00:00 +0000
-Build Date: 2025-09-20 00:00:00 UTC
-Built by: vercel.cmkl.ac.th
+Build Number: 2
+Commit Hash: 8746f03
+Commit Message: Added workflow to add build number and deploy to vercel automatically
+Commit Author: Pattarapark Chutisamoot
+Commit Date: 2025-09-20 15:24:01 +0700
+Build Date: 2025-09-20 08:24:20 UTC
+Built by: CMKL-Vercel
