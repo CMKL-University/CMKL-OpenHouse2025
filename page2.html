@@ -4190,20 +4190,7 @@
                         <small style="font-size: 14px; opacity: 0.7;">Contact staff to view current items</small>
                     </div>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 15px; justify-content: center; align-items: center;">
-                    <button id="contactStaffBtn" style="
-                        background: linear-gradient(45deg, #0a2a0a, #1a3a1a, #2a4a2a);
-                        border: 2px solid #00ff65;
-                        border-radius: 8px;
-                        padding: 12px 20px;
-                        color: #00ff65;
-                        font-family: 'Orbitron', monospace;
-                        font-weight: 700;
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                        font-size: 14px;
-                        width: 200px;
-                    ">Contact Staff</button>
+                <div style="display: flex; justify-content: center; align-items: center;">
                     <button id="closeLostFoundBtn" style="
                         background: linear-gradient(45deg, #2a0a2a, #3a1a3a, #4a2a4a);
                         border: 2px solid #c084fc;
@@ -4237,11 +4224,6 @@
                         transform: scale(1) translateY(0);
                     }
                 }
-                #contactStaffBtn:hover {
-                    background: linear-gradient(45deg, #1a3a1a, #2a4a2a, #3a5a3a);
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 15px rgba(0, 255, 101, 0.3);
-                }
                 #closeLostFoundBtn:hover {
                     background: linear-gradient(45deg, #3a1a3a, #4a2a4a, #5a3a5a);
                     transform: translateY(-2px);
@@ -4253,16 +4235,7 @@
             overlay.appendChild(dialog);
             document.body.appendChild(overlay);
 
-            // Button event handlers
-            document.getElementById('contactStaffBtn').onclick = () => {
-                console.log('🎯 User wants to contact staff about lost & found');
-                document.body.removeChild(overlay);
-                document.head.removeChild(style);
-
-                // Show contact information
-                alert('Please contact our staff at the registration desk or call:\nPhone: +66-XXX-XXX-XXXX\nEmail: support@cmkl.ac.th');
-            };
-
+            // Button event handler
             document.getElementById('closeLostFoundBtn').onclick = () => {
                 console.log('❌ User closed lost & found popup');
                 document.body.removeChild(overlay);
