@@ -3858,6 +3858,15 @@
                                 card.style.filter = 'none';
                                 card.classList.add('key-available');
                             }
+
+                            // Show evaluation popup when key4 is first enabled
+                            const evaluationPopupShown = localStorage.getItem('evaluationPopupShown') === 'true';
+                            if (!evaluationPopupShown) {
+                                localStorage.setItem('evaluationPopupShown', 'true');
+                                setTimeout(() => {
+                                    showEvaluationPopup();
+                                }, 1000); // Show popup after a brief delay
+                            }
                         } else {
                             // Keep 4th card locked - either not enough keys or redeem key disabled
                             card.classList.add('locked', 'key-locked');
@@ -3915,7 +3924,146 @@
                 console.error('Error updating key status display:', error);
             }
         }
-        
+
+        // Show evaluation popup when key4 is enabled
+        function showEvaluationPopup() {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                backdrop-filter: blur(5px);
+                animation: fadeIn 0.15s ease-out;
+            `;
+
+            // Create dialog
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                background: #000616;
+                border: 2px solid #c084fc;
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 400px;
+                width: 90%;
+                text-align: center;
+                font-family: 'Orbitron', monospace;
+                animation: slideIn 0.2s ease-out;
+            `;
+
+            dialog.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📋</div>
+                    <h3 style="color: #c084fc; margin-bottom: 10px; font-size: 22px;">Evaluation Time!</h3>
+                    <p style="color: #fff; font-size: 16px; margin-bottom: 20px;">
+                        You've unlocked the redeem key! Before continuing, please help us improve by filling out our evaluation form.
+                    </p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 15px; justify-content: center; align-items: center;">
+                    <button id="fillEvaluationBtn" style="
+                        background: linear-gradient(45deg, #0a2a0a, #1a3a1a, #2a4a2a);
+                        border: 2px solid #00ff65;
+                        border-radius: 8px;
+                        padding: 12px 20px;
+                        color: #00ff65;
+                        font-family: 'Orbitron', monospace;
+                        font-weight: 700;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        font-size: 14px;
+                        width: 200px;
+                    ">Fill Evaluation Form</button>
+                    <button id="skipEvaluationBtn" style="
+                        background: linear-gradient(45deg, #2a0a2a, #3a1a3a, #4a2a4a);
+                        border: 2px solid #c084fc;
+                        border-radius: 8px;
+                        padding: 12px 20px;
+                        color: #c084fc;
+                        font-family: 'Orbitron', monospace;
+                        font-weight: 700;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        font-size: 14px;
+                        width: 200px;
+                    ">Skip for Now</button>
+                </div>
+            `;
+
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideIn {
+                    from {
+                        opacity: 0;
+                        transform: scale(0.8) translateY(-20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: scale(1) translateY(0);
+                    }
+                }
+                #fillEvaluationBtn:hover {
+                    background: linear-gradient(45deg, #1a3a1a, #2a4a2a, #3a5a3a);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 15px rgba(0, 255, 101, 0.3);
+                }
+                #skipEvaluationBtn:hover {
+                    background: linear-gradient(45deg, #3a1a3a, #4a2a4a, #5a3a5a);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 15px rgba(192, 132, 252, 0.3);
+                }
+            `;
+            document.head.appendChild(style);
+
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+
+            // Button event handlers
+            document.getElementById('fillEvaluationBtn').onclick = () => {
+                console.log('🎯 User chose to fill evaluation form');
+                document.body.removeChild(overlay);
+                document.head.removeChild(style);
+
+                // Open evaluation form in new tab
+                window.open('https://airtable.com/appJ4wjdd0e8imlia/pagH28gQ7ImKZS7Lp/form', '_blank');
+            };
+
+            document.getElementById('skipEvaluationBtn').onclick = () => {
+                console.log('⏭️ User chose to skip evaluation for now');
+                document.body.removeChild(overlay);
+                document.head.removeChild(style);
+            };
+
+            // Close on overlay click
+            overlay.onclick = (e) => {
+                if (e.target === overlay) {
+                    document.body.removeChild(overlay);
+                    document.head.removeChild(style);
+                }
+            };
+
+            // Handle Escape key
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    document.body.removeChild(overlay);
+                    document.head.removeChild(style);
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+        }
+
         function startMainAnimations() {
 
             // Cyberpunk animation sequence
