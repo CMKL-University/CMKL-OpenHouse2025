@@ -1212,11 +1212,8 @@
 
           let mindFileToCache;
           if (keyType === 'key2') {
-            if (targetParam === 'innovation') {
-              mindFileToCache = 'model/Innovation_key/innovation.mind';
-            } else {
-              mindFileToCache = `model/Innovation_key/${targetParam}.mind`;
-            }
+            // Always use innovation.mind for Innovation Key
+            mindFileToCache = 'model/Innovation_key/innovation.mind';
           } else if (keyType === 'key3') {
             mindFileToCache = `model/Wonder_key/${targetParam}.mind`;
           } else {
@@ -1408,9 +1405,9 @@
           console.log('🎯 Using COMBINED Innovation Key file for 100% progress:', innovationMindFile);
           console.log('🎯 Users can scan ANY Innovation Key target');
         } else {
-          // Use specific target file
-          innovationMindFile = `model/Innovation_key/${targetParam}.mind`;
-          maxTargets = 1;
+          // Use innovation.mind file for all individual targets
+          innovationMindFile = 'model/Innovation_key/innovation.mind';
+          maxTargets = 4;
           console.log('🎯 Using Innovation Key file:', innovationMindFile);
           console.log(`🎯 Current target: IN${targetParam}`);
         }
