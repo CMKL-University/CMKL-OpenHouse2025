@@ -1,0 +1,83 @@
+name: Update Build Number
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  update-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Configure Git
+      run: |
+        git config --local user.email "vercel@cmkl.ac.th"
+        git config --local user.name "CMKL-Vercel"
+
+    - name: Get current build number
+      id: get_build
+      run: |
+        if [ -f "build-number.txt" ]; then
+          BUILD_NUM=$(cat build-number.txt)
+        else
+          BUILD_NUM=0
+        fi
+        echo "current_build=$BUILD_NUM" >> $GITHUB_OUTPUT
+
+    - name: Increment build number
+      id: increment_build
+      run: |
+        NEW_BUILD=$(((${{ steps.get_build.outputs.current_build }} + 1)))
+        echo "new_build=$NEW_BUILD" >> $GITHUB_OUTPUT
+        echo $NEW_BUILD > build-number.txt
+
+    - name: Get commit info
+      id: commit_info
+      run: |
+        COMMIT_HASH=$(git rev-parse --short HEAD)
+        COMMIT_MESSAGE=$(git log -1 --pretty=%B | head -n 1)
+        COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
+        COMMIT_DATE=$(git log -1 --pretty=format:'%ci')
+        echo "hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
+        echo "message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+        echo "author=$COMMIT_AUTHOR" >> $GITHUB_OUTPUT
+        echo "date=$COMMIT_DATE" >> $GITHUB_OUTPUT
+
+    - name: Update build info file
+      run: |
+        cat > build-info.txt << EOF
+        Build Number: ${{ steps.increment_build.outputs.new_build }}
+        Commit Hash: ${{ steps.commit_info.outputs.hash }}
+        Commit Message: ${{ steps.commit_info.outputs.message }}
+        Commit Author: ${{ steps.commit_info.outputs.author }}
+        Commit Date: ${{ steps.commit_info.outputs.date }}
+        Build Date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+        Built by: CMKL-Vercel
+        EOF
+
+    - name: Commit and push changes
+      run: |
+        git add build-number.txt build-info.txt
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "🚀 Auto-update build number to ${{ steps.increment_build.outputs.new_build }} [skip ci]"
+          git push
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Display build information
+      run: |
+        echo "✅ Build completed successfully!"
+        echo "📦 Build Number: ${{ steps.increment_build.outputs.new_build }}"
+        echo "🔗 Commit: ${{ steps.commit_info.outputs.hash }}"
+        echo "👤 Author: CMKL-Vercel"
