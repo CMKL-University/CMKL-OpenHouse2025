@@ -3708,6 +3708,15 @@
             
             // Start main animations
             startMainAnimations();
+
+            // Show lost and found popup automatically on first visit
+            const lostFoundShown = localStorage.getItem('lostFoundPopupShown');
+            if (!lostFoundShown) {
+                setTimeout(() => {
+                    showLostAndFoundPopup();
+                    localStorage.setItem('lostFoundPopupShown', 'true');
+                }, 2000); // Show after 2 seconds to let page load fully
+            }
         });
         
         // Loading screen functions
@@ -4161,7 +4170,7 @@
                     </p>
                 </div>
                 <div style="margin-bottom: 20px;">
-                    <img src="svg/IMG_3432.tiff" alt="Lost and Found Items" style="
+                    <img src="svg/IMG_3433.PNG" alt="Lost and Found Items" style="
                         max-width: 100%;
                         max-height: 400px;
                         border-radius: 10px;
