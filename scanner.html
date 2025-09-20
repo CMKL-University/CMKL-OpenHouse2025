@@ -1,6 +1,15 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Permission Policy Headers for Camera and Microphone Access -->
+    <meta http-equiv="Permissions-Policy" content="camera=*, microphone=*, display-capture=*" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; media-src 'self' blob: data: https:; connect-src 'self' https:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:;" />
+
+    <!-- Android-specific meta tags for WebView compatibility -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -581,6 +590,28 @@
         50% { opacity: 0.5; }
       }
 
+      /* Help button animation */
+      @keyframes helpPulse {
+        0%, 100% {
+          box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+          transform: scale(1);
+        }
+        50% {
+          box-shadow: 0 0 25px rgba(0, 255, 65, 0.6);
+          transform: scale(1.05);
+        }
+      }
+
+      /* Help panel animations */
+      .help-panel.show {
+        right: 0 !important;
+      }
+
+      #help-button:hover {
+        background: linear-gradient(45deg, #00ff60, #00dd40);
+        transform: scale(1.1);
+      }
+
     </style>
   </head>
   <body>
@@ -655,7 +686,138 @@
       <span class="button-text">← Back to Portal</span>
       <span class="button-done-text" style="display: none;">✨ Done</span>
     </a>
-    
+
+    <!-- Help Button -->
+    <button id="help-button" class="help-button" onclick="toggleHelpPanel()" style="
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #00ff41, #00cc33);
+      border: 2px solid #00ff41;
+      color: #000;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10001;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: helpPulse 2s infinite;
+    ">?</button>
+
+    <!-- Camera Permission Help Panel -->
+    <div id="help-panel" class="help-panel" style="
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 380px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      border-left: 2px solid #00ff41;
+      z-index: 10000;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+      padding: 20px;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+      color: #fff;
+    ">
+      <div class="help-header" style="
+        border-bottom: 1px solid #00ff41;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+      ">
+        <h3 style="color: #00ff41; margin: 0; font-size: 18px;">📷 Camera Troubleshooting</h3>
+        <button onclick="toggleHelpPanel()" style="
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          background: none;
+          border: none;
+          color: #ff4444;
+          font-size: 24px;
+          cursor: pointer;
+        ">×</button>
+      </div>
+
+      <div class="help-content">
+        <!-- Android-specific section -->
+        <div class="help-section" style="margin-bottom: 25px;">
+          <h4 style="color: #ff8800; margin: 0 0 10px 0; font-size: 16px;">📱 Android Devices</h4>
+          <div class="help-steps" style="font-size: 14px; line-height: 1.6;">
+            <div style="margin: 8px 0; padding: 8px; background: rgba(255, 136, 0, 0.1); border-radius: 5px;">
+              <strong>1. Grant Permission</strong><br>
+              Tap "Allow" when browser asks for camera access
+            </div>
+            <div style="margin: 8px 0; padding: 8px; background: rgba(255, 136, 0, 0.1); border-radius: 5px;">
+              <strong>2. Check Settings</strong><br>
+              Settings → Apps → Chrome → Permissions → Camera → Allow
+            </div>
+            <div style="margin: 8px 0; padding: 8px; background: rgba(255, 136, 0, 0.1); border-radius: 5px;">
+              <strong>3. Browser Issues</strong><br>
+              Clear browser cache or try Chrome/Firefox
+            </div>
+            <div style="margin: 8px 0; padding: 8px; background: rgba(255, 136, 0, 0.1); border-radius: 5px;">
+              <strong>4. HTTPS Required</strong><br>
+              Make sure URL starts with "https://"
+            </div>
+          </div>
+        </div>
+
+        <!-- General troubleshooting -->
+        <div class="help-section" style="margin-bottom: 25px;">
+          <h4 style="color: #00ff41; margin: 0 0 10px 0; font-size: 16px;">🔧 General Issues</h4>
+          <div class="help-steps" style="font-size: 14px; line-height: 1.6;">
+            <div style="margin: 8px 0; padding: 8px; background: rgba(0, 255, 65, 0.1); border-radius: 5px;">
+              <strong>Camera Blocked?</strong><br>
+              Click the camera icon 📷 in your address bar
+            </div>
+            <div style="margin: 8px 0; padding: 8px; background: rgba(0, 255, 65, 0.1); border-radius: 5px;">
+              <strong>Camera In Use?</strong><br>
+              Close other camera apps and refresh page
+            </div>
+            <div style="margin: 8px 0; padding: 8px; background: rgba(0, 255, 65, 0.1); border-radius: 5px;">
+              <strong>Still Not Working?</strong><br>
+              Try incognito mode or different browser
+            </div>
+          </div>
+        </div>
+
+        <!-- Reset instructions -->
+        <div class="help-section" style="margin-bottom: 20px;">
+          <h4 style="color: #ff4444; margin: 0 0 10px 0; font-size: 16px;">🔄 Reset Permissions</h4>
+          <div style="text-align: center;">
+            <button onclick="resetCameraPermissions()" style="
+              background: linear-gradient(45deg, #ff4444, #ff6666);
+              border: none;
+              border-radius: 8px;
+              padding: 12px 20px;
+              color: white;
+              font-weight: bold;
+              cursor: pointer;
+              margin: 10px 0;
+              transition: all 0.3s ease;
+            ">🔄 Reset & Retry</button>
+          </div>
+          <div style="font-size: 12px; color: #ccc; text-align: center;">
+            Clears cached permissions and reloads page
+          </div>
+        </div>
+
+        <!-- Device info -->
+        <div class="help-section">
+          <h4 style="color: #6666ff; margin: 0 0 10px 0; font-size: 16px;">📊 Device Info</h4>
+          <div id="device-info" style="font-size: 12px; color: #ccc; line-height: 1.4;">
+            Loading device information...
+          </div>
+        </div>
+      </div>
+    </div>
+
     <a-scene
       id="ar-scene"
       mindar-image="imageTargetSrc: model/registration.mind; maxTrack: 4; uiScanning: #custom-scanning-overlay"
@@ -776,6 +938,226 @@
         handleTargetFound(targetIndex);
         console.log('✅ Manual target detection test completed');
       };
+
+      // Android-specific detection and handling
+      function detectAndroidEnvironment() {
+        const userAgent = navigator.userAgent;
+        const androidInfo = {
+          isAndroid: /Android/i.test(userAgent),
+          isWebView: /wv/i.test(userAgent),
+          isChrome: /Chrome/i.test(userAgent),
+          isFirefox: /Firefox/i.test(userAgent),
+          isSamsung: /Samsung/i.test(userAgent),
+          androidVersion: null,
+          chromeVersion: null,
+          deviceModel: null
+        };
+
+        // Extract Android version
+        const androidMatch = userAgent.match(/Android\s+([\d.]+)/);
+        if (androidMatch) {
+          androidInfo.androidVersion = androidMatch[1];
+        }
+
+        // Extract Chrome version
+        const chromeMatch = userAgent.match(/Chrome\/([\d.]+)/);
+        if (chromeMatch) {
+          androidInfo.chromeVersion = chromeMatch[1];
+        }
+
+        // Extract device model
+        const modelMatch = userAgent.match(/;\s*([^)]+)\s*\)/);
+        if (modelMatch) {
+          androidInfo.deviceModel = modelMatch[1];
+        }
+
+        console.log('📱 Android Environment:', androidInfo);
+        return androidInfo;
+      }
+
+      // Check Android-specific camera compatibility
+      function checkAndroidCameraCompatibility(androidInfo) {
+        const issues = [];
+        const recommendations = [];
+
+        // Check Android version compatibility
+        if (androidInfo.isAndroid && androidInfo.androidVersion) {
+          const versionNumber = parseFloat(androidInfo.androidVersion);
+
+          if (versionNumber < 6.0) {
+            issues.push('Android version below 6.0 may have camera permission issues');
+            recommendations.push('Update Android to version 6.0 or higher');
+          } else if (versionNumber < 7.0) {
+            issues.push('Android 6.x may require manual permission granting');
+            recommendations.push('Check app permissions in Android settings');
+          }
+        }
+
+        // Check WebView compatibility
+        if (androidInfo.isWebView) {
+          issues.push('WebView detected - camera permissions need native app support');
+          recommendations.push('Request camera permission in the native app');
+          recommendations.push('Use external browser as alternative');
+        }
+
+        // Check Chrome version for WebRTC support
+        if (androidInfo.isChrome && androidInfo.chromeVersion) {
+          const chromeVersion = parseInt(androidInfo.chromeVersion);
+
+          if (chromeVersion < 53) {
+            issues.push('Chrome version too old for reliable camera access');
+            recommendations.push('Update Chrome to latest version');
+          } else if (chromeVersion < 70) {
+            issues.push('Older Chrome version may have camera issues');
+            recommendations.push('Consider updating Chrome for better performance');
+          }
+        }
+
+        // Samsung-specific issues
+        if (androidInfo.isSamsung) {
+          issues.push('Samsung devices may have additional security restrictions');
+          recommendations.push('Check Samsung Internet browser compatibility');
+          recommendations.push('Disable Samsung security features if camera fails');
+        }
+
+        console.log('🔍 Android Compatibility Check:', { issues, recommendations });
+        return { issues, recommendations };
+      }
+
+      // Show Android-specific guidance
+      function showAndroidGuidance(androidInfo, compatibility) {
+        if (!androidInfo.isAndroid || compatibility.issues.length === 0) {
+          return; // No Android-specific issues
+        }
+
+        console.log('📱 Showing Android-specific guidance');
+
+        // Create a temporary guidance overlay
+        const guidance = document.createElement('div');
+        guidance.style.cssText = `
+          position: fixed;
+          top: 60px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(255, 165, 0, 0.9);
+          color: #000;
+          padding: 15px;
+          border-radius: 10px;
+          font-size: 14px;
+          max-width: 350px;
+          z-index: 9999;
+          text-align: center;
+          border: 2px solid #ff8800;
+          animation: androidGuidanceSlide 0.5s ease-out;
+        `;
+
+        guidance.innerHTML = `
+          <div style="font-weight: bold; margin-bottom: 10px;">📱 Android Device Detected</div>
+          <div style="margin-bottom: 10px;">Camera optimization in progress...</div>
+          <div style="font-size: 12px; color: #333;">
+            ${compatibility.recommendations.slice(0, 2).join(' • ')}
+          </div>
+        `;
+
+        // Add animation style
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes androidGuidanceSlide {
+            from {
+              opacity: 0;
+              transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(-50%) translateY(0);
+            }
+          }
+        `;
+        document.head.appendChild(style);
+
+        document.body.appendChild(guidance);
+
+        // Remove guidance after 4 seconds
+        setTimeout(() => {
+          if (document.body.contains(guidance)) {
+            document.body.removeChild(guidance);
+            document.head.removeChild(style);
+          }
+        }, 4000);
+      }
+
+      // Initialize Android detection
+      const androidInfo = detectAndroidEnvironment();
+      const androidCompatibility = checkAndroidCameraCompatibility(androidInfo);
+
+      // Show guidance if needed
+      if (androidInfo.isAndroid) {
+        setTimeout(() => {
+          showAndroidGuidance(androidInfo, androidCompatibility);
+        }, 1000);
+      }
+
+      // Help panel functionality
+      function toggleHelpPanel() {
+        const helpPanel = document.getElementById('help-panel');
+        const isVisible = helpPanel.classList.contains('show');
+
+        if (isVisible) {
+          helpPanel.classList.remove('show');
+          console.log('📖 Help panel closed');
+        } else {
+          helpPanel.classList.add('show');
+          console.log('📖 Help panel opened');
+          updateDeviceInfo();
+        }
+      }
+
+      function resetCameraPermissions() {
+        console.log('🔄 Resetting camera permissions...');
+
+        // Clear all camera-related localStorage
+        localStorage.removeItem(CACHE_KEYS.CAMERA_PERMISSIONS);
+        localStorage.removeItem('evaluationPopupShown'); // Also reset evaluation popup
+
+        // Show confirmation
+        alert('Camera permissions reset. Page will reload to retry camera access.');
+
+        // Reload the page
+        location.reload();
+      }
+
+      function updateDeviceInfo() {
+        const deviceInfoEl = document.getElementById('device-info');
+        if (!deviceInfoEl) return;
+
+        const info = [
+          `🌐 Browser: ${navigator.userAgent.split(' ').pop()}`,
+          `📱 Platform: ${navigator.platform}`,
+          `🔒 Secure: ${window.isSecureContext ? 'Yes' : 'No'}`,
+          `📍 Protocol: ${location.protocol}`,
+          `🎥 Camera API: ${navigator.mediaDevices ? 'Available' : 'Not available'}`,
+          `📋 Permissions API: ${navigator.permissions ? 'Available' : 'Not available'}`,
+          `🔧 WebRTC: ${window.RTCPeerConnection ? 'Supported' : 'Not supported'}`
+        ];
+
+        // Add Android-specific info if available
+        if (typeof androidInfo !== 'undefined' && androidInfo.isAndroid) {
+          info.push(`📱 Android: ${androidInfo.androidVersion || 'Unknown'}`);
+          info.push(`🌐 Chrome: ${androidInfo.chromeVersion || 'N/A'}`);
+          info.push(`📱 WebView: ${androidInfo.isWebView ? 'Yes' : 'No'}`);
+          info.push(`📱 Samsung: ${androidInfo.isSamsung ? 'Yes' : 'No'}`);
+        }
+
+        deviceInfoEl.innerHTML = info.join('<br>');
+      }
+
+      // Initialize help panel on page load
+      document.addEventListener('DOMContentLoaded', () => {
+        // Update device info initially
+        setTimeout(() => {
+          updateDeviceInfo();
+        }, 1000);
+      });
 
       // Helper function to convert numbers to ordinal format (1st, 2nd, 3rd, 4th)
       function getOrdinalNumber(number) {
@@ -1157,34 +1539,440 @@
         });
       }
 
+      // Enhanced camera system initialization with permission checking
       function initializeCameraSystem() {
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
           if (hasCameraPermissions) {
             console.log('✅ Using cached camera permissions');
             resolve();
             return;
           }
 
-          console.log('🔄 Initializing camera system...');
-          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-              .then(stream => {
-                console.log('✅ Camera permission verified during loading');
-                localStorage.setItem(CACHE_KEYS.CAMERA_PERMISSIONS, 'true');
-                localStorage.setItem(CACHE_KEYS.LAST_CACHE_DATE, Date.now().toString());
-                console.log('📦 Camera permissions cached for future visits');
-                // Stop the stream as we'll use it later in AR scene
-                stream.getTracks().forEach(track => track.stop());
-                resolve();
-              })
-              .catch(err => {
-                console.error('❌ Camera permission denied during loading:', err);
-                resolve();
-              });
-          } else {
+          console.log('🔄 Initializing enhanced camera system...');
+
+          // Check if browser supports required APIs
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            console.error('❌ Camera API not supported on this browser');
+            showCameraError('BROWSER_NOT_SUPPORTED');
+            resolve();
+            return;
+          }
+
+          try {
+            // Step 1: Check permission state if available
+            let permissionState = 'unknown';
+            if (navigator.permissions && navigator.permissions.query) {
+              try {
+                const cameraPermission = await navigator.permissions.query({ name: 'camera' });
+                permissionState = cameraPermission.state;
+                console.log('📋 Camera permission state:', permissionState);
+
+                // Handle already denied permissions
+                if (permissionState === 'denied') {
+                  console.warn('⚠️ Camera permission previously denied');
+                  showCameraError('PERMISSION_DENIED_PREVIOUSLY');
+                  resolve();
+                  return;
+                }
+              } catch (permissionError) {
+                console.log('ℹ️ Permission query not supported, proceeding with getUserMedia');
+              }
+            }
+
+            // Step 2: Detect Android-specific scenarios
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const isWebView = /wv/i.test(navigator.userAgent);
+            const isSecureContext = window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost';
+
+            console.log('🔍 Device info:', { isAndroid, isWebView, isSecureContext });
+
+            if (isAndroid && !isSecureContext) {
+              console.error('❌ Android requires HTTPS for camera access');
+              showCameraError('HTTPS_REQUIRED_ANDROID');
+              resolve();
+              return;
+            }
+
+            // Step 3: Request camera access with fallback constraints
+            const constraintSets = [
+              // Preferred constraints for AR (environment camera with specific resolution)
+              {
+                video: {
+                  facingMode: 'environment',
+                  width: { ideal: 1280, min: 640 },
+                  height: { ideal: 720, min: 480 }
+                }
+              },
+              // Fallback for Android devices (any back camera)
+              {
+                video: {
+                  facingMode: 'environment'
+                }
+              },
+              // Fallback for devices without environment camera
+              {
+                video: {
+                  width: { ideal: 1280, min: 640 },
+                  height: { ideal: 720, min: 480 }
+                }
+              },
+              // Basic fallback (any camera)
+              {
+                video: true
+              }
+            ];
+
+            // Try constraints in order with fallbacks
+            await tryGetUserMediaWithFallbacks(constraintSets, isAndroid, isWebView, resolve);
+
+          } catch (error) {
+            console.error('❌ Unexpected error in camera initialization:', error);
+            showCameraError('UNEXPECTED_ERROR');
             resolve();
           }
         });
+      }
+
+      // Try getUserMedia with multiple constraint fallbacks
+      async function tryGetUserMediaWithFallbacks(constraintSets, isAndroid, isWebView, resolve) {
+        for (let i = 0; i < constraintSets.length; i++) {
+          const constraints = constraintSets[i];
+          const attemptNumber = i + 1;
+
+          console.log(`🔄 Camera attempt ${attemptNumber}/${constraintSets.length}:`, constraints);
+
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+            console.log(`✅ Camera permission granted on attempt ${attemptNumber}`);
+            localStorage.setItem(CACHE_KEYS.CAMERA_PERMISSIONS, 'true');
+            localStorage.setItem(CACHE_KEYS.LAST_CACHE_DATE, Date.now().toString());
+            console.log('📦 Camera permissions cached for future visits');
+
+            // Log stream details for debugging
+            const videoTrack = stream.getVideoTracks()[0];
+            if (videoTrack) {
+              const settings = videoTrack.getSettings();
+              console.log('📹 Camera details:', {
+                label: videoTrack.label,
+                settings: settings,
+                facingMode: settings.facingMode,
+                resolution: `${settings.width}x${settings.height}`
+              });
+
+              // Log capabilities if available
+              try {
+                const capabilities = videoTrack.getCapabilities();
+                console.log('📹 Camera capabilities:', capabilities);
+              } catch (capError) {
+                console.log('ℹ️ Camera capabilities not available');
+              }
+            }
+
+            // Stop the test stream as we'll create a new one for AR
+            stream.getTracks().forEach(track => track.stop());
+            resolve();
+            return; // Success - exit the function
+
+          } catch (err) {
+            console.warn(`⚠️ Camera attempt ${attemptNumber} failed:`, err.name, err.message);
+
+            // If this is the last attempt, handle the error
+            if (i === constraintSets.length - 1) {
+              console.error('❌ All camera constraint attempts failed');
+              handleCameraPermissionError(err, isAndroid, isWebView);
+              resolve();
+              return;
+            }
+
+            // For constraint errors, continue to next fallback
+            if (err.name === 'OverconstrainedError') {
+              console.log(`🔄 Trying fallback constraints (attempt ${attemptNumber + 1})`);
+              continue;
+            }
+
+            // For permission/access errors, don't try fallbacks - these won't succeed
+            if (err.name === 'NotAllowedError' || err.name === 'NotFoundError' || err.name === 'SecurityError') {
+              console.error('❌ Permission/access error - not trying fallbacks');
+              handleCameraPermissionError(err, isAndroid, isWebView);
+              resolve();
+              return;
+            }
+
+            // For other errors, continue trying fallbacks
+            console.log(`🔄 Continuing to next fallback (attempt ${attemptNumber + 1})`);
+          }
+        }
+      }
+
+      // Handle different camera permission errors
+      function handleCameraPermissionError(error, isAndroid, isWebView) {
+        const errorName = error.name;
+        const errorMessage = error.message;
+
+        console.log('🔍 Permission error details:', { errorName, errorMessage, isAndroid, isWebView });
+
+        switch (errorName) {
+          case 'NotAllowedError':
+            if (isAndroid && isWebView) {
+              showCameraError('WEBVIEW_PERMISSION_DENIED');
+            } else {
+              showCameraError('PERMISSION_DENIED');
+            }
+            break;
+          case 'NotFoundError':
+            showCameraError('CAMERA_NOT_FOUND');
+            break;
+          case 'NotReadableError':
+            if (isAndroid) {
+              showCameraError('CAMERA_IN_USE_ANDROID');
+            } else {
+              showCameraError('CAMERA_IN_USE');
+            }
+            break;
+          case 'OverconstrainedError':
+            showCameraError('CAMERA_CONSTRAINTS');
+            break;
+          case 'SecurityError':
+            showCameraError('SECURITY_ERROR');
+            break;
+          default:
+            showCameraError('UNKNOWN_ERROR');
+        }
+      }
+
+      // Show detailed camera error messages with recovery guidance
+      function showCameraError(errorType) {
+        const statusEl = document.getElementById('status-indicator');
+        const errorMessages = {
+          'BROWSER_NOT_SUPPORTED': {
+            title: '❌ BROWSER NOT SUPPORTED',
+            message: 'Your browser doesn\'t support camera access. Please use Chrome, Firefox, or Safari.',
+            actions: ['Try a different browser', 'Update your current browser']
+          },
+          'PERMISSION_DENIED': {
+            title: '📷 CAMERA ACCESS DENIED',
+            message: 'Camera permission was denied. Please allow camera access to use AR scanner.',
+            actions: ['Click the camera icon in your address bar', 'Refresh and try again', 'Check browser settings']
+          },
+          'PERMISSION_DENIED_PREVIOUSLY': {
+            title: '🔒 CAMERA PERMISSION BLOCKED',
+            message: 'Camera access was previously blocked. Please reset permissions to continue.',
+            actions: ['Click site settings icon in address bar', 'Change camera to "Allow"', 'Refresh the page']
+          },
+          'WEBVIEW_PERMISSION_DENIED': {
+            title: '📱 ANDROID WEBVIEW ISSUE',
+            message: 'Camera access denied in WebView. The app needs camera permissions.',
+            actions: ['Grant camera permission to the app', 'Open in external browser', 'Contact app developer']
+          },
+          'CAMERA_NOT_FOUND': {
+            title: '📷 NO CAMERA FOUND',
+            message: 'No camera device detected on your device.',
+            actions: ['Check camera connection', 'Close other apps using camera', 'Restart your device']
+          },
+          'CAMERA_IN_USE': {
+            title: '📷 CAMERA IN USE',
+            message: 'Camera is currently being used by another application.',
+            actions: ['Close other camera apps', 'Restart your browser', 'Check video call apps']
+          },
+          'CAMERA_IN_USE_ANDROID': {
+            title: '📱 ANDROID CAMERA BUSY',
+            message: 'Camera is being used by another app. Close other camera apps and try again.',
+            actions: ['Close camera apps', 'Close video call apps', 'Restart your device']
+          },
+          'HTTPS_REQUIRED_ANDROID': {
+            title: '🔒 HTTPS REQUIRED',
+            message: 'Android requires HTTPS for camera access. Please access via secure connection.',
+            actions: ['Use https:// instead of http://', 'Contact site administrator', 'Try on desktop']
+          },
+          'CAMERA_CONSTRAINTS': {
+            title: '⚙️ CAMERA SETTINGS ISSUE',
+            message: 'Camera doesn\'t support required settings. Trying fallback options.',
+            actions: ['Wait for automatic retry', 'Try different camera', 'Update device drivers']
+          },
+          'SECURITY_ERROR': {
+            title: '🔒 SECURITY ERROR',
+            message: 'Security policy blocks camera access. Check browser settings.',
+            actions: ['Check browser security settings', 'Disable ad blockers', 'Try incognito mode']
+          },
+          'UNEXPECTED_ERROR': {
+            title: '❌ UNEXPECTED ERROR',
+            message: 'An unexpected error occurred. Please try again.',
+            actions: ['Refresh the page', 'Clear browser cache', 'Try different browser']
+          }
+        };
+
+        const error = errorMessages[errorType] || errorMessages['UNEXPECTED_ERROR'];
+
+        // Update status display
+        if (statusEl) {
+          statusEl.textContent = error.title;
+          statusEl.className = 'status-overlay error-message';
+        }
+
+        // Show detailed error dialog after a brief delay
+        setTimeout(() => {
+          showCameraErrorDialog(error);
+        }, 1000);
+
+        console.error('🚨 Camera Error:', errorType, error);
+      }
+
+      // Show camera error dialog with troubleshooting steps
+      function showCameraErrorDialog(error) {
+        // Remove any existing error dialog
+        const existingDialog = document.getElementById('camera-error-dialog');
+        if (existingDialog) {
+          existingDialog.remove();
+        }
+
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'camera-error-dialog';
+        overlay.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+          backdrop-filter: blur(5px);
+          animation: fadeIn 0.3s ease-out;
+        `;
+
+        // Create dialog
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `
+          background: #0a0a0a;
+          border: 2px solid #ff4444;
+          border-radius: 15px;
+          padding: 30px;
+          max-width: 400px;
+          width: 90%;
+          text-align: center;
+          font-family: 'Arial', sans-serif;
+          color: #fff;
+          animation: slideIn 0.3s ease-out;
+          box-shadow: 0 10px 30px rgba(255, 68, 68, 0.3);
+        `;
+
+        // Create action buttons HTML
+        const actionButtons = error.actions.map((action, index) => `
+          <div style="
+            background: #333;
+            border: 1px solid #666;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 5px 0;
+            color: #fff;
+            font-size: 14px;
+            cursor: default;
+          ">📋 ${action}</div>
+        `).join('');
+
+        dialog.innerHTML = `
+          <div style="margin-bottom: 20px;">
+            <h3 style="color: #ff4444; margin-bottom: 15px; font-size: 20px;">${error.title}</h3>
+            <p style="color: #ccc; font-size: 16px; line-height: 1.4; margin-bottom: 20px;">
+              ${error.message}
+            </p>
+            <div style="text-align: left; margin-bottom: 20px;">
+              <strong style="color: #00ff41; margin-bottom: 10px; display: block;">Troubleshooting Steps:</strong>
+              ${actionButtons}
+            </div>
+          </div>
+          <div style="display: flex; gap: 15px; justify-content: center;">
+            <button id="retryCamera" style="
+              background: linear-gradient(45deg, #ff4444, #ff6666);
+              border: none;
+              border-radius: 8px;
+              padding: 12px 20px;
+              color: white;
+              font-weight: bold;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              font-size: 14px;
+            ">🔄 Try Again</button>
+            <button id="continueWithoutCamera" style="
+              background: linear-gradient(45deg, #666, #888);
+              border: none;
+              border-radius: 8px;
+              padding: 12px 20px;
+              color: white;
+              font-weight: bold;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              font-size: 14px;
+            ">❌ Continue Without Camera</button>
+          </div>
+        `;
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideIn {
+            from {
+              opacity: 0;
+              transform: scale(0.8) translateY(-20px);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+            }
+          }
+          #retryCamera:hover {
+            background: linear-gradient(45deg, #ff6666, #ff8888);
+            transform: translateY(-2px);
+          }
+          #continueWithoutCamera:hover {
+            background: linear-gradient(45deg, #888, #aaa);
+            transform: translateY(-2px);
+          }
+        `;
+        document.head.appendChild(style);
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        // Button event handlers
+        document.getElementById('retryCamera').onclick = () => {
+          console.log('🔄 User requested camera retry');
+          document.body.removeChild(overlay);
+          document.head.removeChild(style);
+
+          // Clear cached permissions and retry
+          localStorage.removeItem(CACHE_KEYS.CAMERA_PERMISSIONS);
+          location.reload();
+        };
+
+        document.getElementById('continueWithoutCamera').onclick = () => {
+          console.log('❌ User chose to continue without camera');
+          document.body.removeChild(overlay);
+          document.head.removeChild(style);
+
+          // Show message that AR features won't work
+          const statusEl = document.getElementById('status-indicator');
+          if (statusEl) {
+            statusEl.textContent = '❌ AR SCANNER DISABLED - NO CAMERA';
+            statusEl.className = 'status-overlay error-message';
+          }
+        };
+
+        // Close on overlay click (but not on dialog click)
+        overlay.onclick = (e) => {
+          if (e.target === overlay) {
+            document.body.removeChild(overlay);
+            document.head.removeChild(style);
+          }
+        };
       }
 
       function calibrateARSystem() {
