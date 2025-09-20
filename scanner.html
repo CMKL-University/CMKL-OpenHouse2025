@@ -1619,17 +1619,10 @@
         })
         .catch(err => console.error('❌ Texture file fetch error:', err));
 
-      // Comprehensive Model File Validation
+      // Model File Validation - Only test currently used models
       const modelsToTest = [
-        { name: 'Registration Model', path: 'model/register.gltf' },
-        { name: 'Innovation Model 1', path: 'model/Innovation_key/in1_compressed.gltf' },
-        { name: 'Innovation Model 2', path: 'model/Innovation_key/in2.gltf' },
-        { name: 'Innovation Model 3', path: 'model/Innovation_key/in3.gltf' },
-        { name: 'Innovation Model 4', path: 'model/Innovation_key/in4_compressed.gltf' },
-        { name: 'Wonder Model 1', path: 'model/Wonder_key/wd1.gltf' },
-        { name: 'Wonder Model 2', path: 'model/Wonder_key/wd2.gltf' },
-        { name: 'Wonder Model 3', path: 'model/Wonder_key/wd3.gltf' },
-        { name: 'Wonder Model 5', path: 'model/Wonder_key/wd5.gltf' }
+        { name: 'Magic Key Model', path: 'model/magic_key/scene.gltf' },
+        { name: 'Key 1-3 Model', path: 'model/key_1_3.gltf' }
       ];
 
       console.log('🧪 Testing model file accessibility...');
